@@ -43,10 +43,7 @@ export default async function handler(req, res) {
         return res.status(502).json({ success: false, error: "Invalid playlist response" });
       }
 
-      // Enhance tracks with stream URLs
-      data.tracks = data.tracks
-        .filter(Boolean)
-        .map(enhanceTrack);
+      data.tracks = data.tracks.filter(Boolean).map(enhanceTrack);
 
       return res.status(200).json({
         success: true,
@@ -74,7 +71,7 @@ export default async function handler(req, res) {
   }
 
   /* ============================================================
-     MODE 2: Search (tracks / playlists / users / albums)
+     MODE 2: Search
   ============================================================ */
   if (!q) {
     return res.status(400).json({
@@ -135,10 +132,8 @@ export default async function handler(req, res) {
       data.collection = [];
     }
 
-    // Filter nulls
     data.collection = data.collection.filter(Boolean);
 
-    // Enhance based on type
     if (safeType === "tracks") {
       data.collection = data.collection.map(enhanceTrack);
     } else if (safeType === "playlists") {
@@ -183,25 +178,32 @@ export default async function handler(req, res) {
 
 /* ============================================================
    Helper: enhance track with stream URL
+   Prioritas: progressive (single file) > hls
 ============================================================ */
 function enhanceTrack(track) {
   let streamUrl = null;
+  let streamType = null;
 
-  if (track.stream_url) streamUrl = track.stream_url;
+  if (track.stream_url) {
+    streamUrl = track.stream_url;
+    streamType = "progressive";
+  }
 
   if (!streamUrl && Array.isArray(track.media?.transcodings)) {
+    // Coba progressive dulu (no segment expiry)
     const prog = track.media.transcodings.find(t =>
       t?.format?.protocol === "progressive" || t?.format?.mime_type === "audio/mpeg"
     );
-    if (prog?.url) streamUrl = prog.url;
 
-    if (!streamUrl) {
+    if (prog?.url) {
+      streamUrl = prog.url;
+      streamType = "progressive";
+    } else {
       const hls = track.media.transcodings.find(t => t?.format?.protocol === "hls");
-      if (hls?.url) streamUrl = hls.url;
-    }
-
-    if (!streamUrl && track.media.transcodings[0]?.url) {
-      streamUrl = track.media.transcodings[0].url;
+      if (hls?.url) {
+        streamUrl = hls.url;
+        streamType = "hls";
+      }
     }
   }
 
@@ -219,7 +221,8 @@ function enhanceTrack(track) {
     genre: track.genre,
     permalink_url: track.permalink_url,
     stream_url: streamUrl,
+    stream_type: streamType,
     streamable,
     policy: track.policy
   };
-                      }
+                                    }

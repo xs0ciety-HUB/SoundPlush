@@ -84,6 +84,25 @@ export default async function handler(req, res) {
       return res.status(502).json({ error: "Stream URL tidak valid dari SoundCloud" });
     }
 
+    // Mode proxy: dipakai tombol download kalau CDN SoundCloud nolak fetch lintas-origin (CORS)
+    if (first(req.query.proxy)) {
+      const up = await fetch(target, {
+        headers: { "User-Agent": UA, ...(req.headers.range ? { Range: req.headers.range } : {}) },
+      });
+      if (!up.ok && up.status !== 206) {
+        return res.status(502).json({ error: "CDN menolak", upstream_status: up.status });
+      }
+      res.status(up.status);
+      for (const h of ["content-type", "content-length", "content-range", "accept-ranges"]) {
+        const v = up.headers.get(h);
+        if (v) res.setHeader(h, v);
+      }
+      res.setHeader("Access-Control-Expose-Headers", "Content-Length, Content-Range");
+      const { Readable } = await import("node:stream");
+      Readable.fromWeb(up.body).pipe(res);
+      return;
+    }
+
     // URL CDN bertanda tangan & expire berjam-jam; cache singkat di browser aja
     res.setHeader("Cache-Control", "private, max-age=300");
     return res.redirect(302, target);

@@ -404,7 +404,7 @@ window.addEventListener("load", async () => {
     <div class="flex items-start justify-between mb-5">
       <div>
         <p class="text-[9px] font-semibold tracking-[0.22em] text-white/35 uppercase mb-[6px]">Modern Personal Music Platform</p>
-        <h1 class="text-[26px] leading-none font-extrabold tracking-tight bg-gradient-to-r from-[#c084fc] to-[#ec4899] bg-clip-text text-transparent">xs0ciety HUB</h1>
+        <h1 class="text-[26px] leading-none font-extrabold tracking-tight bg-gradient-to-r from-[#c084fc] to-[#ec4899] bg-clip-text text-transparent">SoundPulse</h1>
       </div>
       <div class="flex items-center gap-[6px] mt-1">
         <button onclick="openSearch()" class="w-[38px] h-[38px] rounded-full bg-white/[0.06] border border-white/[0.08] flex items-center justify-center text-white/70 tap">
@@ -536,7 +536,7 @@ window.addEventListener("load", async () => {
             <i data-lucide="pencil" class="w-[14px] h-[14px]"></i>
           </button>
         </div>
-        <h2 id="profileName" class="grad-text text-[34px] leading-tight font-extrabold mt-4 tracking-tight">xs0ciety HUB</h2>
+        <h2 id="profileName" class="grad-text text-[34px] leading-tight font-extrabold mt-4 tracking-tight">SoundPulse</h2>
         <p id="profileBio" class="text-[15px] text-white/50 mt-1 px-4">Streaming Musik dengan Lirik & Chat</p>
       </div>
 
@@ -546,8 +546,8 @@ window.addEventListener("load", async () => {
           <h3 class="text-[14px] font-bold tracking-wide uppercase">Aplikasi &amp; PWA</h3>
         </div>
         <div class="space-y-[14px] text-[16px]">
-          <div class="flex justify-between"><span class="row-k">Nama</span><span class="row-v">xs0ciety HUB</span></div>
-          <div class="flex justify-between"><span class="row-k">Versi</span><span class="row-v">v3.5.0</span></div>
+          <div class="flex justify-between"><span class="row-k">Nama</span><span class="row-v">SoundPulse</span></div>
+          <div class="flex justify-between"><span class="row-k">Versi</span><span class="row-v">v3.6.0</span></div>
           <div class="flex justify-between"><span class="row-k">Mode Offline PWA</span><span class="row-v flex items-center gap-2 text-emerald-400"><span class="w-[8px] h-[8px] rounded-full bg-emerald-400"></span>Aktif</span></div>
           <div class="flex justify-between"><span class="row-k">Service Worker</span><span class="row-v" id="swStatus">Mendaftar...</span></div>
           <div class="flex justify-between items-center pt-3 border-t border-white/[0.07] text-[13.5px]">
@@ -607,7 +607,7 @@ window.addEventListener("load", async () => {
       </button>
       <div class="flex-1 min-w-0">
         <h1 class="text-[18px] font-extrabold">Chat Global</h1>
-        <p id="chatStatus" class="text-[11px] text-white/45 truncate">Ngombol bareng pendengar xs0ciety HUB</p>
+        <p id="chatStatus" class="text-[11px] text-white/45 truncate">Ngombol bareng pendengar SoundPulse</p>
       </div>
       <div id="chatAvatarBox" class="w-[34px] h-[34px] rounded-full accent-bg flex items-center justify-center text-[12px] font-bold overflow-hidden cursor-pointer" onclick="openOnboarding(true)">
         <span id="chatAvatar">?</span>
@@ -778,7 +778,7 @@ window.addEventListener("load", async () => {
       <div class="shrink-0">
         <div class="flex items-end justify-between gap-3 mb-4">
           <div class="min-w-0 flex-1">
-            <p class="text-[12px] font-bold text-white/45 mb-1 flex items-center gap-[6px]"><i data-lucide="radio" class="w-[13px] h-[13px]"></i> xs0ciety HUB</p>
+            <p class="text-[12px] font-bold text-white/45 mb-1 flex items-center gap-[6px]"><i data-lucide="radio" class="w-[13px] h-[13px]"></i> SoundPulse</p>
             <h2 id="fullTitle" class="text-[26px] leading-tight font-extrabold truncate">—</h2>
             <p id="fullArtist" class="text-[15px] text-white/50 truncate mt-[2px]">—</p>
           </div>
@@ -1173,12 +1173,11 @@ function submitOnboarding() {
 
 function updateProfileUI() {
   const p = state.userProfile;
-  const name = (p && p.name) || "xs0ciety HUB";
+  const name = (p && p.name) || "SoundPulse";
   const bio = (p && p.bio) || "Streaming Musik dengan Lirik & Chat";
   const avatar = (p && p.avatar) || DEFAULT_AVATAR;
   const initial = name.charAt(0).toUpperCase();
 
-  document.getElementById("profileName").textContent = name;
   document.getElementById("profileBio").textContent = bio;
 
   const box = document.getElementById("profileAvatarBox");
@@ -2216,9 +2215,18 @@ function installPWA() {
 }
 
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/sw.js').then(() => {
+  const hadController = !!navigator.serviceWorker.controller;
+  let reloaded = false;
+  // Versi baru ter-deploy -> pindah otomatis (tanpa harus hapus cache manual)
+  navigator.serviceWorker.addEventListener("controllerchange", () => {
+    if (!hadController || reloaded) return;
+    reloaded = true;
+    location.reload();
+  });
+  navigator.serviceWorker.register('/sw.js', { updateViaCache: 'none' }).then((reg) => {
     const sw = document.getElementById("swStatus");
     if (sw) sw.textContent = "Terdaftar";
+    reg.update().catch(() => {});
   }).catch(() => {
     const sw = document.getElementById("swStatus");
     if (sw) sw.textContent = "Gagal";
@@ -2235,7 +2243,7 @@ const CHAT_CACHE_KEY = "sp_chat_cache";
 function loadChatCache() {
   try {
     const raw = localStorage.getItem(CHAT_CACHE_KEY);
-    return raw ? JSON.parse(raw) : [];
+    return raw ? dedupeMessages(JSON.parse(raw)) : [];
   } catch { return []; }
 }
 
@@ -2250,13 +2258,26 @@ function saveChatCache(msgs) {
   }
 }
 
+/* Buang salinan "pending" (pesan lokal sementara) kalau versi dari server-nya sudah ada */
+function dedupeMessages(list) {
+  const real = list.filter(m => m && !m._pending);
+  return list.filter(m => {
+    if (!m) return false;
+    if (!m._pending) return true;
+    return !real.some(r =>
+      r.name === m.name && (r.text || "") === (m.text || "") &&
+      !!r.image === !!m.image && !!r.file === !!m.file &&
+      Math.abs((r.ts || 0) - (m.ts || 0)) < 30000);
+  });
+}
+
 function mergeMessages(serverMsgs, localMsgs) {
   const map = new Map();
   for (const m of localMsgs) if (m && m.id) map.set(m.id, m);
   for (const m of serverMsgs) if (m && m.id) map.set(m.id, m);
   const merged = Array.from(map.values());
   merged.sort((a, b) => (a.ts || 0) - (b.ts || 0));
-  return merged;
+  return dedupeMessages(merged);
 }
 
 function startChatPoll() {
@@ -2283,7 +2304,7 @@ async function loadChat() {
     const data = await r.json();
     if (data.success) {
       const statusEl = document.getElementById("chatStatus");
-      if (statusEl) statusEl.textContent = `Ngombol bareng pendengar xs0ciety HUB (${data.storage === 'kv' ? 'live' : 'lokal'})`;
+      if (statusEl) statusEl.textContent = `Ngombol bareng pendengar SoundPulse (${data.storage === 'kv' ? 'live' : 'lokal'})`;
 
       const serverMsgs = data.messages || [];
       const cachedMsgs = loadChatCache();
@@ -2549,8 +2570,10 @@ async function sendChat() {
   if (!hasProfile()) { openOnboarding(false); return; }
 
   const profile = state.userProfile;
+  const msgId = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
 
   const payload = {
+    clientId: msgId,
     name: profile.name,
     text: text || "",
     avatar: profile.avatar || null,
@@ -2574,7 +2597,7 @@ async function sendChat() {
   cancelAttach();
 
   const optimisticMsg = {
-    id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+    id: msgId,
     name: profile.name,
     text: payload.text,
     avatar: profile.avatar || null,
@@ -2635,4 +2658,4 @@ initApp();
 </script>
 
 </body>
- </html>
+                   </html>

@@ -160,19 +160,22 @@
   }
   .modal-card { animation: modalIn .35s cubic-bezier(.22,.9,.3,1); }
 
-  .avatar-preview {
+  .avatar-upload {
     position: relative;
     width: 110px; height: 110px;
-    border-radius: 9999px;
+    border-radius: 9999px; cursor: pointer;
     overflow: hidden;
     border: 3px solid rgba(168,85,247,.5);
     box-shadow: 0 8px 30px -8px rgba(168,85,247,.7);
+    transition: border-color .2s ease;
     background: linear-gradient(135deg, rgba(168,85,247,.25) 0%, rgba(236,72,153,.25) 100%);
     display: flex; align-items: center; justify-content: center;
   }
-  .avatar-preview img { width: 100%; height: 100%; object-fit: cover; }
-  .avatar-preview .avatar-fallback {
-    font-size: 40px; font-weight: 800; color: #fff;
+  .avatar-upload:hover { border-color: rgba(168,85,247,.9); }
+  .avatar-upload img { width: 100%; height: 100%; object-fit: cover; }
+  .avatar-upload .placeholder {
+    width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center;
   }
 
   .lyric-line {
@@ -698,21 +701,18 @@
           <p id="onboardSubtitle" class="text-[12px] text-white/50 mt-[4px]">Lengkapi profil dulu biar yang lain kenal kamu</p>
         </div>
 
+        <!-- Avatar upload -->
         <div class="flex justify-center mb-5">
-          <div class="avatar-preview">
+          <label class="avatar-upload tap">
+            <input type="file" accept="image/*" id="onboardAvatarInput" class="hidden" onchange="handleAvatarUpload(event)">
             <img id="onboardAvatarImg" class="hidden" alt="">
-            <span id="onboardAvatarFallback" class="avatar-fallback">?</span>
-          </div>
-        </div>
-
-        <div class="mb-4">
-          <label class="text-[11px] font-bold tracking-widest text-white/50 uppercase block mb-2">
-            URL Foto Profil <span class="text-white/30 normal-case font-normal tracking-normal">(opsional)</span>
+            <div id="onboardAvatarPlaceholder" class="placeholder">
+              <div class="text-center">
+                <i data-lucide="camera" class="w-[26px] h-[26px] text-white/85 mx-auto mb-[4px]"></i>
+                <p class="text-[10px] font-semibold text-white/80 uppercase tracking-wider">Upload Foto</p>
+              </div>
+            </div>
           </label>
-          <input id="onboardAvatarUrl" type="url" placeholder="https://files.catbox.moe/xxxxx.jpg"
-            oninput="onAvatarUrlInput(this.value)"
-            class="w-full bg-white/[0.05] border border-white/[0.08] rounded-2xl px-[14px] py-[12px] text-[13px] focus:outline-none focus:border-[#a855f7]/60">
-          <p class="text-[10px] text-white/35 mt-[6px]">Upload gambar ke catbox.moe, lalu paste linknya di sini</p>
         </div>
 
         <div class="mb-4">
@@ -785,8 +785,6 @@ const state = {
 
 const DEFAULT_ART = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23150a1e'/><text x='50%' y='60%' font-family='sans-serif' font-size='42' fill='%23a855f7' text-anchor='middle'>♪</text></svg>";
 const DEFAULT_AVATAR = "https://files.catbox.moe/7ppk3q.jpg";
-const DEFAULT_NAME = "xs0ciety HUB";
-const DEFAULT_BIO = "Streaming Musik dengan Lirik & Chat";
 
 const GENRES = ["Semua", "Developer Profile", "Chill", "Focus", "Commute", "Pop Indo", "Remix / DJ"];
 const GENRE_QUERY = {
@@ -891,14 +889,13 @@ function hasProfile() {
 function openOnboarding(isEdit = false) {
   state.onboardMode = isEdit ? "edit" : "join";
   const existing = state.userProfile || {};
-  state.tempAvatar = existing.avatar || DEFAULT_AVATAR;
+  state.tempAvatar = existing.avatar || null;
 
   const modal = document.getElementById("onboardingModal");
   modal.classList.remove("hidden");
 
   document.getElementById("onboardName").value = existing.name || "";
   document.getElementById("onboardBio").value = existing.bio || "";
-  document.getElementById("onboardAvatarUrl").value = existing.avatar || DEFAULT_AVATAR;
   document.getElementById("bioCount").textContent = (existing.bio || "").length;
 
   renderOnboardAvatar();
@@ -927,36 +924,44 @@ function closeOnboarding() {
 
 function renderOnboardAvatar() {
   const img = document.getElementById("onboardAvatarImg");
-  const fallback = document.getElementById("onboardAvatarFallback");
-  const name = (document.getElementById("onboardName")?.value || "").trim();
-  const initial = name ? name.charAt(0).toUpperCase() : "?";
-
+  const ph = document.getElementById("onboardAvatarPlaceholder");
   if (state.tempAvatar) {
     img.src = state.tempAvatar;
     img.classList.remove("hidden");
-    fallback.classList.add("hidden");
-    img.onerror = () => {
-      img.classList.add("hidden");
-      fallback.classList.remove("hidden");
-      fallback.textContent = initial;
-    };
+    ph.classList.add("hidden");
   } else {
     img.classList.add("hidden");
-    fallback.classList.remove("hidden");
-    fallback.textContent = initial;
+    ph.classList.remove("hidden");
   }
 }
 
-function onAvatarUrlInput(url) {
-  const clean = (url || "").trim();
-  state.tempAvatar = clean || null;
-  renderOnboardAvatar();
+function handleAvatarUpload(e) {
+  const file = e.target.files?.[0];
+  if (!file) return;
+  if (!file.type.startsWith("image/")) { toast("File harus berupa gambar"); return; }
+  if (file.size > 5 * 1024 * 1024) { toast("Ukuran gambar maksimal 5MB"); return; }
+
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement("canvas");
+      const SIZE = 256;
+      canvas.width = SIZE; canvas.height = SIZE;
+      const ctx = canvas.getContext("2d");
+      const min = Math.min(img.width, img.height);
+      const sx = (img.width - min) / 2;
+      const sy = (img.height - min) / 2;
+      ctx.drawImage(img, sx, sy, min, min, 0, 0, SIZE, SIZE);
+      state.tempAvatar = canvas.toDataURL("image/jpeg", 0.85);
+      renderOnboardAvatar();
+    };
+    img.src = ev.target.result;
+  };
+  reader.readAsDataURL(file);
 }
 
 document.addEventListener("input", (e) => {
-  if (e.target.id === "onboardName") {
-    if (!state.tempAvatar) renderOnboardAvatar();
-  }
   if (e.target.id === "onboardBio") {
     document.getElementById("bioCount").textContent = e.target.value.length;
   }
@@ -965,18 +970,13 @@ document.addEventListener("input", (e) => {
 function submitOnboarding() {
   const name = (document.getElementById("onboardName").value || "").trim();
   const bio = (document.getElementById("onboardBio").value || "").trim();
-  const avatar = (state.tempAvatar || DEFAULT_AVATAR).trim();
 
   if (!name) { toast("Nama wajib diisi"); return; }
   if (name.length < 2) { toast("Nama minimal 2 karakter"); return; }
 
-  if (avatar && !/^https?:\/\//i.test(avatar)) {
-    toast("URL foto harus mulai dengan http:// atau https://");
-    return;
-  }
-
   const profile = {
-    name, bio, avatar,
+    name, bio,
+    avatar: state.tempAvatar || DEFAULT_AVATAR,
     joined: (state.userProfile && state.userProfile.joined) || Date.now(),
     updated: Date.now(),
   };
@@ -993,8 +993,8 @@ function submitOnboarding() {
 
 function updateProfileUI() {
   const p = state.userProfile;
-  const name = (p && p.name) || DEFAULT_NAME;
-  const bio = (p && p.bio) || DEFAULT_BIO;
+  const name = (p && p.name) || "xs0ciety HUB";
+  const bio = (p && p.bio) || "Streaming Musik dengan Lirik & Chat";
   const avatar = (p && p.avatar) || DEFAULT_AVATAR;
   const initial = name.charAt(0).toUpperCase();
 

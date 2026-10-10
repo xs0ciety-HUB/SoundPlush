@@ -42,7 +42,8 @@ export default async function handler(req, res) {
     // ============ POST ============
     if (req.method === "POST") {
       const body = typeof req.body === "string" ? JSON.parse(req.body) : req.body;
-      const { name, text, avatar, bio, image, file, replyTo } = body || {};
+      const { name, text, avatar, bio, image, file, replyTo, clientId } = body || {};
+      const safeId = typeof clientId === "string" && /^[a-z0-9]{6,30}$/i.test(clientId) ? clientId : null;
 
       // Validasi: harus ada text atau image atau file
       if (!name || (!text && !image && !file)) {
@@ -83,7 +84,7 @@ export default async function handler(req, res) {
       }
 
       const msg = {
-        id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+        id: safeId || (Date.now().toString(36) + Math.random().toString(36).slice(2, 6)),
         name: cleanName,
         text: cleanText,
         avatar: cleanAvatar,
@@ -93,6 +94,18 @@ export default async function handler(req, res) {
         replyTo: cleanReply,
         ts: Date.now(),
       };
+
+      // Idempotent: id yang sama (retry / kirim ganda) tidak disimpan dua kali
+      if (safeId) {
+        let dup = false;
+        if (useKV) {
+          const recent = await kv.lrange(KEY, 0, 49);
+          dup = recent.some(m => { try { return (typeof m === "string" ? JSON.parse(m) : m).id === safeId; } catch { return false; } });
+        } else {
+          dup = memStore.messages.some(m => m.id === safeId);
+        }
+        if (dup) return res.status(200).json({ success: true, duplicate: true });
+      }
 
       if (useKV) {
         await kv.lpush(KEY, JSON.stringify(msg));
@@ -110,4 +123,4 @@ export default async function handler(req, res) {
     console.error("[chat]", err);
     return res.status(500).json({ success: false, error: err.message });
   }
-      }
+                                 }

@@ -43,6 +43,23 @@ export default async function handler(req, res) {
         return res.status(502).json({ success: false, error: "Invalid playlist response" });
       }
 
+      // Playlist SoundCloud cuma kirim data lengkap untuk beberapa lagu awal;
+      // sisanya "stub" (id doang, tanpa media) -> dulu dianggap tidak bisa diputar.
+      const stubIds = data.tracks.filter(t => t && t.id && !t.media).map(t => t.id);
+      if (stubIds.length) {
+        const full = new Map();
+        for (let i = 0; i < stubIds.length; i += 30) {
+          try {
+            const ids = stubIds.slice(i, i + 30).join(",");
+            const rr = await fetch(`https://api-v2.soundcloud.com/tracks?ids=${ids}&client_id=${client_id}`, {
+              headers: { "User-Agent": UA, Accept: "application/json" }
+            });
+            if (rr.ok) (await rr.json()).forEach(tr => tr && full.set(tr.id, tr));
+          } catch {}
+        }
+        data.tracks = data.tracks.map(t => (t && full.get(t.id)) || t);
+      }
+
       data.tracks = data.tracks.filter(Boolean).map(enhanceTrack);
 
       return res.status(200).json({

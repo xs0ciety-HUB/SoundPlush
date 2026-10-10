@@ -206,7 +206,7 @@
       localStorage.setItem("sp_recent", JSON.stringify(t));
       loadRecentPlayed();
 
-      const transcode = (t.media && t.media.transcodings) ? t.media.transcodings.find(tr => tr.format.protocol === 'progressive') || t.media.transcodings[0] : null;
+      const transcode = (t.media && t.media.transcodings) ? t.media.transcodings.find(tr => tr.format.protocol === 'progressive' || tr.format.mime_type.includes('mpeg')) || t.media.transcodings[0] : null;
       const streamSource = transcode ? transcode.url : (t.stream_url || '');
       const streamUrl = `/api/stream?url=${encodeURIComponent(streamSource)}&client_id=${state.clientId}`;
 

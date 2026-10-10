@@ -1,28 +1,34 @@
 // api/stream.js
-export const config = { runtime: "nodejs", maxDuration: 60 };
+export const config = { runtime: "edge" };
 
 const SC_UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36";
 
-export default async function handler(req, res) {
+export default async function handler(req) {
   if (req.method === "OPTIONS") {
-    res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader("Access-Control-Allow-Methods", "GET, HEAD, OPTIONS");
-    res.setHeader("Access-Control-Allow-Headers", "Content-Type, Range");
-    return res.status(204).end();
+    return new Response(null, {
+      status: 204,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, HEAD, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type, Range",
+      },
+    });
   }
 
-  const { url, client_id } = req.query;
+  const reqUrl = new URL(req.url);
+  const url = reqUrl.searchParams.get("url");
+  const clientId = reqUrl.searchParams.get("client_id");
 
-  if (!url || !client_id) {
-    return res.status(400).json({ error: "Missing url or client_id" });
+  if (!url || !clientId) {
+    return json({ error: "Missing url or client_id" }, 400);
   }
 
   try {
     let targetUrl = url;
 
-    // Resolve transcoding endpoint → dapat URL CDN asli
+    // Resolve transcoding endpoint -> dapat URL CDN asli
     if (url.includes("/transcodings/") || url.includes("/stream/")) {
-      const apiUrl = `${url}${url.includes("?") ? "&" : "?"}client_id=${client_id}`;
+      const apiUrl = `${url}${url.includes("?") ? "&" : "?"}client_id=${clientId}`;
       const tokenRes = await fetch(apiUrl, {
         headers: {
           "User-Agent": SC_UA,
@@ -32,36 +38,35 @@ export default async function handler(req, res) {
       });
 
       if (!tokenRes.ok) {
-        return res.status(tokenRes.status).json({
-          error: `Token resolve failed: ${tokenRes.status}`,
-        });
+        return json({ error: `Token resolve failed: ${tokenRes.status}` }, tokenRes.status);
       }
 
       const tokenData = await tokenRes.json();
       targetUrl = tokenData.url || (Array.isArray(tokenData.urls) && tokenData.urls[0]);
 
       if (!targetUrl) {
-        return res.status(502).json({ error: "No URL in token response" });
+        return json({ error: "No URL in token response" }, 502);
       }
     }
 
     // Fetch dari CDN SoundCloud pake header yang tepat
-    const upstreamHeaders = {
+    const fwdHeaders = {
       "User-Agent": SC_UA,
       "Accept": "*/*",
       "Accept-Language": "en-US,en;q=0.9",
       "Referer": "https://soundcloud.com/",
       "Origin": "https://soundcloud.com",
     };
-    if (req.headers.range) upstreamHeaders["Range"] = req.headers.range;
+    const range = req.headers.get("range");
+    if (range) fwdHeaders["Range"] = range;
 
-    const upstream = await fetch(targetUrl, { headers: upstreamHeaders });
+    const upstream = await fetch(targetUrl, { headers: fwdHeaders });
 
     if (!upstream.ok && upstream.status !== 206) {
-      return res.status(upstream.status).json({
+      return json({
         error: `Upstream error: ${upstream.status}`,
         target: targetUrl.slice(0, 100),
-      });
+      }, upstream.status);
     }
 
     const upstreamType = upstream.headers.get("content-type") || "";
@@ -70,13 +75,11 @@ export default async function handler(req, res) {
       upstreamType.includes("m3u") ||
       targetUrl.split("?")[0].endsWith(".m3u8");
 
-    // HLS manifest — rewrite semua segment URL biar lewat proxy ini juga
+    // HLS manifest -> rewrite semua segment URL biar lewat proxy ini juga
     if (isManifest) {
       const text = await upstream.text();
       const base = new URL(targetUrl);
-      const proto = req.headers["x-forwarded-proto"] || "https";
-      const host = req.headers["x-forwarded-host"] || req.headers.host;
-      const proxyOrigin = `${proto}://${host}`;
+      const proxyOrigin = reqUrl.origin;
 
       const rewritten = text
         .split("\n")
@@ -89,55 +92,56 @@ export default async function handler(req, res) {
             return t.replace(/URI="([^"]+)"/g, (_, u) => {
               let abs;
               try { abs = new URL(u, base).toString(); } catch { return `URI="${u}"`; }
-              return `URI="${proxyOrigin}/api/stream?url=${encodeURIComponent(abs)}&client_id=${client_id}"`;
+              return `URI="${proxyOrigin}/api/stream?url=${encodeURIComponent(abs)}&client_id=${clientId}"`;
             });
           }
 
           // Rewrite URL segment
           let abs;
           try { abs = new URL(t, base).toString(); } catch { return line; }
-          return `${proxyOrigin}/api/stream?url=${encodeURIComponent(abs)}&client_id=${client_id}`;
+          return `${proxyOrigin}/api/stream?url=${encodeURIComponent(abs)}&client_id=${clientId}`;
         })
         .join("\n");
 
-      res.setHeader("Content-Type", "application/vnd.apple.mpegurl");
-      res.setHeader("Access-Control-Allow-Origin", "*");
-      res.setHeader("Cache-Control", "no-store");
-      return res.status(200).send(rewritten);
+      return new Response(rewritten, {
+        status: 200,
+        headers: {
+          "Content-Type": "application/vnd.apple.mpegurl",
+          "Access-Control-Allow-Origin": "*",
+          "Cache-Control": "no-store",
+        },
+      });
     }
 
-    // Pipe audio stream
-    res.setHeader("Content-Type", upstreamType || "audio/mpeg");
-    res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader("Accept-Ranges", "bytes");
-    res.setHeader("Cache-Control", "public, max-age=3600");
+    // Pipe audio stream pake ReadableStream (Edge-compatible)
+    const respHeaders = new Headers();
+    respHeaders.set("Content-Type", upstreamType || "audio/mpeg");
+    respHeaders.set("Access-Control-Allow-Origin", "*");
+    respHeaders.set("Accept-Ranges", "bytes");
+    respHeaders.set("Cache-Control", "public, max-age=3600");
 
     const cl = upstream.headers.get("content-length");
-    if (cl) res.setHeader("Content-Length", cl);
+    if (cl) respHeaders.set("Content-Length", cl);
     const cr = upstream.headers.get("content-range");
-    if (cr) res.setHeader("Content-Range", cr);
+    if (cr) respHeaders.set("Content-Range", cr);
 
-    res.status(upstream.status);
-
-    // Pipe body
-    const reader = upstream.body.getReader();
-    try {
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        res.write(Buffer.from(value));
-      }
-    } catch (e) {
-      console.error("[stream] pipe error:", e.message);
-    }
-    res.end();
+    return new Response(upstream.body, {
+      status: upstream.status,
+      headers: respHeaders,
+    });
 
   } catch (err) {
     console.error("[stream]", err);
-    if (!res.headersSent) {
-      res.status(500).json({ error: err.message });
-    } else {
-      res.end();
-    }
+    return json({ error: err.message }, 500);
   }
-        }
+}
+
+function json(obj, status = 200) {
+  return new Response(JSON.stringify(obj), {
+    status,
+    headers: {
+      "Content-Type": "application/json",
+      "Access-Control-Allow-Origin": "*",
+    },
+  });
+    }

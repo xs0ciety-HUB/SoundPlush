@@ -1,13 +1,11 @@
 {
-  "name": "soundpulse-soundcloud-player",
+  "name": "soundpulse",
   "version": "1.0.0",
-  "description": "SoundCloud Mobile Web Player Proxy & Streamer",
-  "main": "public/index.html",
+  "description": "SoundCloud Mobile Web Player",
   "scripts": {
     "start": "node server.js"
   },
   "dependencies": {},
-  "devDependencies": {},
   "engines": {
     "node": ">=18.x"
   }

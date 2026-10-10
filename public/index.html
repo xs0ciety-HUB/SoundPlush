@@ -20,7 +20,7 @@
     color: #fff;
     font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif;
     -webkit-font-smoothing: antialiased;
-    padding-bottom: 140px;
+    padding-bottom: 160px;
   }
   ::-webkit-scrollbar { display: none; }
   .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
@@ -39,7 +39,7 @@
   .accent-soft { background: rgba(168,85,247,.14); border: 1px solid rgba(168,85,247,.28); }
 
   .glass {
-    background: rgba(10,6,18,.78);
+    background: rgba(10,6,18,.82);
     backdrop-filter: blur(24px) saturate(160%);
     -webkit-backdrop-filter: blur(24px) saturate(160%);
   }
@@ -66,11 +66,9 @@
 
   .cover-grad::after {
     content: '';
-    position: absolute;
-    inset: 0;
+    position: absolute; inset: 0;
     background: linear-gradient(180deg, transparent 40%, rgba(0,0,0,.7) 100%);
-    border-radius: inherit;
-    pointer-events: none;
+    border-radius: inherit; pointer-events: none;
   }
 
   .safe-bottom { padding-bottom: max(env(safe-area-inset-bottom), 0px); }
@@ -80,6 +78,7 @@
     transform: translateY(100%);
     transition: transform .4s cubic-bezier(.22,.9,.3,1);
     will-change: transform;
+    overflow: hidden;
   }
   .full-player.show { transform: translateY(0); }
 
@@ -99,17 +98,20 @@
   .pill-bar { scroll-snap-type: x proximity; }
   .pill-bar > * { scroll-snap-align: start; }
 
+  .navbtn { transition: color .2s ease, transform .15s ease; }
+  .navbtn:active { transform: scale(.92); }
   .nav-active { color: #c084fc; }
-  .nav-active .nav-dot { opacity: 1; transform: scale(1); }
+  .nav-active i { filter: drop-shadow(0 0 10px rgba(192,132,252,.7)); }
+  .nav-active .nav-dot { opacity: 1; transform: translateX(-50%) scale(1); }
   .nav-dot {
-    position: absolute; bottom: -6px; left: 50%; transform: translateX(-50%) scale(0);
+    position: absolute; bottom: -4px; left: 50%; transform: translateX(-50%) scale(0);
     width: 4px; height: 4px; border-radius: 9999px; background: #c084fc;
     opacity: 0; transition: all .2s ease;
+    box-shadow: 0 0 8px rgba(192,132,252,.9);
   }
 
   .chat-input-bar {
-    position: fixed; bottom: 0; left: 0; right: 0;
-    z-index: 60;
+    position: fixed; bottom: 0; left: 0; right: 0; z-index: 60;
     padding: 10px 12px max(env(safe-area-inset-bottom), 10px);
     background: rgba(10,6,18,.92);
     backdrop-filter: blur(20px);
@@ -118,9 +120,9 @@
 
   input[type=range].vol {
     -webkit-appearance: none; appearance: none;
-    height: 3px; border-radius: 9999px;
+    height: 4px; border-radius: 9999px;
     background: rgba(255,255,255,.15);
-    outline: none;
+    outline: none; width: 100%;
   }
   input[type=range].vol::-webkit-slider-thumb {
     -webkit-appearance: none; appearance: none;
@@ -149,7 +151,6 @@
     background: #fff; border: none; cursor: pointer;
   }
 
-  /* Onboarding modal */
   .modal-overlay {
     position: fixed; inset: 0; z-index: 400;
     background: rgba(0,0,0,.75);
@@ -157,25 +158,58 @@
     -webkit-backdrop-filter: blur(12px);
     animation: overlayIn .25s ease;
   }
-  .modal-card {
-    animation: modalIn .35s cubic-bezier(.22,.9,.3,1);
-  }
-  .avatar-upload {
+  .modal-card { animation: modalIn .35s cubic-bezier(.22,.9,.3,1); }
+
+  .avatar-preview {
     position: relative;
     width: 110px; height: 110px;
     border-radius: 9999px;
-    cursor: pointer;
     overflow: hidden;
     border: 3px solid rgba(168,85,247,.5);
     box-shadow: 0 8px 30px -8px rgba(168,85,247,.7);
-    transition: border-color .2s ease;
-  }
-  .avatar-upload:hover { border-color: rgba(168,85,247,.9); }
-  .avatar-upload img { width: 100%; height: 100%; object-fit: cover; }
-  .avatar-upload .placeholder {
-    width: 100%; height: 100%;
     background: linear-gradient(135deg, rgba(168,85,247,.25) 0%, rgba(236,72,153,.25) 100%);
     display: flex; align-items: center; justify-content: center;
+  }
+  .avatar-preview img { width: 100%; height: 100%; object-fit: cover; }
+  .avatar-preview .avatar-fallback {
+    font-size: 40px; font-weight: 800; color: #fff;
+  }
+
+  .lyric-line {
+    transition: color .3s ease, transform .3s ease;
+    color: rgba(255,255,255,.35);
+    font-size: 17px;
+    line-height: 1.7;
+    padding: 6px 0;
+    font-weight: 600;
+  }
+  .lyric-line.active {
+    color: #fff;
+    transform: scale(1.05);
+    text-shadow: 0 0 20px rgba(168,85,247,.5);
+  }
+  .lyric-scroll {
+    max-height: 340px;
+    overflow-y: auto;
+    scroll-behavior: smooth;
+    -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 15%, #000 85%, transparent 100%);
+    mask-image: linear-gradient(180deg, transparent 0%, #000 15%, #000 85%, transparent 100%);
+    padding: 30px 8px;
+  }
+
+  .song-row {
+    display: grid;
+    grid-template-columns: 52px 1fr auto;
+    gap: 12px;
+    align-items: center;
+  }
+  .song-actions {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  @media (max-width: 380px) {
+    .song-actions button { width: 30px; height: 30px; }
   }
 </style>
 </head>
@@ -196,9 +230,6 @@
         </button>
         <button onclick="switchView('chat')" class="w-[38px] h-[38px] rounded-full bg-white/[0.06] border border-white/[0.08] flex items-center justify-center text-white/70 tap">
           <i data-lucide="message-circle" class="w-[17px] h-[17px]"></i>
-        </button>
-        <button onclick="switchView('profile')" class="w-[38px] h-[38px] rounded-full accent-bg flex items-center justify-center text-white tap">
-          <i data-lucide="user" class="w-[17px] h-[17px]"></i>
         </button>
       </div>
     </div>
@@ -227,7 +258,7 @@
           Refresh <i data-lucide="refresh-cw" class="w-[11px] h-[11px]"></i>
         </button>
       </div>
-      <div id="quickPicksGrid" class="grid grid-cols-1 gap-[8px]">
+      <div id="quickPicksGrid" class="space-y-2">
         <div class="text-white/35 text-[12px] py-8 text-center">Memuat lagu...</div>
       </div>
     </section>
@@ -292,23 +323,18 @@
     <button onclick="createPlaylist()" class="w-full py-[11px] rounded-2xl border border-white/[0.08] bg-white/[0.04] hover:bg-white/[0.07] text-[13px] font-semibold mb-4 flex items-center justify-center gap-2 tap">
       <i data-lucide="plus" class="w-[16px] h-[16px]"></i> Buat Playlist Baru
     </button>
-    <div id="libraryContent">
-      <div class="rounded-2xl border border-white/[0.06] bg-white/[0.025] p-8 text-center">
-        <div class="w-[56px] h-[56px] mx-auto mb-3 rounded-2xl bg-white/[0.04] flex items-center justify-center">
-          <i data-lucide="list-music" class="w-[24px] h-[24px] text-white/40"></i>
-        </div>
-        <h3 class="text-[14px] font-bold mb-1">Belum Ada Playlist</h3>
-        <p class="text-[11.5px] text-white/45 leading-relaxed">Buat playlist pertamamu dan kumpulkan lagu favoritmu di satu tempat.</p>
-      </div>
-    </div>
+    <div id="libraryContent"></div>
   </section>
 
   <!-- LIKED -->
   <section id="view-liked" class="view hidden max-w-[640px] mx-auto px-4 pt-6">
     <div class="flex items-center justify-between mb-4">
-      <h1 class="text-[26px] font-extrabold">Liked Songs</h1>
-      <div class="w-[38px] h-[38px] rounded-full accent-bg flex items-center justify-center">
-        <i data-lucide="heart" class="w-[18px] h-[18px] fill-current"></i>
+      <div>
+        <h1 class="text-[26px] font-extrabold">Liked Songs</h1>
+        <p id="likedCount" class="text-[12px] text-white/45 mt-1">0 lagu</p>
+      </div>
+      <div class="w-[44px] h-[44px] rounded-full accent-bg flex items-center justify-center">
+        <i data-lucide="heart" class="w-[20px] h-[20px] fill-current"></i>
       </div>
     </div>
     <div id="likedList" class="space-y-2"></div>
@@ -327,8 +353,8 @@
           <i data-lucide="pencil" class="w-[14px] h-[14px]"></i>
         </button>
       </div>
-      <h2 id="profileName" class="text-[20px] font-extrabold mt-3 bg-gradient-to-r from-[#c084fc] to-[#ec4899] bg-clip-text text-transparent">Belum diatur</h2>
-      <p id="profileBio" class="text-[12px] text-white/45 mt-[4px] px-6">Klik ikon pensil untuk atur profil chat kamu</p>
+      <h2 id="profileName" class="text-[20px] font-extrabold mt-3 bg-gradient-to-r from-[#c084fc] to-[#ec4899] bg-clip-text text-transparent">xs0ciety HUB</h2>
+      <p id="profileBio" class="text-[12px] text-white/45 mt-[4px] px-6">Streaming Musik dengan Lirik & Chat</p>
     </div>
 
     <div class="rounded-2xl border border-white/[0.07] bg-white/[0.025] p-4 mb-4">
@@ -338,12 +364,12 @@
       </div>
       <div class="space-y-[10px] text-[13px]">
         <div class="flex justify-between"><span class="text-white/55">Nama</span><span class="font-semibold">SoundPulse</span></div>
-        <div class="flex justify-between"><span class="text-white/55">Versi</span><span class="font-semibold">v3.0.0</span></div>
+        <div class="flex justify-between"><span class="text-white/55">Versi</span><span class="font-semibold">v3.1.0</span></div>
         <div class="flex justify-between"><span class="text-white/55">Mode Offline PWA</span><span class="font-semibold flex items-center gap-[6px]"><span class="w-[7px] h-[7px] rounded-full bg-green-500"></span>Aktif</span></div>
         <div class="flex justify-between"><span class="text-white/55">Service Worker</span><span class="font-semibold" id="swStatus">Mendaftar...</span></div>
         <div class="flex justify-between items-center pt-2 border-t border-white/[0.05]">
           <span class="text-white/55">Cache PWA tersimpan</span>
-          <button onclick="clearCache()" class="text-[12px] font-semibold text-pink-400 hover:text-pink-300">Bersihkan Cache</button>
+          <button onclick="clearCache()" class="text-[12px] font-semibold text-pink-400">Bersihkan Cache</button>
         </div>
       </div>
     </div>
@@ -353,7 +379,7 @@
         <i data-lucide="refresh-cw" class="w-[16px] h-[16px] accent-text"></i>
         <h3 class="text-[12px] font-bold tracking-widest uppercase">Sinkron Antar HP</h3>
       </div>
-      <p class="text-[11.5px] text-white/50 leading-relaxed mb-3">Masukkan namamu, simpan di HP ini, lalu ambil di HP lain pakai nama yang sama.</p>
+      <p class="text-[11.5px] text-white/50 mb-3">Masukkan namamu, simpan, lalu ambil di HP lain pakai nama yang sama.</p>
       <input id="syncName" type="text" placeholder="Nama kamu" class="w-full bg-white/[0.05] border border-white/[0.08] rounded-xl px-[14px] py-[10px] text-[13px] focus:outline-none focus:border-[#a855f7]/60 mb-3">
       <div class="grid grid-cols-2 gap-2">
         <button onclick="syncSave()" class="py-[10px] rounded-xl bg-white/[0.06] border border-white/[0.1] text-[12.5px] font-semibold flex items-center justify-center gap-2 tap">
@@ -375,14 +401,6 @@
           <span class="text-white/55">Developed by</span>
           <span class="font-semibold flex items-center gap-2">xs0ciety HUB <span class="w-[24px] h-[24px] rounded-full accent-bg flex items-center justify-center text-[11px] font-bold">X</span></span>
         </div>
-        <div>
-          <p class="text-white/55 mb-[6px] flex items-center gap-2"><i data-lucide="heart" class="w-[12px] h-[12px] text-pink-400 fill-current"></i> LAGU YANG DISUKAI</p>
-          <div class="rounded-xl bg-white/[0.04] border border-white/[0.06] px-[12px] py-[9px] text-[12px]">Semua lagu Raim Laode, Tulus & Hindia</div>
-        </div>
-        <div>
-          <p class="text-white/55 mb-[6px] flex items-center gap-2"><i data-lucide="disc" class="w-[12px] h-[12px] text-purple-400"></i> PLAYLIST YANG DISUKAI</p>
-          <div class="rounded-xl bg-white/[0.04] border border-white/[0.06] px-[12px] py-[9px] text-[12px]">Semua album Raim Laode, Tulus & Hindia</div>
-        </div>
       </div>
     </div>
 
@@ -395,16 +413,6 @@
     <button id="installBtn" onclick="installPWA()" class="w-full py-[13px] rounded-2xl bg-white/[0.05] border border-white/[0.08] text-[13px] font-semibold flex items-center justify-center gap-2 mb-3 tap hidden">
       <i data-lucide="download" class="w-[16px] h-[16px]"></i> Install Aplikasi
     </button>
-    <a href="https://wa.me/62800000000" target="_blank" class="w-full py-[13px] rounded-2xl bg-green-500/10 border border-green-500/20 text-[13px] font-semibold flex items-center justify-between px-4 mb-3">
-      <div class="flex items-center gap-3">
-        <div class="w-[32px] h-[32px] rounded-full bg-green-500 flex items-center justify-center"><i data-lucide="message-circle" class="w-[16px] h-[16px]"></i></div>
-        <div class="text-left">
-          <p class="text-[12.5px] font-bold">Saluran WhatsApp SoundPulse</p>
-          <p class="text-[10.5px] text-white/50 font-normal">Gabung untuk update rilis terbaru</p>
-        </div>
-      </div>
-      <i data-lucide="chevron-right" class="w-[16px] h-[16px] text-white/40"></i>
-    </a>
   </section>
 
   <!-- CHAT -->
@@ -421,7 +429,6 @@
         <span id="chatAvatar">?</span>
       </div>
     </div>
-
     <div id="chatMessages" class="px-4 space-y-3" style="min-height: 60vh;">
       <div class="text-center text-white/35 text-[12px] py-10">Memuat chat...</div>
     </div>
@@ -431,53 +438,51 @@
   <section id="view-offline" class="view hidden max-w-[640px] mx-auto px-4 pt-6">
     <div class="flex items-center justify-between mb-4">
       <div>
-        <h1 class="text-[24px] font-extrabold flex items-center gap-2">Offline Mode <span class="text-[10px] px-[8px] py-[3px] rounded-full bg-green-500/15 border border-green-500/30 text-green-400 font-bold">ONLINE</span></h1>
+        <h1 class="text-[24px] font-extrabold flex items-center gap-2">Offline Mode <span class="text-[10px] px-[8px] py-[3px] rounded-full bg-green-500/15 border border-green-500/30 text-green-400 font-bold" id="netBadge">ONLINE</span></h1>
         <p class="text-[11.5px] text-white/45 mt-1">File audio tersimpan di perangkat</p>
       </div>
       <button onclick="switchView('profile')" class="w-[38px] h-[38px] rounded-full bg-white/[0.06] flex items-center justify-center tap">
         <i data-lucide="wifi-off" class="w-[16px] h-[16px]"></i>
       </button>
     </div>
-
     <div class="flex items-center justify-between mb-3">
       <p id="offlineCount" class="text-[11px] font-bold tracking-widest uppercase text-white/50">0 LAGU TERSIMPAN</p>
       <button onclick="playAllOffline()" class="text-[11px] font-semibold text-pink-400 flex items-center gap-1">
         <i data-lucide="play" class="w-[11px] h-[11px] fill-current"></i> Putar Semua
       </button>
     </div>
-
     <div id="offlineList" class="space-y-2"></div>
   </section>
 
   <!-- MINI PLAYER -->
   <div id="miniPlayer" class="fixed left-0 right-0 bottom-[78px] z-40 px-3 hidden">
     <div class="max-w-[640px] mx-auto">
-      <div class="glass border border-white/[0.08] rounded-2xl shadow-[0_8px_40px_-8px_rgba(0,0,0,.85)] overflow-hidden">
-        <div class="h-[2.5px] bg-white/[0.06]">
+      <div class="glass border border-white/[0.08] rounded-2xl shadow-[0_10px_40px_-8px_rgba(0,0,0,.9)] overflow-hidden">
+        <div class="h-[2px] bg-white/[0.06]">
           <div id="miniProgress" class="h-full accent-bg" style="width:0%"></div>
         </div>
-        <div class="px-[10px] py-[9px] flex items-center gap-[10px]" onclick="openFullPlayer()">
-          <div class="w-[42px] h-[42px] rounded-xl overflow-hidden shrink-0 border border-white/[0.08] bg-white/[0.03]">
+        <div class="px-[10px] py-[8px] flex items-center gap-[10px]">
+          <div class="w-[40px] h-[40px] rounded-xl overflow-hidden shrink-0 border border-white/[0.08] bg-white/[0.03] cursor-pointer" onclick="openFullPlayer()">
             <img id="miniArt" src="" class="w-full h-full object-cover">
           </div>
-          <div class="flex-1 min-w-0">
-            <h4 id="miniTitle" class="text-[12.5px] font-semibold truncate">—</h4>
+          <div class="flex-1 min-w-0 cursor-pointer" onclick="openFullPlayer()">
+            <h4 id="miniTitle" class="text-[12.5px] font-semibold truncate leading-tight">—</h4>
             <p id="miniArtist" class="text-[10.5px] text-white/45 truncate mt-[1px]">—</p>
           </div>
-          <div class="flex items-center gap-1 shrink-0" onclick="event.stopPropagation()">
-            <button onclick="toggleLikeCurrent()" class="w-[32px] h-[32px] rounded-full flex items-center justify-center text-white/50">
-              <i data-lucide="heart" id="miniHeartIcon" class="w-[15px] h-[15px]"></i>
+          <div class="flex items-center gap-[2px] shrink-0">
+            <button onclick="playPrev()" class="w-[30px] h-[30px] rounded-full flex items-center justify-center text-white/80 tap">
+              <i data-lucide="skip-back" class="w-[14px] h-[14px] fill-current"></i>
             </button>
-            <button onclick="playPrev()" class="w-[32px] h-[32px] rounded-full flex items-center justify-center text-white/70">
-              <i data-lucide="skip-back" class="w-[15px] h-[15px]"></i>
-            </button>
-            <button onclick="togglePlay()" class="w-[36px] h-[36px] rounded-full accent-bg flex items-center justify-center">
+            <button onclick="togglePlay()" class="w-[34px] h-[34px] rounded-full accent-bg flex items-center justify-center text-white tap">
               <i data-lucide="pause" id="miniPlayIcon" class="w-[15px] h-[15px] fill-current"></i>
             </button>
-            <button onclick="playNext()" class="w-[32px] h-[32px] rounded-full flex items-center justify-center text-white/70">
-              <i data-lucide="skip-forward" class="w-[15px] h-[15px]"></i>
+            <button onclick="playNext()" class="w-[30px] h-[30px] rounded-full flex items-center justify-center text-white/80 tap">
+              <i data-lucide="skip-forward" class="w-[14px] h-[14px] fill-current"></i>
             </button>
-            <button onclick="closePlayer()" class="w-[32px] h-[32px] rounded-full flex items-center justify-center text-white/40">
+            <button onclick="toggleLikeCurrent()" class="w-[30px] h-[30px] rounded-full flex items-center justify-center text-white/55 tap">
+              <i data-lucide="heart" id="miniHeartIcon" class="w-[15px] h-[15px]"></i>
+            </button>
+            <button onclick="closePlayer()" class="w-[30px] h-[30px] rounded-full flex items-center justify-center text-white/40 tap">
               <i data-lucide="x" class="w-[15px] h-[15px]"></i>
             </button>
           </div>
@@ -487,31 +492,37 @@
   </div>
 
   <!-- BOTTOM NAV -->
-  <nav id="bottomNav" class="fixed bottom-0 left-0 right-0 z-40 glass border-t border-white/[0.06] safe-bottom">
-    <div class="max-w-[640px] mx-auto px-3 pt-[10px] pb-[8px]">
-      <div class="flex items-center justify-around">
-        <button onclick="switchView('home')" id="navbtn-home" class="navbtn relative flex flex-col items-center gap-[3px] text-white/45 transition tap w-[56px]">
-          <i data-lucide="home" class="w-[20px] h-[20px]"></i>
-          <span class="text-[9.5px] font-semibold">Home</span>
-          <span class="nav-dot"></span>
-        </button>
-        <button onclick="switchView('search')" id="navbtn-search" class="navbtn relative flex flex-col items-center gap-[3px] text-white/45 transition tap w-[56px]">
-          <i data-lucide="search" class="w-[20px] h-[20px]"></i>
-          <span class="text-[9.5px] font-semibold">Cari</span>
-          <span class="nav-dot"></span>
-        </button>
-        <button onclick="openFullPlayer()" class="tap relative -mt-[18px] w-[52px] h-[52px] rounded-full accent-bg flex items-center justify-center text-white shadow-[0_8px_22px_-4px_rgba(168,85,247,.65)] border-[3px] border-[#0a0612]">
-          <i data-lucide="disc-3" class="w-[22px] h-[22px]"></i>
-        </button>
-        <button onclick="switchView('library')" id="navbtn-library" class="navbtn relative flex flex-col items-center gap-[3px] text-white/45 transition tap w-[56px]">
-          <i data-lucide="library" class="w-[20px] h-[20px]"></i>
-          <span class="text-[9.5px] font-semibold">Library</span>
-          <span class="nav-dot"></span>
-        </button>
-        <button onclick="switchView('profile')" id="navbtn-profile" class="navbtn relative flex flex-col items-center gap-[3px] text-white/45 transition tap w-[56px]">
-          <i data-lucide="user" class="w-[20px] h-[20px]"></i>
-          <span class="text-[9.5px] font-semibold">Profil</span>
-          <span class="nav-dot"></span>
+  <nav id="bottomNav" class="fixed bottom-0 left-0 right-0 z-40 safe-bottom px-3 pb-2">
+    <div class="max-w-[640px] mx-auto">
+      <div class="relative">
+        <div class="glass border border-white/[0.08] rounded-[26px] shadow-[0_10px_40px_-10px_rgba(0,0,0,.9)] px-2 pt-[10px] pb-[6px]">
+          <div class="flex items-end justify-around relative">
+            <button onclick="switchView('home')" id="navbtn-home" class="navbtn relative flex flex-col items-center gap-[2px] text-white/50 tap w-[58px] pb-[2px]">
+              <i data-lucide="home" class="w-[20px] h-[20px]"></i>
+              <span class="text-[9px] font-semibold">Home</span>
+              <span class="nav-dot"></span>
+            </button>
+            <button onclick="switchView('search')" id="navbtn-search" class="navbtn relative flex flex-col items-center gap-[2px] text-white/50 tap w-[58px] pb-[2px]">
+              <i data-lucide="search" class="w-[20px] h-[20px]"></i>
+              <span class="text-[9px] font-semibold">Cari</span>
+              <span class="nav-dot"></span>
+            </button>
+            <div class="w-[54px] shrink-0"></div>
+            <button onclick="switchView('library')" id="navbtn-library" class="navbtn relative flex flex-col items-center gap-[2px] text-white/50 tap w-[58px] pb-[2px]">
+              <i data-lucide="library" class="w-[20px] h-[20px]"></i>
+              <span class="text-[9px] font-semibold">Library</span>
+              <span class="nav-dot"></span>
+            </button>
+            <button onclick="switchView('liked')" id="navbtn-liked" class="navbtn relative flex flex-col items-center gap-[2px] text-white/50 tap w-[58px] pb-[2px]">
+              <i data-lucide="heart" class="w-[20px] h-[20px]"></i>
+              <span class="text-[9px] font-semibold">Disukai</span>
+              <span class="nav-dot"></span>
+            </button>
+          </div>
+        </div>
+
+        <button onclick="openFullPlayer()" class="tap absolute left-1/2 -translate-x-1/2 -top-[26px] w-[56px] h-[56px] rounded-full accent-bg flex items-center justify-center text-white border-[3px] border-[#0a0612]" style="box-shadow: 0 0 24px 2px rgba(168,85,247,.6), 0 10px 30px -6px rgba(168,85,247,.9);">
+          <i data-lucide="disc-3" class="w-[24px] h-[24px]"></i>
         </button>
       </div>
     </div>
@@ -531,52 +542,68 @@
 
   <!-- FULL PLAYER -->
   <div id="fullPlayer" class="full-player">
-    <div id="playerAmbient" class="ambient-blur" style="background-image: url('');"></div>
-    <div class="absolute inset-0" style="background: linear-gradient(180deg, rgba(10,6,18,.4) 0%, rgba(10,6,18,.85) 60%, #0a0612 100%);"></div>
+    <div id="playerAmbient" class="ambient-blur"></div>
+    <div class="absolute inset-0" style="background: linear-gradient(180deg, rgba(10,6,18,.35) 0%, rgba(10,6,18,.9) 70%, #0a0612 100%);"></div>
 
-    <div class="relative h-full flex flex-col max-w-[640px] mx-auto px-5 pt-4 pb-6">
-      <div class="flex items-center justify-between mb-6">
-        <button onclick="closeFullPlayer()" class="w-[38px] h-[38px] rounded-full flex items-center justify-center text-white/80 tap">
+    <div class="relative h-full flex flex-col max-w-[640px] mx-auto px-5 pt-4 pb-6 overflow-y-auto no-scrollbar">
+      <div class="flex items-center justify-between mb-5 shrink-0">
+        <button onclick="closeFullPlayer()" class="w-[38px] h-[38px] rounded-full flex items-center justify-center text-white/85 tap">
           <i data-lucide="chevron-down" class="w-[22px] h-[22px]"></i>
         </button>
-        <div class="text-center flex-1">
+        <div class="text-center flex-1 min-w-0">
           <p class="text-[9px] font-bold tracking-[0.22em] text-white/45 uppercase">Sedang Diputar</p>
-          <p id="fullArtistTop" class="text-[12px] font-semibold mt-[2px] truncate">—</p>
+          <p id="fullArtistTop" class="text-[12.5px] font-semibold mt-[2px] truncate px-2">—</p>
         </div>
-        <button onclick="showTrackMenu()" class="w-[38px] h-[38px] rounded-full flex items-center justify-center text-white/80 tap">
+        <button onclick="showTrackMenu()" class="w-[38px] h-[38px] rounded-full flex items-center justify-center text-white/85 tap">
           <i data-lucide="more-vertical" class="w-[18px] h-[18px]"></i>
         </button>
       </div>
 
-      <div class="flex justify-center mb-6">
-        <div class="bg-white/[0.08] rounded-full p-[3px] flex gap-[2px]">
-          <button id="tabCover" onclick="switchPlayerTab('cover')" class="px-[20px] py-[7px] rounded-full text-[12px] font-semibold bg-white/[0.12]">Cover</button>
-          <button id="tabLyrics" onclick="switchPlayerTab('lyrics')" class="px-[20px] py-[7px] rounded-full text-[12px] font-medium text-white/60">Lirik</button>
+      <div class="flex justify-center mb-5 shrink-0">
+        <div class="bg-white/[0.08] rounded-full p-[4px] flex gap-[2px]">
+          <button id="tabCover" onclick="switchPlayerTab('cover')" class="px-[26px] py-[8px] rounded-full text-[12.5px] font-semibold bg-white/[0.14] transition">Cover</button>
+          <button id="tabLyrics" onclick="switchPlayerTab('lyrics')" class="px-[26px] py-[8px] rounded-full text-[12.5px] font-medium text-white/60 transition">Lirik</button>
         </div>
       </div>
 
-      <div id="panelCover" class="flex-1 flex items-center justify-center mb-6">
+      <div id="panelCover" class="flex-1 flex items-center justify-center mb-5">
         <div class="relative w-full max-w-[340px] aspect-square rounded-[28px] overflow-hidden shadow-[0_20px_60px_-15px_rgba(168,85,247,.5)]">
           <img id="fullArt" src="" class="w-full h-full object-cover">
         </div>
       </div>
 
-      <div id="panelLyrics" class="hidden flex-1 mb-6 overflow-y-auto">
-        <div class="rounded-2xl bg-white/[0.04] border border-white/[0.06] p-5">
-          <div class="flex items-center gap-3 mb-4 pb-4 border-b border-white/[0.06]">
-            <img id="lyricArt" src="" class="w-[42px] h-[42px] rounded-lg object-cover">
-            <div class="min-w-0">
+      <div id="panelLyrics" class="hidden flex-1 mb-5">
+        <div class="rounded-3xl bg-white/[0.04] border border-white/[0.06] p-4">
+          <div class="flex items-center gap-3 mb-3 pb-3 border-b border-white/[0.06]">
+            <img id="lyricArt" src="" class="w-[44px] h-[44px] rounded-xl object-cover">
+            <div class="min-w-0 flex-1">
               <p id="lyricTitle" class="text-[13px] font-bold truncate">—</p>
               <p id="lyricArtist" class="text-[11px] text-white/50 truncate">—</p>
             </div>
           </div>
-          <div id="lyricContent" class="text-[14px] leading-[1.8] text-white/85 whitespace-pre-wrap">
-            <div class="flex justify-center py-6"><div class="spinner"></div></div>
+          <div id="lyricScroll" class="lyric-scroll">
+            <div id="lyricContent" class="text-center">
+              <div class="flex justify-center py-6"><div class="spinner"></div></div>
+            </div>
+          </div>
+          <div class="flex items-center justify-between mt-3 pt-3 border-t border-white/[0.06]">
+            <div class="flex items-center gap-2">
+              <span class="text-[11px] text-white/50 font-semibold">Sync</span>
+              <button onclick="lyricOffset(-0.5)" class="w-[26px] h-[26px] rounded-full bg-white/[0.08] flex items-center justify-center tap">
+                <i data-lucide="minus" class="w-[12px] h-[12px]"></i>
+              </button>
+              <button onclick="lyricOffset(0.5)" class="w-[26px] h-[26px] rounded-full bg-white/[0.08] flex items-center justify-center tap">
+                <i data-lucide="plus" class="w-[12px] h-[12px]"></i>
+              </button>
+            </div>
+            <button onclick="showFullLyrics()" class="flex items-center gap-1 px-[12px] py-[6px] rounded-full bg-white/[0.06] border border-white/[0.08] text-[11px] font-semibold tap">
+              <i data-lucide="maximize-2" class="w-[11px] h-[11px]"></i> Lirik Penuh
+            </button>
           </div>
         </div>
       </div>
 
-      <div class="mb-4">
+      <div class="shrink-0">
         <div class="flex items-center justify-between gap-3 mb-3">
           <div class="min-w-0 flex-1">
             <p class="text-[10px] text-white/40 mb-[2px]">SoundPulse</p>
@@ -585,88 +612,117 @@
           </div>
           <div class="flex items-center gap-2 shrink-0">
             <button onclick="toggleLikeCurrent()" class="w-[42px] h-[42px] rounded-full bg-white/[0.06] border border-white/[0.08] flex items-center justify-center tap">
-              <i data-lucide="heart" id="fullHeartIcon" class="w-[18px] h-[18px]"></i>
+              <i data-lucide="heart" id="fullHeartIcon" class="w-[18px] h-[18px] text-white/75"></i>
             </button>
-            <button onclick="downloadCurrent()" class="w-[42px] h-[42px] rounded-full bg-white/[0.06] border border-white/[0.08] flex items-center justify-center tap">
-              <i data-lucide="download" id="fullDownloadIcon" class="w-[18px] h-[18px]"></i>
+            <button onclick="downloadCurrent()" class="w-[42px] h-[42px] rounded-full bg-white/[0.06] border border-white/[0.08] flex items-center justify-center tap" id="fullDownloadBtn">
+              <i data-lucide="download" id="fullDownloadIcon" class="w-[18px] h-[18px] text-white/75"></i>
             </button>
           </div>
         </div>
 
-        <div class="mb-3">
+        <div class="mb-2">
           <input id="fullProgress" type="range" class="prog" min="0" max="100" value="0" oninput="seekTo(this.value)">
-          <div class="flex justify-between text-[10.5px] text-white/50 mt-[6px]">
+          <div class="flex justify-between text-[10.5px] text-white/50 mt-[4px]">
             <span id="timeCurrent">0:00</span>
             <span id="timeTotal">0:00</span>
           </div>
         </div>
 
+        <div class="flex items-center gap-3 mb-[18px]">
+          <button onclick="toggleMute()" class="w-[26px] h-[26px] flex items-center justify-center text-white/60 tap">
+            <i data-lucide="volume-2" id="volumeIcon" class="w-[18px] h-[18px]"></i>
+          </button>
+          <input id="volumeSlider" type="range" class="vol flex-1" min="0" max="100" value="100" oninput="setVolume(this.value)">
+          <button onclick="openAirPlay()" class="w-[26px] h-[26px] flex items-center justify-center text-white/60 tap">
+            <i data-lucide="cast" class="w-[18px] h-[18px]"></i>
+          </button>
+        </div>
+
         <div class="flex items-center justify-between">
           <button onclick="toggleShuffle()" id="shuffleBtn" class="w-[40px] h-[40px] rounded-full flex items-center justify-center text-white/60 tap">
-            <i data-lucide="shuffle" class="w-[18px] h-[18px]"></i>
+            <i data-lucide="shuffle" class="w-[20px] h-[20px]"></i>
           </button>
           <button onclick="playPrev()" class="w-[48px] h-[48px] rounded-full flex items-center justify-center text-white tap">
             <i data-lucide="skip-back" class="w-[26px] h-[26px] fill-current"></i>
           </button>
-          <button onclick="togglePlay()" class="w-[66px] h-[66px] rounded-full accent-bg flex items-center justify-center text-white shadow-[0_8px_30px_-4px_rgba(168,85,247,.7)] tap">
-            <i data-lucide="pause" id="fullPlayIcon" class="w-[26px] h-[26px] fill-current"></i>
+          <button onclick="togglePlay()" class="w-[68px] h-[68px] rounded-full accent-bg flex items-center justify-center text-white shadow-[0_8px_30px_-4px_rgba(168,85,247,.7)] tap">
+            <i data-lucide="pause" id="fullPlayIcon" class="w-[28px] h-[28px] fill-current"></i>
           </button>
           <button onclick="playNext()" class="w-[48px] h-[48px] rounded-full flex items-center justify-center text-white tap">
             <i data-lucide="skip-forward" class="w-[26px] h-[26px] fill-current"></i>
           </button>
           <button onclick="toggleRepeat()" id="repeatBtn" class="w-[40px] h-[40px] rounded-full flex items-center justify-center text-white/60 tap">
-            <i data-lucide="repeat" class="w-[18px] h-[18px]"></i>
+            <i data-lucide="repeat" class="w-[20px] h-[20px]"></i>
           </button>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- ============================================================
-       ONBOARDING MODAL — Join Chat Global
-  ============================================================ -->
+  <!-- FULL LYRICS MODAL -->
+  <div id="fullLyricsModal" class="modal-overlay hidden" style="z-index: 500;">
+    <div class="relative h-full flex flex-col p-4">
+      <div class="flex items-center justify-between mb-4 max-w-[640px] mx-auto w-full shrink-0">
+        <button onclick="closeFullLyrics()" class="w-[38px] h-[38px] rounded-full bg-white/[0.08] flex items-center justify-center tap">
+          <i data-lucide="chevron-down" class="w-[20px] h-[20px]"></i>
+        </button>
+        <p class="text-[13px] font-bold">Lirik Penuh</p>
+        <div class="w-[38px]"></div>
+      </div>
+      <div class="max-w-[640px] mx-auto w-full flex-1 overflow-y-auto no-scrollbar glass rounded-3xl border border-white/[0.08] p-6">
+        <div id="fullLyricHeader" class="flex items-center gap-3 mb-5 pb-5 border-b border-white/[0.06]">
+          <img id="fullLyricArt" src="" class="w-[56px] h-[56px] rounded-xl object-cover">
+          <div class="min-w-0">
+            <p id="fullLyricTitle" class="text-[15px] font-bold truncate">—</p>
+            <p id="fullLyricArtist" class="text-[12px] text-white/50 truncate">—</p>
+          </div>
+        </div>
+        <div id="fullLyricContent" class="text-[16px] leading-[2] text-white/85 whitespace-pre-wrap"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ONBOARDING MODAL -->
   <div id="onboardingModal" class="modal-overlay hidden">
     <div class="relative h-full flex items-end sm:items-center justify-center p-4 overflow-y-auto">
-      <div class="modal-card w-full max-w-[400px] rounded-3xl glass border border-white/[0.1] p-6 shadow-[0_20px_60px_-15px_rgba(168,85,247,.5)]">
-        <!-- Close btn -->
-        <button onclick="closeOnboarding()" class="absolute top-3 right-3 w-[34px] h-[34px] rounded-full flex items-center justify-center text-white/40 hover:text-white tap">
+      <div class="modal-card w-full max-w-[400px] rounded-3xl glass border border-white/[0.1] p-6 shadow-[0_20px_60px_-15px_rgba(168,85,247,.5)] relative">
+        <button onclick="closeOnboarding()" class="absolute top-3 right-3 w-[34px] h-[34px] rounded-full flex items-center justify-center text-white/40 tap">
           <i data-lucide="x" class="w-[18px] h-[18px]"></i>
         </button>
 
-        <!-- Header -->
         <div class="text-center mb-5">
           <div class="w-[52px] h-[52px] rounded-2xl accent-bg mx-auto mb-3 flex items-center justify-center shadow-[0_8px_24px_-6px_rgba(168,85,247,.7)]">
             <i data-lucide="message-circle" class="w-[26px] h-[26px]"></i>
           </div>
-          <h2 class="text-[19px] font-extrabold">Gabung Chat Global</h2>
-          <p class="text-[12px] text-white/50 mt-[4px] leading-relaxed">Lengkapi profil dulu biar yang lain kenal kamu</p>
+          <h2 id="onboardTitle" class="text-[19px] font-extrabold">Gabung Chat Global</h2>
+          <p id="onboardSubtitle" class="text-[12px] text-white/50 mt-[4px]">Lengkapi profil dulu biar yang lain kenal kamu</p>
         </div>
 
-        <!-- Avatar upload -->
         <div class="flex justify-center mb-5">
-          <label class="avatar-upload tap">
-            <input type="file" accept="image/*" id="onboardAvatarInput" class="hidden" onchange="handleAvatarUpload(event)">
+          <div class="avatar-preview">
             <img id="onboardAvatarImg" class="hidden" alt="">
-            <div id="onboardAvatarPlaceholder" class="placeholder">
-              <div class="text-center">
-                <i data-lucide="camera" class="w-[26px] h-[26px] text-white/85 mx-auto mb-[4px]"></i>
-                <p class="text-[10px] font-semibold text-white/80 uppercase tracking-wider">Upload Foto</p>
-              </div>
-            </div>
-          </label>
+            <span id="onboardAvatarFallback" class="avatar-fallback">?</span>
+          </div>
         </div>
 
-        <!-- Name -->
+        <div class="mb-4">
+          <label class="text-[11px] font-bold tracking-widest text-white/50 uppercase block mb-2">
+            URL Foto Profil <span class="text-white/30 normal-case font-normal tracking-normal">(opsional)</span>
+          </label>
+          <input id="onboardAvatarUrl" type="url" placeholder="https://files.catbox.moe/xxxxx.jpg"
+            oninput="onAvatarUrlInput(this.value)"
+            class="w-full bg-white/[0.05] border border-white/[0.08] rounded-2xl px-[14px] py-[12px] text-[13px] focus:outline-none focus:border-[#a855f7]/60">
+          <p class="text-[10px] text-white/35 mt-[6px]">Upload gambar ke catbox.moe, lalu paste linknya di sini</p>
+        </div>
+
         <div class="mb-4">
           <label class="text-[11px] font-bold tracking-widest text-white/50 uppercase block mb-2">
             Nama <span class="text-pink-400">*</span>
           </label>
           <input id="onboardName" type="text" maxlength="24" placeholder="Nama kamu"
             class="w-full bg-white/[0.05] border border-white/[0.08] rounded-2xl px-[14px] py-[12px] text-[13px] focus:outline-none focus:border-[#a855f7]/60">
-          <p class="text-[10px] text-white/35 mt-[6px]">Maksimal 24 karakter, wajib diisi</p>
         </div>
 
-        <!-- Bio (optional) -->
         <div class="mb-5">
           <label class="text-[11px] font-bold tracking-widest text-white/50 uppercase block mb-2">
             Bio <span class="text-white/30 normal-case font-normal tracking-normal">(opsional)</span>
@@ -679,21 +735,15 @@
           </div>
         </div>
 
-        <!-- Submit -->
         <button onclick="submitOnboarding()" class="w-full py-[14px] rounded-2xl accent-bg font-bold text-[14px] shadow-[0_8px_24px_-8px_rgba(168,85,247,.8)] tap flex items-center justify-center gap-2">
-          <i data-lucide="sparkles" class="w-[16px] h-[16px]"></i>
-          Mulai Chat
+          <i data-lucide="sparkles" class="w-[16px] h-[16px]"></i> Simpan
         </button>
-
-        <p class="text-[10px] text-white/35 text-center mt-3 leading-relaxed">
-          Profil disimpan di perangkat ini. Bisa diedit kapan aja di halaman Profil.
-        </p>
       </div>
     </div>
   </div>
 
   <!-- TOAST -->
-  <div id="toast" class="fixed top-[20px] left-1/2 z-[500] px-[16px] py-[10px] rounded-2xl glass border border-white/[0.09] text-[12.5px] font-medium opacity-0 pointer-events-none transition-all duration-300 whitespace-nowrap" style="transform: translate(-50%, -12px);">
+  <div id="toast" class="fixed top-[20px] left-1/2 z-[600] px-[16px] py-[10px] rounded-2xl glass border border-white/[0.09] text-[12.5px] font-medium opacity-0 pointer-events-none transition-all duration-300 whitespace-nowrap" style="transform: translate(-50%, -12px);">
     Notifikasi
   </div>
 
@@ -726,11 +776,17 @@ const state = {
   repeat: "off",
   searchType: "tracks",
   view: "home",
-  onboardMode: "join", // "join" | "edit"
-  tempAvatar: null,    // base64 sementara
+  onboardMode: "join",
+  tempAvatar: null,
+  lyricOffset: 0,
+  lyricLines: [],
+  currentLyricLine: -1,
 };
 
 const DEFAULT_ART = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23150a1e'/><text x='50%' y='60%' font-family='sans-serif' font-size='42' fill='%23a855f7' text-anchor='middle'>♪</text></svg>";
+const DEFAULT_AVATAR = "https://files.catbox.moe/7ppk3q.jpg";
+const DEFAULT_NAME = "xs0ciety HUB";
+const DEFAULT_BIO = "Streaming Musik dengan Lirik & Chat";
 
 const GENRES = ["Semua", "Developer Profile", "Chill", "Focus", "Commute", "Pop Indo", "Remix / DJ"];
 const GENRE_QUERY = {
@@ -787,23 +843,15 @@ function fmtAgo(ts) {
 function colorFromName(name) {
   let hash = 0;
   for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
-  const h = Math.abs(hash) % 360;
-  return `hsl(${h}, 65%, 55%)`;
+  return `hsl(${Math.abs(hash) % 360}, 65%, 55%)`;
 }
 
 /* ============================================================
-   NAV / VIEW SWITCH
+   NAV
 ============================================================ */
 function switchView(name) {
   if (state.view === "chat" && name !== "chat") stopChatPoll();
-
-  // Butuh profile lengkap untuk masuk chat
-  if (name === "chat" && !hasProfile()) {
-    state.view = "chat";
-    openOnboarding(false);
-    return;
-  }
-
+  if (name === "chat" && !hasProfile()) { state.view = "chat"; openOnboarding(false); return; }
   state.view = name;
 
   document.querySelectorAll(".view").forEach(v => v.classList.add("hidden"));
@@ -817,7 +865,6 @@ function switchView(name) {
   document.getElementById("chatInputBar").classList.toggle("hidden", name !== "chat");
   document.getElementById("bottomNav").style.display = name === "chat" ? "none" : "";
   document.getElementById("miniPlayer").style.display = (state.currentTrack && name !== "chat") ? "" : "none";
-
   window.scrollTo({ top: 0 });
 
   if (name === "chat") { startChatPoll(); renderChatLocal(); }
@@ -843,43 +890,35 @@ function hasProfile() {
 
 function openOnboarding(isEdit = false) {
   state.onboardMode = isEdit ? "edit" : "join";
-  state.tempAvatar = state.userProfile?.avatar || null;
+  const existing = state.userProfile || {};
+  state.tempAvatar = existing.avatar || DEFAULT_AVATAR;
 
   const modal = document.getElementById("onboardingModal");
   modal.classList.remove("hidden");
 
-  // Prefill
-  document.getElementById("onboardName").value = state.userProfile?.name || "";
-  document.getElementById("onboardBio").value = state.userProfile?.bio || "";
-  document.getElementById("bioCount").textContent = (state.userProfile?.bio || "").length;
+  document.getElementById("onboardName").value = existing.name || "";
+  document.getElementById("onboardBio").value = existing.bio || "";
+  document.getElementById("onboardAvatarUrl").value = existing.avatar || DEFAULT_AVATAR;
+  document.getElementById("bioCount").textContent = (existing.bio || "").length;
 
-  // Avatar preview
   renderOnboardAvatar();
 
-  // Set mode title
-  const title = modal.querySelector("h2");
-  const subtitle = modal.querySelector("h2 + p");
   if (isEdit) {
-    title.textContent = "Edit Profil";
-    subtitle.textContent = "Ubah data profil chat kamu";
+    document.getElementById("onboardTitle").textContent = "Edit Profil";
+    document.getElementById("onboardSubtitle").textContent = "Ubah data profil chat kamu";
   } else {
-    title.textContent = "Gabung Chat Global";
-    subtitle.textContent = "Lengkapi profil dulu biar yang lain kenal kamu";
+    document.getElementById("onboardTitle").textContent = "Gabung Chat Global";
+    document.getElementById("onboardSubtitle").textContent = "Lengkapi profil dulu biar yang lain kenal kamu";
   }
 
   document.body.style.overflow = "hidden";
   lucide.createIcons();
-
-  // Focus name input
   setTimeout(() => document.getElementById("onboardName").focus(), 300);
 }
 
 function closeOnboarding() {
-  const modal = document.getElementById("onboardingModal");
-  modal.classList.add("hidden");
+  document.getElementById("onboardingModal").classList.add("hidden");
   document.body.style.overflow = "";
-
-  // Kalau mode "join" dan belum ada profil, balik ke home
   if (!hasProfile() && state.view === "chat") {
     state.view = "home";
     switchView("home");
@@ -888,147 +927,92 @@ function closeOnboarding() {
 
 function renderOnboardAvatar() {
   const img = document.getElementById("onboardAvatarImg");
-  const ph = document.getElementById("onboardAvatarPlaceholder");
+  const fallback = document.getElementById("onboardAvatarFallback");
+  const name = (document.getElementById("onboardName")?.value || "").trim();
+  const initial = name ? name.charAt(0).toUpperCase() : "?";
 
   if (state.tempAvatar) {
     img.src = state.tempAvatar;
     img.classList.remove("hidden");
-    ph.classList.add("hidden");
+    fallback.classList.add("hidden");
+    img.onerror = () => {
+      img.classList.add("hidden");
+      fallback.classList.remove("hidden");
+      fallback.textContent = initial;
+    };
   } else {
     img.classList.add("hidden");
-    ph.classList.remove("hidden");
+    fallback.classList.remove("hidden");
+    fallback.textContent = initial;
   }
 }
 
-function handleAvatarUpload(e) {
-  const file = e.target.files?.[0];
-  if (!file) return;
-
-  if (!file.type.startsWith("image/")) {
-    toast("File harus berupa gambar");
-    return;
-  }
-
-  if (file.size > 5 * 1024 * 1024) {
-    toast("Ukuran gambar maksimal 5MB");
-    return;
-  }
-
-  const reader = new FileReader();
-  reader.onload = (ev) => {
-    // Resize ke 128x128 biar hemat storage
-    const img = new Image();
-    img.onload = () => {
-      const canvas = document.createElement("canvas");
-      const SIZE = 128;
-      canvas.width = SIZE;
-      canvas.height = SIZE;
-      const ctx = canvas.getContext("2d");
-
-      // Crop center square
-      const min = Math.min(img.width, img.height);
-      const sx = (img.width - min) / 2;
-      const sy = (img.height - min) / 2;
-      ctx.drawImage(img, sx, sy, min, min, 0, 0, SIZE, SIZE);
-
-      state.tempAvatar = canvas.toDataURL("image/jpeg", 0.85);
-      renderOnboardAvatar();
-    };
-    img.onerror = () => toast("Gagal memuat gambar");
-    img.src = ev.target.result;
-  };
-  reader.readAsDataURL(file);
+function onAvatarUrlInput(url) {
+  const clean = (url || "").trim();
+  state.tempAvatar = clean || null;
+  renderOnboardAvatar();
 }
 
-function submitOnboarding() {
-  const name = (document.getElementById("onboardName").value || "").trim();
-  const bio = (document.getElementById("onboardBio").value || "").trim();
-
-  if (!name) {
-    toast("Nama wajib diisi");
-    document.getElementById("onboardName").focus();
-    return;
-  }
-
-  if (name.length < 2) {
-    toast("Nama minimal 2 karakter");
-    return;
-  }
-
-  const profile = {
-    name,
-    bio,
-    avatar: state.tempAvatar || null,
-    joined: state.userProfile?.joined || Date.now(),
-    updated: Date.now(),
-  };
-
-  state.userProfile = profile;
-  localStorage.setItem("sp_profile", JSON.stringify(profile));
-
-  // Sync legacy userName biar sinkron antar HP tetep works
-  localStorage.setItem("sp_user_name", name);
-
-  const wasEdit = state.onboardMode === "edit";
-  closeOnboarding();
-  updateProfileUI();
-
-  toast(wasEdit ? "Profil tersimpan" : "Selamat bergabung, " + name + "!");
-
-  if (!wasEdit) {
-    // Lanjut ke chat
-    switchView("chat");
-  }
-}
-
-// Update bio counter
 document.addEventListener("input", (e) => {
+  if (e.target.id === "onboardName") {
+    if (!state.tempAvatar) renderOnboardAvatar();
+  }
   if (e.target.id === "onboardBio") {
     document.getElementById("bioCount").textContent = e.target.value.length;
   }
 });
 
+function submitOnboarding() {
+  const name = (document.getElementById("onboardName").value || "").trim();
+  const bio = (document.getElementById("onboardBio").value || "").trim();
+  const avatar = (state.tempAvatar || DEFAULT_AVATAR).trim();
+
+  if (!name) { toast("Nama wajib diisi"); return; }
+  if (name.length < 2) { toast("Nama minimal 2 karakter"); return; }
+
+  if (avatar && !/^https?:\/\//i.test(avatar)) {
+    toast("URL foto harus mulai dengan http:// atau https://");
+    return;
+  }
+
+  const profile = {
+    name, bio, avatar,
+    joined: (state.userProfile && state.userProfile.joined) || Date.now(),
+    updated: Date.now(),
+  };
+  state.userProfile = profile;
+  localStorage.setItem("sp_profile", JSON.stringify(profile));
+  localStorage.setItem("sp_user_name", name);
+
+  const wasEdit = state.onboardMode === "edit";
+  closeOnboarding();
+  updateProfileUI();
+  toast(wasEdit ? "Profil tersimpan" : "Selamat bergabung, " + name + "!");
+  if (!wasEdit) switchView("chat");
+}
+
 function updateProfileUI() {
   const p = state.userProfile;
+  const name = (p && p.name) || DEFAULT_NAME;
+  const bio = (p && p.bio) || DEFAULT_BIO;
+  const avatar = (p && p.avatar) || DEFAULT_AVATAR;
+  const initial = name.charAt(0).toUpperCase();
 
-  if (p && p.name) {
-    // Profile page
-    const initial = p.name.charAt(0).toUpperCase();
-    const avatarBox = document.getElementById("profileAvatarBox");
-    const avatarEl = document.getElementById("profileAvatar");
-    const nameEl = document.getElementById("profileName");
-    const bioEl = document.getElementById("profileBio");
+  document.getElementById("profileName").textContent = name;
+  document.getElementById("profileBio").textContent = bio;
 
-    nameEl.textContent = p.name;
-    bioEl.textContent = p.bio || "Belum ada bio";
+  const box = document.getElementById("profileAvatarBox");
+  box.innerHTML = `<img src="${esc(avatar)}" class="w-full h-full object-cover" onerror="this.parentNode.innerHTML='<span>${initial}</span>'">`;
 
-    if (p.avatar) {
-      avatarBox.innerHTML = `<img src="${p.avatar}" class="w-full h-full object-cover">`;
-    } else {
-      avatarBox.innerHTML = `<span id="profileAvatar">${initial}</span>`;
-    }
+  const chatBox = document.getElementById("chatAvatarBox");
+  chatBox.innerHTML = `<img src="${esc(avatar)}" class="w-full h-full object-cover" onerror="this.parentNode.innerHTML='<span>${initial}</span>'">`;
 
-    // Chat header
-    const chatAvatarBox = document.getElementById("chatAvatarBox");
-    if (p.avatar) {
-      chatAvatarBox.innerHTML = `<img src="${p.avatar}" class="w-full h-full object-cover">`;
-    } else {
-      chatAvatarBox.innerHTML = `<span id="chatAvatar">${initial}</span>`;
-    }
-
-    // Sync input
-    const syncEl = document.getElementById("syncName");
-    if (syncEl) syncEl.value = p.name;
-  } else {
-    document.getElementById("profileName").textContent = "Belum diatur";
-    document.getElementById("profileBio").textContent = "Klik ikon pensil untuk atur profil chat kamu";
-    document.getElementById("profileAvatarBox").innerHTML = `<span id="profileAvatar">X</span>`;
-    document.getElementById("chatAvatarBox").innerHTML = `<span id="chatAvatar">?</span>`;
-  }
+  const syncEl = document.getElementById("syncName");
+  if (syncEl) syncEl.value = (p && p.name) || "";
 }
 
 /* ============================================================
-   GENRE PILLS
+   GENRE
 ============================================================ */
 function renderGenrePills() {
   const wrap = document.getElementById("genrePills");
@@ -1065,7 +1049,6 @@ async function loadQuickPicks(query) {
     grid.innerHTML = `<div class="text-red-400/80 text-[12px] py-6 text-center">API client tidak tersedia. Cek Console browser.</div>`;
     return;
   }
-
   try {
     const data = await apiClient.search(query);
     const tracks = (data.collection || []).filter(t => t && t.title).slice(0, 20);
@@ -1088,20 +1071,29 @@ function renderTrackList(list, containerId) {
     const artist = (t.user && t.user.username) || "Unknown";
     const playing = state.currentTrack && state.currentTrack.id === t.id;
     const liked = state.likes.some(l => l.id === t.id);
+    const downloaded = state.downloaded.some(d => d.id === t.id);
     const blocked = t.streamable === false;
 
     return `
-      <div onclick="${blocked ? `toast('Lagu ini tidak bisa diputar')` : `playTrackByList(${i},'${containerId}')`}"
-        class="fadeUp tap cursor-pointer rounded-2xl border ${playing ? 'border-[#a855f7]/50 bg-[#a855f7]/[0.06]' : 'border-white/[0.06] bg-white/[0.025] hover:bg-white/[0.045]'} p-[10px] flex items-center gap-[12px] transition ${blocked ? 'opacity-50' : ''}">
-        <div class="relative w-[52px] h-[52px] rounded-xl overflow-hidden shrink-0 border border-white/[0.06] bg-white/[0.03]">
-          <img src="${art}" class="w-full h-full object-cover" onerror="this.src='${DEFAULT_ART}'">
-          ${playing ? `<div class="absolute inset-0 bg-black/45 flex items-center justify-center"><i data-lucide="pause" class="w-[18px] h-[18px] text-white fill-current"></i></div>` : ''}
+      <div class="fadeUp tap rounded-2xl border ${playing ? 'border-[#a855f7]/50 bg-[#a855f7]/[0.06]' : 'border-white/[0.06] bg-white/[0.025] hover:bg-white/[0.045]'} p-[10px] transition ${blocked ? 'opacity-50' : ''}">
+        <div class="song-row" onclick="${blocked ? `toast('Lagu ini tidak bisa diputar')` : `playTrackByList(${i},'${containerId}')`}">
+          <div class="relative w-[52px] h-[52px] rounded-xl overflow-hidden shrink-0 border border-white/[0.06] bg-white/[0.03]">
+            <img src="${art}" class="w-full h-full object-cover" onerror="this.src='${DEFAULT_ART}'">
+            ${playing ? `<div class="absolute inset-0 bg-black/55 flex items-center justify-center"><i data-lucide="pause" class="w-[20px] h-[20px] text-white fill-current"></i></div>` : ''}
+          </div>
+          <div class="min-w-0">
+            <h4 class="text-[13px] font-semibold truncate leading-tight ${playing ? 'text-[#c084fc]' : ''}">${esc(t.title)}</h4>
+            <p class="text-[11px] text-white/45 truncate mt-[3px]">${esc(artist)}</p>
+          </div>
+          <div class="song-actions" onclick="event.stopPropagation()">
+            <button onclick="toggleLikeById('${t.id}')" class="w-[34px] h-[34px] rounded-full flex items-center justify-center ${liked ? 'text-pink-400' : 'text-white/50'} tap">
+              <i data-lucide="heart" class="w-[15px] h-[15px] ${liked ? 'fill-current' : ''}"></i>
+            </button>
+            <button onclick="downloadTrackById('${t.id}')" class="w-[34px] h-[34px] rounded-full flex items-center justify-center ${downloaded ? 'text-green-400' : 'text-white/50'} tap">
+              <i data-lucide="${downloaded ? 'check-circle' : 'download'}" class="w-[15px] h-[15px] ${downloaded ? 'fill-current' : ''}"></i>
+            </button>
+          </div>
         </div>
-        <div class="flex-1 min-w-0">
-          <h4 class="text-[13px] font-semibold truncate leading-tight ${playing ? 'text-[#c084fc]' : ''}">${esc(t.title)}</h4>
-          <p class="text-[11px] text-white/45 truncate mt-[3px]">${esc(artist)}</p>
-        </div>
-        ${liked ? '<i data-lucide="heart" class="w-[13px] h-[13px] text-pink-400 fill-current shrink-0"></i>' : ''}
       </div>
     `;
   }).join("");
@@ -1119,17 +1111,11 @@ function playTrackByList(idx, containerId) {
 ============================================================ */
 async function loadPopularPlaylists() {
   const row = document.getElementById("playlistsRow");
-  if (!apiClient) {
-    row.innerHTML = `<div class="shrink-0 text-red-400/70 text-[12px] py-4">API client tidak siap</div>`;
-    return;
-  }
+  if (!apiClient) { row.innerHTML = `<div class="shrink-0 text-red-400/70 text-[12px] py-4">API client tidak siap</div>`; return; }
   try {
     const data = await apiClient.searchPlaylists("pop indonesia");
     const items = (data.collection || []).filter(p => p && p.id && p.title).slice(0, 12);
-    if (!items.length) {
-      row.innerHTML = `<div class="shrink-0 text-white/35 text-[12px] py-4">Playlist tidak tersedia</div>`;
-      return;
-    }
+    if (!items.length) { row.innerHTML = `<div class="shrink-0 text-white/35 text-[12px] py-4">Playlist tidak tersedia</div>`; return; }
     row.innerHTML = items.map((p, idx) => {
       const art = p.artwork_url || (p.user && p.user.avatar_url) || null;
       const creator = (p.user && p.user.username) || "Unknown";
@@ -1148,9 +1134,7 @@ async function loadPopularPlaylists() {
       `;
     }).join("");
     lucide.createIcons();
-  } catch (e) {
-    row.innerHTML = `<div class="shrink-0 text-red-400/70 text-[12px] py-4">Gagal: ${esc(e.message)}</div>`;
-  }
+  } catch (e) { row.innerHTML = `<div class="shrink-0 text-red-400/70 text-[12px] py-4">Gagal: ${esc(e.message)}</div>`; }
 }
 
 async function openPlaylist(id, title) {
@@ -1165,24 +1149,16 @@ async function openPlaylist(id, title) {
     state.tracks = tracks;
     renderTrackList(tracks, "quickPicksGrid");
     document.getElementById("picksTitle").scrollIntoView({ behavior: "smooth", block: "center" });
-  } catch (e) {
-    grid.innerHTML = `<div class="text-red-400/80 text-[12px] py-6 text-center">Gagal: ${esc(e.message)}</div>`;
-  }
+  } catch (e) { grid.innerHTML = `<div class="text-red-400/80 text-[12px] py-6 text-center">Gagal: ${esc(e.message)}</div>`; }
 }
 
 async function loadTopArtists() {
   const row = document.getElementById("artistsRow");
-  if (!apiClient) {
-    row.innerHTML = `<div class="shrink-0 text-red-400/70 text-[12px] py-4">API client tidak siap</div>`;
-    return;
-  }
+  if (!apiClient) { row.innerHTML = `<div class="shrink-0 text-red-400/70 text-[12px] py-4">API client tidak siap</div>`; return; }
   try {
     const data = await apiClient.searchArtists("indonesia");
     const artists = (data.collection || []).filter(a => a && a.username).slice(0, 12);
-    if (!artists.length) {
-      row.innerHTML = `<div class="shrink-0 text-white/35 text-[12px] py-4">Artis tidak tersedia</div>`;
-      return;
-    }
+    if (!artists.length) { row.innerHTML = `<div class="shrink-0 text-white/35 text-[12px] py-4">Artis tidak tersedia</div>`; return; }
     row.innerHTML = artists.map((a, idx) => {
       const art = a.avatar_url;
       const hue1 = (idx * 55) % 360, hue2 = (hue1 + 45) % 360;
@@ -1197,9 +1173,7 @@ async function loadTopArtists() {
       `;
     }).join("");
     lucide.createIcons();
-  } catch (e) {
-    row.innerHTML = `<div class="shrink-0 text-red-400/70 text-[12px] py-4">Gagal: ${esc(e.message)}</div>`;
-  }
+  } catch (e) { row.innerHTML = `<div class="shrink-0 text-red-400/70 text-[12px] py-4">Gagal: ${esc(e.message)}</div>`; }
 }
 
 async function openArtist(name) {
@@ -1214,9 +1188,7 @@ async function openArtist(name) {
     state.tracks = tracks;
     renderTrackList(tracks, "quickPicksGrid");
     document.getElementById("picksTitle").scrollIntoView({ behavior: "smooth", block: "center" });
-  } catch (e) {
-    grid.innerHTML = `<div class="text-red-400/80 text-[12px] py-6 text-center">Gagal: ${esc(e.message)}</div>`;
-  }
+  } catch (e) { grid.innerHTML = `<div class="text-red-400/80 text-[12px] py-6 text-center">Gagal: ${esc(e.message)}</div>`; }
 }
 
 /* ============================================================
@@ -1279,15 +1251,18 @@ function playTrack(idx) {
   document.getElementById("miniArtist").textContent = (t.user && t.user.username) || "Unknown";
   document.getElementById("miniArt").src = t.artwork_url || (t.user && t.user.avatar_url) || DEFAULT_ART;
 
+  const art = t.artwork_url || (t.user && t.user.avatar_url) || DEFAULT_ART;
   document.getElementById("fullTitle").textContent = t.title || "Unknown";
   document.getElementById("fullArtist").textContent = (t.user && t.user.username) || "Unknown";
   document.getElementById("fullArtistTop").textContent = (t.user && t.user.username) || "Unknown";
-  const art = t.artwork_url || (t.user && t.user.avatar_url) || DEFAULT_ART;
   document.getElementById("fullArt").src = art;
   document.getElementById("lyricArt").src = art;
   document.getElementById("lyricTitle").textContent = t.title || "—";
   document.getElementById("lyricArtist").textContent = (t.user && t.user.username) || "—";
   document.getElementById("playerAmbient").style.backgroundImage = `url('${art}')`;
+  document.getElementById("fullLyricArt").src = art;
+  document.getElementById("fullLyricTitle").textContent = t.title || "—";
+  document.getElementById("fullLyricArtist").textContent = (t.user && t.user.username) || "—";
 
   state.recent = t;
   localStorage.setItem("sp_recent", JSON.stringify(t));
@@ -1296,7 +1271,6 @@ function playTrack(idx) {
   let raw = null;
   if (apiClient && typeof apiClient.getStreamUrl === "function") raw = apiClient.getStreamUrl(t);
   if (!raw) { toast('Stream tidak tersedia'); return; }
-
   const clientId = apiClient.clientId || "";
   const streamUrl = `/api/stream?url=${encodeURIComponent(raw)}&client_id=${clientId}`;
 
@@ -1322,6 +1296,8 @@ function playTrack(idx) {
 
   setPlayIcon(true);
   updateHeartUI(t.id);
+  updateDownloadUI(t.id);
+  resetLyrics();
   if (state.view === "home") renderTrackList(state.tracks, "quickPicksGrid");
   if (state.view === "liked") renderLiked();
   if (state.view === "offline") renderOffline();
@@ -1381,6 +1357,9 @@ function closeFullPlayer() {
   document.body.style.overflow = "";
 }
 
+/* ============================================================
+   TABS COVER / LIRIK
+============================================================ */
 function switchPlayerTab(tab) {
   const cover = document.getElementById("panelCover");
   const lyrics = document.getElementById("panelLyrics");
@@ -1390,39 +1369,123 @@ function switchPlayerTab(tab) {
   if (tab === "cover") {
     cover.classList.remove("hidden");
     lyrics.classList.add("hidden");
-    tabCover.className = "px-[20px] py-[7px] rounded-full text-[12px] font-semibold bg-white/[0.12]";
-    tabLyrics.className = "px-[20px] py-[7px] rounded-full text-[12px] font-medium text-white/60";
+    tabCover.className = "px-[26px] py-[8px] rounded-full text-[12.5px] font-semibold bg-white/[0.14] transition";
+    tabLyrics.className = "px-[26px] py-[8px] rounded-full text-[12.5px] font-medium text-white/60 transition";
   } else {
     cover.classList.add("hidden");
     lyrics.classList.remove("hidden");
-    tabLyrics.className = "px-[20px] py-[7px] rounded-full text-[12px] font-semibold bg-white/[0.12]";
-    tabCover.className = "px-[20px] py-[7px] rounded-full text-[12px] font-medium text-white/60";
+    tabLyrics.className = "px-[26px] py-[8px] rounded-full text-[12.5px] font-semibold bg-white/[0.14] transition";
+    tabCover.className = "px-[26px] py-[8px] rounded-full text-[12.5px] font-medium text-white/60 transition";
     fetchLyrics();
   }
+}
+
+function resetLyrics() {
+  state.lyricLines = [];
+  state.currentLyricLine = -1;
+  state.lyricOffset = 0;
+  const c = document.getElementById("lyricContent");
+  if (c) c.innerHTML = `<div class="text-white/40 text-[13px] py-8">Buka tab Lirik untuk memuat</div>`;
+  const fc = document.getElementById("fullLyricContent");
+  if (fc) fc.textContent = "";
 }
 
 async function fetchLyrics() {
   const t = state.currentTrack;
   if (!t) return;
+  if (state.lyricLines.length) { renderLyricLines(); return; }
+
   const c = document.getElementById("lyricContent");
   c.innerHTML = `<div class="flex justify-center py-6"><div class="spinner"></div></div>`;
+
   const artist = (t.user && t.user.username) || "";
   const title = t.title || "";
+
   try {
     const r = await fetch(`https://api.lyrics.ovh/v1/${encodeURIComponent(artist)}/${encodeURIComponent(title)}`);
-    if (!r.ok) throw new Error("Lyrics not found");
+    if (!r.ok) throw new Error("not found");
     const data = await r.json();
     if (!data.lyrics) throw new Error("empty");
-    c.textContent = data.lyrics.trim();
+
+    const lines = data.lyrics.trim().split("\n").filter(l => l.trim());
+    state.lyricLines = lines;
+
+    const fc = document.getElementById("fullLyricContent");
+    if (fc) fc.textContent = lines.join("\n");
+
+    renderLyricLines();
   } catch {
     c.innerHTML = `<div class="text-center text-white/45 py-10 text-[13px]">Lirik tidak tersedia untuk lagu ini.</div>`;
+    const fc = document.getElementById("fullLyricContent");
+    if (fc) fc.textContent = "Lirik tidak tersedia untuk lagu ini.";
   }
+}
+
+function renderLyricLines() {
+  const c = document.getElementById("lyricContent");
+  if (!state.lyricLines.length) return;
+  c.innerHTML = state.lyricLines.map((line, i) =>
+    `<div class="lyric-line" data-line="${i}">${esc(line)}</div>`
+  ).join("");
+}
+
+function lyricOffset(delta) {
+  state.lyricOffset = Math.max(-10, Math.min(10, state.lyricOffset + delta));
+  toast("Sync: " + (state.lyricOffset > 0 ? "+" : "") + state.lyricOffset.toFixed(1) + "s");
+}
+
+function updateLyricHighlight() {
+  if (!state.lyricLines.length) return;
+  if (!audio.duration || !isFinite(audio.duration)) return;
+
+  const t = audio.currentTime + state.lyricOffset;
+  const total = state.lyricLines.length;
+  const perLine = Math.min(5, Math.max(2, audio.duration / total));
+  const idx = Math.min(total - 1, Math.floor(t / perLine));
+
+  if (idx !== state.currentLyricLine) {
+    state.currentLyricLine = idx;
+    const lines = document.querySelectorAll("#lyricContent .lyric-line");
+    lines.forEach((el, i) => el.classList.toggle("active", i === idx));
+    const active = lines[idx];
+    if (active) active.scrollIntoView({ behavior: "smooth", block: "center" });
+  }
+}
+
+function showFullLyrics() {
+  const modal = document.getElementById("fullLyricsModal");
+  modal.classList.remove("hidden");
+  document.body.style.overflow = "hidden";
+  if (!state.lyricLines.length) fetchLyrics();
+}
+
+function closeFullLyrics() {
+  document.getElementById("fullLyricsModal").classList.add("hidden");
+  document.body.style.overflow = "";
 }
 
 function seekTo(pct) {
   if (!audio.duration || !isFinite(audio.duration)) return;
   audio.currentTime = (pct / 100) * audio.duration;
 }
+
+function setVolume(v) {
+  audio.volume = v / 100;
+  audio.muted = false;
+  const icon = document.getElementById("volumeIcon");
+  if (icon) icon.setAttribute("data-lucide", v == 0 ? "volume-x" : v < 50 ? "volume-1" : "volume-2");
+  lucide.createIcons();
+}
+
+function toggleMute() {
+  audio.muted = !audio.muted;
+  const icon = document.getElementById("volumeIcon");
+  if (icon) icon.setAttribute("data-lucide", audio.muted ? "volume-x" : "volume-2");
+  lucide.createIcons();
+  toast(audio.muted ? "Mute" : "Unmute");
+}
+
+function openAirPlay() { toast("Fitur cast segera hadir"); }
 
 function toggleShuffle() {
   state.shuffle = !state.shuffle;
@@ -1433,8 +1496,7 @@ function toggleShuffle() {
 
 function toggleRepeat() {
   const modes = ["off", "all", "one"];
-  const idx = modes.indexOf(state.repeat);
-  state.repeat = modes[(idx + 1) % modes.length];
+  state.repeat = modes[(modes.indexOf(state.repeat) + 1) % modes.length];
   const btn = document.getElementById("repeatBtn");
   btn.classList.toggle("text-[#c084fc]", state.repeat !== "off");
   btn.classList.toggle("text-white/60", state.repeat === "off");
@@ -1450,26 +1512,25 @@ audio.addEventListener("timeupdate", () => {
     document.getElementById("fullProgress").value = pct;
     document.getElementById("timeCurrent").textContent = fmtTime(audio.currentTime);
     document.getElementById("timeTotal").textContent = fmtTime(audio.duration);
+    updateLyricHighlight();
   }
 });
 audio.addEventListener("ended", () => {
   if (state.repeat === "one") { audio.currentTime = 0; audio.play(); return; }
   playNext();
 });
-audio.addEventListener("error", (e) => {
-  console.error("[audio] error:", e);
-  toast("Stream gagal diputar.");
-  setPlayIcon(false);
-});
+audio.addEventListener("error", () => { toast("Stream gagal diputar."); setPlayIcon(false); });
 audio.addEventListener("play", () => setPlayIcon(true));
 audio.addEventListener("pause", () => setPlayIcon(false));
 
 /* ============================================================
-   LIKES
+   LIKES + DOWNLOADS
 ============================================================ */
-function toggleLikeCurrent() {
-  if (!state.currentTrack) return toast('Belum ada lagu');
-  const t = state.currentTrack;
+function toggleLikeById(trackId) {
+  const t = state.currentTrack && state.currentTrack.id === trackId
+    ? state.currentTrack
+    : state.tracks.find(x => x.id == trackId) || state.likes.find(x => x.id == trackId);
+  if (!t) return;
   const idx = state.likes.findIndex(i => i.id === t.id);
   if (idx >= 0) { state.likes.splice(idx, 1); toast('Dihapus dari Disukai'); }
   else { state.likes.push(t); toast('Ditambahkan ke Disukai'); }
@@ -1477,6 +1538,12 @@ function toggleLikeCurrent() {
   updateHeartUI(t.id);
   if (state.view === "home") renderTrackList(state.tracks, "quickPicksGrid");
   if (state.view === "liked") renderLiked();
+  if (state.view === "search") renderSearch();
+}
+
+function toggleLikeCurrent() {
+  if (!state.currentTrack) return toast('Belum ada lagu');
+  toggleLikeById(state.currentTrack.id);
 }
 
 function updateHeartUI(trackId) {
@@ -1486,16 +1553,52 @@ function updateHeartUI(trackId) {
   if (mini) {
     mini.classList.toggle("fill-current", liked);
     mini.classList.toggle("text-pink-400", liked);
-    mini.classList.toggle("text-white/50", !liked);
+    mini.classList.toggle("text-white/55", !liked);
   }
   if (full) {
     full.classList.toggle("fill-current", liked);
     full.classList.toggle("text-pink-400", liked);
-    full.classList.toggle("text-white/70", !liked);
+    full.classList.toggle("text-white/75", !liked);
   }
 }
 
+function downloadTrackById(trackId) {
+  const t = state.tracks.find(x => x.id == trackId) || (state.currentTrack && state.currentTrack.id == trackId ? state.currentTrack : null);
+  if (!t) return;
+  const exist = state.downloaded.some(d => d.id === t.id);
+  if (exist) {
+    state.downloaded = state.downloaded.filter(d => d.id !== t.id);
+    toast('Dihapus dari Offline');
+  } else {
+    state.downloaded.push(t);
+    toast('"' + t.title + '" tersimpan offline');
+  }
+  localStorage.setItem("sp_downloaded", JSON.stringify(state.downloaded));
+  updateDownloadUI(t.id);
+  if (state.view === "home") renderTrackList(state.tracks, "quickPicksGrid");
+  if (state.view === "offline") renderOffline();
+  if (state.view === "search") renderSearch();
+}
+
+function downloadCurrent() {
+  if (!state.currentTrack) return toast('Belum ada lagu');
+  downloadTrackById(state.currentTrack.id);
+}
+
+function updateDownloadUI(trackId) {
+  const dl = state.downloaded.some(d => d.id === trackId);
+  const icon = document.getElementById("fullDownloadIcon");
+  if (icon) {
+    icon.setAttribute("data-lucide", dl ? "check-circle" : "download");
+    icon.classList.toggle("fill-current", dl);
+    icon.classList.toggle("text-green-400", dl);
+    icon.classList.toggle("text-white/75", !dl);
+  }
+  lucide.createIcons();
+}
+
 function renderLiked() {
+  document.getElementById("likedCount").textContent = state.likes.length + " lagu";
   const el = document.getElementById("likedList");
   if (!state.likes.length) {
     el.innerHTML = `
@@ -1504,7 +1607,7 @@ function renderLiked() {
           <i data-lucide="heart" class="w-[24px] h-[24px] text-white/40"></i>
         </div>
         <h3 class="text-[14px] font-bold mb-1">Belum Ada Lagu Disukai</h3>
-        <p class="text-[11.5px] text-white/45">Tap ikon hati di player untuk menyukai lagu.</p>
+        <p class="text-[11.5px] text-white/45">Tap ikon hati di lagu untuk menyukai.</p>
       </div>`;
     lucide.createIcons();
     return;
@@ -1516,10 +1619,12 @@ function renderLiked() {
 /* ============================================================
    SEARCH
 ============================================================ */
+let lastSearchQuery = "";
 function handleSearchKey(e) {
   if (e.key !== 'Enter') return;
   const q = (document.getElementById("searchInput").value || "").trim();
   if (!q) return;
+  lastSearchQuery = q;
   doSearch(q);
 }
 
@@ -1529,10 +1634,10 @@ function switchSearchTab(type, btn) {
     b.className = "search-tab pill shrink-0 px-[16px] py-[7px] rounded-full text-[12px] font-medium bg-white/[0.05] border border-white/[0.08] text-white/70";
   });
   btn.className = "search-tab pill shrink-0 px-[16px] py-[7px] rounded-full text-[12px] font-semibold accent-bg text-white";
-  const q = (document.getElementById("searchInput").value || "").trim();
-  if (q) doSearch(q);
+  if (lastSearchQuery) doSearch(lastSearchQuery);
 }
 
+let lastSearchData = [];
 async function doSearch(q) {
   const el = document.getElementById("searchResults");
   el.innerHTML = `<div class="flex justify-center py-10"><div class="spinner"></div></div>`;
@@ -1545,6 +1650,7 @@ async function doSearch(q) {
     else data = await apiClient.searchArtists(q);
 
     const items = (data.collection || []).filter(Boolean);
+    lastSearchData = items;
     if (!items.length) { el.innerHTML = `<div class="text-white/40 text-[12px] py-10 text-center">Tidak ada hasil untuk "${esc(q)}"</div>`; return; }
 
     if (state.searchType === "tracks") {
@@ -1574,6 +1680,12 @@ async function doSearch(q) {
     lucide.createIcons();
   } catch (e) {
     el.innerHTML = `<div class="text-red-400/80 text-[12px] py-6 text-center">Gagal: ${esc(e.message)}</div>`;
+  }
+}
+
+function renderSearch() {
+  if (lastSearchData.length && state.searchType === "tracks") {
+    renderTrackList(lastSearchData, "searchResults");
   }
 }
 
@@ -1614,7 +1726,7 @@ function renderLibrary() {
           <h4 class="text-[13px] font-semibold truncate">${esc(p.name)}</h4>
           <p class="text-[11px] text-white/45">${p.tracks.length} lagu</p>
         </div>
-        <button onclick="deletePlaylist(${i})" class="w-[34px] h-[34px] rounded-full flex items-center justify-center text-red-400/70 hover:text-red-400">
+        <button onclick="deletePlaylist(${i})" class="w-[34px] h-[34px] rounded-full flex items-center justify-center text-red-400/70">
           <i data-lucide="trash-2" class="w-[15px] h-[15px]"></i>
         </button>
       </div>
@@ -1664,23 +1776,9 @@ function deletePlaylist(i) {
 /* ============================================================
    OFFLINE
 ============================================================ */
-function downloadCurrent() {
-  if (!state.currentTrack) return toast('Belum ada lagu');
-  const t = state.currentTrack;
-  if (state.downloaded.some(d => d.id === t.id)) {
-    toast('Sudah tersimpan offline');
-    return;
-  }
-  state.downloaded.push(t);
-  localStorage.setItem("sp_downloaded", JSON.stringify(state.downloaded));
-  toast('Lagu "' + t.title + '" siap diputar offline');
-  document.getElementById("fullDownloadIcon").classList.add("text-green-400", "fill-current");
-}
-
 function renderOffline() {
   const el = document.getElementById("offlineList");
   document.getElementById("offlineCount").textContent = state.downloaded.length + " LAGU TERSIMPAN";
-
   if (!state.downloaded.length) {
     el.innerHTML = `
       <div class="rounded-2xl border border-white/[0.06] bg-white/[0.025] p-8 text-center">
@@ -1688,30 +1786,13 @@ function renderOffline() {
           <i data-lucide="wifi-off" class="w-[24px] h-[24px] text-white/40"></i>
         </div>
         <h3 class="text-[14px] font-bold mb-1">Belum Ada Lagu Offline</h3>
-        <p class="text-[11.5px] text-white/45">Tap ikon download di player untuk simpan lagu.</p>
+        <p class="text-[11.5px] text-white/45">Tap ikon download di lagu untuk simpan.</p>
       </div>`;
     lucide.createIcons();
     return;
   }
-
   state.tracks = state.downloaded.slice();
   renderTrackList(state.downloaded, "offlineList");
-  state.downloaded.forEach((t, i) => {
-    const container = el.children[i];
-    if (!container) return;
-    const btn = document.createElement("button");
-    btn.className = "w-[32px] h-[32px] rounded-full flex items-center justify-center text-red-400/70 shrink-0";
-    btn.innerHTML = '<i data-lucide="trash-2" class="w-[14px] h-[14px]"></i>';
-    btn.onclick = (e) => { e.stopPropagation(); removeOffline(i); };
-    container.appendChild(btn);
-  });
-  lucide.createIcons();
-}
-
-function removeOffline(i) {
-  state.downloaded.splice(i, 1);
-  localStorage.setItem("sp_downloaded", JSON.stringify(state.downloaded));
-  renderOffline();
 }
 
 function playAllOffline() {
@@ -1719,6 +1800,15 @@ function playAllOffline() {
   state.tracks = state.downloaded.slice();
   playTrack(0);
 }
+
+function updateNetBadge() {
+  const badge = document.getElementById("netBadge");
+  if (!badge) return;
+  if (navigator.onLine) { badge.textContent = "ONLINE"; badge.className = "text-[10px] px-[8px] py-[3px] rounded-full bg-green-500/15 border border-green-500/30 text-green-400 font-bold"; }
+  else { badge.textContent = "OFFLINE"; badge.className = "text-[10px] px-[8px] py-[3px] rounded-full bg-red-500/15 border border-red-500/30 text-red-400 font-bold"; }
+}
+window.addEventListener("online", updateNetBadge);
+window.addEventListener("offline", updateNetBadge);
 
 /* ============================================================
    SYNC / PWA
@@ -1740,7 +1830,7 @@ function syncLoad() {
   const n = document.getElementById("syncName").value.trim();
   if (!n) return toast('Isi nama dulu');
   const raw = localStorage.getItem("sp_sync_" + n);
-  if (!raw) return toast('Tidak ada data untuk nama ini di perangkat ini');
+  if (!raw) return toast('Tidak ada data untuk nama ini');
   try {
     const data = JSON.parse(raw);
     state.likes = data.likes || [];
@@ -1753,9 +1843,7 @@ function syncLoad() {
     if (data.profile) localStorage.setItem("sp_profile", JSON.stringify(data.profile));
     updateProfileUI();
     toast("Data dimuat!");
-  } catch (e) {
-    toast("Gagal: " + e.message);
-  }
+  } catch (e) { toast("Gagal: " + e.message); }
 }
 
 async function clearCache() {
@@ -1777,10 +1865,7 @@ window.addEventListener("beforeinstallprompt", (e) => {
 function installPWA() {
   if (!deferredPrompt) return toast('Aplikasi sudah terinstall atau tidak didukung');
   deferredPrompt.prompt();
-  deferredPrompt.userChoice.then(r => {
-    if (r.outcome === "accepted") toast("Terinstall!");
-    deferredPrompt = null;
-  });
+  deferredPrompt.userChoice.then(r => { if (r.outcome === "accepted") toast("Terinstall!"); deferredPrompt = null; });
 }
 
 if ('serviceWorker' in navigator) {
@@ -1794,19 +1879,10 @@ if ('serviceWorker' in navigator) {
 }
 
 /* ============================================================
-   CHAT GLOBAL
+   CHAT
 ============================================================ */
-function startChatPoll() {
-  stopChatPoll();
-  loadChat();
-  state.chatPollTimer = setInterval(loadChat, 3000);
-}
-function stopChatPoll() {
-  if (state.chatPollTimer) {
-    clearInterval(state.chatPollTimer);
-    state.chatPollTimer = null;
-  }
-}
+function startChatPoll() { stopChatPoll(); loadChat(); state.chatPollTimer = setInterval(loadChat, 3000); }
+function stopChatPoll() { if (state.chatPollTimer) { clearInterval(state.chatPollTimer); state.chatPollTimer = null; } }
 
 async function loadChat() {
   try {
@@ -1817,10 +1893,7 @@ async function loadChat() {
       if (statusEl) statusEl.textContent = `Ngombol bareng pendengar SoundPulse (${data.storage === 'kv' ? 'live' : 'lokal'})`;
       renderChat(data.messages || []);
     }
-  } catch (e) {
-    console.error("[chat]", e);
-    renderChatLocal();
-  }
+  } catch (e) { renderChatLocal(); }
 }
 
 function renderChatLocal() {
@@ -1835,41 +1908,27 @@ function renderChat(messages) {
     el.innerHTML = `<div class="text-center text-white/35 text-[12px] py-10">Belum ada pesan. Jadi yang pertama!</div>`;
     return;
   }
-
-  const myProfile = state.userProfile;
-  const myName = myProfile?.name || "";
-
+  const myName = state.userProfile?.name || "";
   el.innerHTML = messages.map(m => {
     const isMe = myName && m.name === myName;
     const initial = (m.name || "?").charAt(0).toUpperCase();
     const color = colorFromName(m.name || "?");
-    const avatarHTML = m.avatar
-      ? `<img src="${m.avatar}" class="w-full h-full object-cover">`
-      : initial;
-
+    const avatarHTML = m.avatar ? `<img src="${esc(m.avatar)}" class="w-full h-full object-cover">` : initial;
     if (isMe) {
-      return `
-        <div class="chat-me flex justify-end">
-          <div class="max-w-[78%]">
-            <div class="bubble px-[14px] py-[9px] rounded-2xl rounded-br-md text-[13px] leading-snug">${esc(m.text)}</div>
-            <div class="text-[10px] text-white/35 mt-[4px] text-right">${fmtAgo(m.ts)}</div>
-          </div>
-        </div>`;
+      return `<div class="chat-me flex justify-end"><div class="max-w-[78%]">
+        <div class="bubble px-[14px] py-[9px] rounded-2xl rounded-br-md text-[13px] leading-snug">${esc(m.text)}</div>
+        <div class="text-[10px] text-white/35 mt-[4px] text-right">${fmtAgo(m.ts)}</div>
+      </div></div>`;
     }
-    return `
-      <div class="chat-other flex gap-2">
-        <div class="w-[34px] h-[34px] rounded-full shrink-0 overflow-hidden flex items-center justify-center text-[12px] font-bold text-white" style="background:${color}">
-          ${avatarHTML}
-        </div>
-        <div class="max-w-[78%]">
-          <div class="text-[11px] font-semibold mb-[2px]" style="color:${color}">${esc(m.name)}</div>
-          <div class="bubble px-[14px] py-[9px] rounded-2xl rounded-bl-md text-[13px] leading-snug">${esc(m.text)}</div>
-          <div class="text-[10px] text-white/35 mt-[4px]">${fmtAgo(m.ts)}</div>
-        </div>
-      </div>`;
+    return `<div class="chat-other flex gap-2">
+      <div class="w-[34px] h-[34px] rounded-full shrink-0 overflow-hidden flex items-center justify-center text-[12px] font-bold text-white" style="background:${color}">${avatarHTML}</div>
+      <div class="max-w-[78%]">
+        <div class="text-[11px] font-semibold mb-[2px]" style="color:${color}">${esc(m.name)}</div>
+        <div class="bubble px-[14px] py-[9px] rounded-2xl rounded-bl-md text-[13px] leading-snug">${esc(m.text)}</div>
+        <div class="text-[10px] text-white/35 mt-[4px]">${fmtAgo(m.ts)}</div>
+      </div>
+    </div>`;
   }).join("");
-
-  el.scrollTop = el.scrollHeight;
   window.scrollTo(0, document.body.scrollHeight);
 }
 
@@ -1877,35 +1936,14 @@ async function sendChat() {
   const input = document.getElementById("chatInput");
   const text = (input.value || "").trim();
   if (!text) return;
-
-  // Wajib profil lengkap
-  if (!hasProfile()) {
-    openOnboarding(false);
-    return;
-  }
-
+  if (!hasProfile()) { openOnboarding(false); return; }
   input.value = "";
   const profile = state.userProfile;
-
-  const optimistic = {
-    id: Date.now().toString(36),
-    name: profile.name,
-    avatar: profile.avatar,
-    bio: profile.bio,
-    text,
-    ts: Date.now(),
-  };
-
   try {
     const r = await fetch("/api/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        name: profile.name,
-        text,
-        avatar: profile.avatar || null,
-        bio: profile.bio || null,
-      }),
+      body: JSON.stringify({ name: profile.name, text, avatar: profile.avatar || null, bio: profile.bio || null }),
     });
     const data = await r.json();
     if (!data.success) throw new Error(data.error || "Gagal kirim");
@@ -1913,7 +1951,7 @@ async function sendChat() {
   } catch (e) {
     const raw = localStorage.getItem("sp_chat_local");
     const msgs = raw ? JSON.parse(raw) : [];
-    msgs.push(optimistic);
+    msgs.push({ id: Date.now().toString(36), name: profile.name, avatar: profile.avatar, text, ts: Date.now() });
     localStorage.setItem("sp_chat_local", JSON.stringify(msgs));
     renderChatLocal();
     toast("Pesan lokal (server chat belum aktif)");
@@ -1921,12 +1959,13 @@ async function sendChat() {
 }
 
 /* ============================================================
-   INIT APP
+   INIT
 ============================================================ */
 async function initApp() {
   renderGenrePills();
   renderRecent();
   updateProfileUI();
+  updateNetBadge();
   switchView("home");
 
   await Promise.allSettled([

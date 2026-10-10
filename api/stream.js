@@ -1,109 +1,142 @@
-export default async function handler(req, res) {
-  const { url, client_id } = req.query;
-  
-  // CORS headers
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "GET, HEAD, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Range");
-  res.setHeader("Cache-Control", "public, max-age=7200");
+// api/stream.js
+export const config = { runtime: "edge" };
 
-  if (!url || !client_id) {
-    return res.status(400).json({ 
-      error: "Missing parameters",
-      required: { url: "string", client_id: "string" },
-      received: { url: !!url, client_id: !!client_id }
+const SC_UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36";
+const SC_REFERER = "https://soundcloud.com/";
+
+export default async function handler(req) {
+  if (req.method === "OPTIONS") {
+    return new Response(null, {
+      status: 204,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, HEAD, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type, Range",
+      },
     });
+  }
+
+  const reqUrl = new URL(req.url);
+  const url = reqUrl.searchParams.get("url");
+  const clientId = reqUrl.searchParams.get("client_id");
+  const proxyOrigin = reqUrl.origin;
+
+  if (!url || !clientId) {
+    return json({ error: "Missing parameters: url, client_id" }, 400);
   }
 
   try {
     let targetUrl = url;
-    let resolved = false;
 
-    console.log(`[stream] Resolving: ${url.substring(0, 50)}...`);
+    // === 1. Resolve transcoding URL kalau perlu ===
+    if (url.includes("/transcodings/")) {
+      const apiUrl = `${url}${url.includes("?") ? "&" : "?"}client_id=${clientId}`;
+      const tokenRes = await fetch(apiUrl, {
+        headers: {
+          "User-Agent": SC_UA,
+          "Accept": "application/json",
+          "Referer": SC_REFERER,
+        },
+      });
 
-    // Resolusi transcoding URL dari SoundCloud API v2
-    if (url.includes('/transcodings/') || url.includes('hls') || url.startsWith('http')) {
-      const resolveUrl = url.startsWith('http') ? url : `https://${url}`;
-      const apiUrl = `${resolveUrl}${resolveUrl.includes('?') ? '&' : '?'}client_id=${client_id}`;
-      
-      try {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 8000);
-
-        const tokenRes = await fetch(apiUrl, {
-          signal: controller.signal,
-          headers: {
-            "User-Agent": "Mozilla/5.0 (Linux; Android 13) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36",
-            "Accept": "application/json",
-            "Referer": "https://soundcloud.com/"
-          }
-        });
-
-        clearTimeout(timeoutId);
-
-        if (!tokenRes.ok) {
-          console.warn(`[stream] Transcoding resolve returned ${tokenRes.status}, using direct URL`);
-          targetUrl = apiUrl;
-        } else {
-          try {
-            const tokenData = await tokenRes.json();
-            
-            if (tokenData.url) {
-              targetUrl = tokenData.url;
-              resolved = true;
-              console.log('[stream] Successfully resolved transcoding URL');
-            } else if (tokenData.urls && Array.isArray(tokenData.urls) && tokenData.urls.length > 0) {
-              targetUrl = tokenData.urls[0];
-              resolved = true;
-              console.log('[stream] Using first URL from urls array');
-            } else if (tokenData.stream_url) {
-              targetUrl = tokenData.stream_url;
-              resolved = true;
-            } else {
-              console.warn('[stream] Response has no URL field, using API URL');
-              targetUrl = apiUrl;
-            }
-          } catch (jsonErr) {
-            console.warn('[stream] Response not JSON, using API URL');
-            targetUrl = apiUrl;
-          }
-        }
-      } catch (resolveErr) {
-        if (resolveErr.name === 'AbortError') {
-          console.warn('[stream] Transcoding resolve timed out, using direct URL');
-        } else {
-          console.error('[stream] Transcoding resolve error:', resolveErr.message);
-        }
-        // Fallback ke direct URL + client_id
-        targetUrl = `${resolveUrl}${resolveUrl.includes('?') ? '&' : '?'}client_id=${client_id}`;
+      if (!tokenRes.ok) {
+        return json({ error: `Token resolve failed: ${tokenRes.status}` }, tokenRes.status);
       }
-    } else {
-      // Jika bukan transcoding URL, append client_id saja
-      targetUrl = `${url}${url.includes('?') ? '&' : '?'}client_id=${client_id}`;
+
+      const tokenData = await tokenRes.json();
+      targetUrl = tokenData.url || (Array.isArray(tokenData.urls) && tokenData.urls[0]);
+      if (!targetUrl) {
+        return json({ error: "No URL in token response" }, 502);
+      }
     }
 
-    // Validate final URL
-    if (!targetUrl || !targetUrl.startsWith('http')) {
-      console.error('[stream] Invalid final URL:', targetUrl);
-      return res.status(400).json({ 
-        error: "Could not resolve valid stream URL"
+    // === 2. Fetch dari SoundCloud ===
+    const fwdHeaders = {
+      "User-Agent": SC_UA,
+      "Referer": SC_REFERER,
+      "Origin": "https://soundcloud.com",
+      "Accept": "*/*",
+    };
+    const range = req.headers.get("range");
+    if (range) fwdHeaders["Range"] = range;
+
+    const upstream = await fetch(targetUrl, { headers: fwdHeaders });
+
+    if (!upstream.ok && upstream.status !== 206) {
+      return json({ error: `Upstream ${upstream.status}`, target: targetUrl.slice(0, 80) }, upstream.status);
+    }
+
+    const upstreamType = upstream.headers.get("content-type") || "";
+    const looksLikeManifest =
+      upstreamType.includes("mpegurl") ||
+      upstreamType.includes("m3u") ||
+      targetUrl.split("?")[0].endsWith(".m3u8");
+
+    // === 3. Kalau HLS manifest, rewrite semua segment URL biar lewat proxy ini juga ===
+    if (looksLikeManifest) {
+      const text = await upstream.text();
+      const base = new URL(targetUrl);
+
+      const rewritten = text
+        .split("\n")
+        .map((line) => {
+          const trimmed = line.trim();
+          if (!trimmed) return line;
+          // Baris komentar di m3u8 (kecuali EXT-X-MAP / EXT-X-KEY yang berisi URI)
+          if (trimmed.startsWith("#")) {
+            // Rewrite URI="..." kalau ada (buat encryption key / init segment)
+            return trimmed.replace(/URI="([^"]+)"/g, (_, u) => {
+              let abs;
+              try { abs = new URL(u, base).toString(); } catch { return `URI="${u}"`; }
+              return `URI="${proxyOrigin}/api/stream?url=${encodeURIComponent(abs)}&client_id=${clientId}"`;
+            });
+          }
+          // Baris URL segmen
+          let abs;
+          try { abs = new URL(trimmed, base).toString(); } catch { return line; }
+          return `${proxyOrigin}/api/stream?url=${encodeURIComponent(abs)}&client_id=${clientId}`;
+        })
+        .join("\n");
+
+      return new Response(rewritten, {
+        status: 200,
+        headers: {
+          "Content-Type": "application/vnd.apple.mpegurl",
+          "Access-Control-Allow-Origin": "*",
+          "Cache-Control": "no-store",
+        },
       });
     }
 
-    // Set proper audio headers untuk playback
-    res.setHeader("Content-Type", "audio/mpeg");
-    res.setHeader("Accept-Ranges", "bytes");
-    res.setHeader("X-Stream-Resolved", resolved ? "yes" : "no");
+    // === 4. Pipe audio stream ===
+    const respHeaders = new Headers();
+    respHeaders.set("Content-Type", upstreamType || "audio/mpeg");
+    respHeaders.set("Accept-Ranges", "bytes");
+    respHeaders.set("Access-Control-Allow-Origin", "*");
+    respHeaders.set("Cache-Control", "public, max-age=7200");
 
-    console.log(`[stream] Redirecting to: ${targetUrl.substring(0, 50)}... (resolved: ${resolved})`);
+    const cl = upstream.headers.get("content-length");
+    if (cl) respHeaders.set("Content-Length", cl);
+    const cr = upstream.headers.get("content-range");
+    if (cr) respHeaders.set("Content-Range", cr);
 
-    // Redirect ke final URL
-    return res.redirect(302, targetUrl);
-  } catch (err) {
-    console.error("[stream] Error:", err.message);
-    return res.status(500).json({ 
-      error: err.message,
-      type: err.name
+    return new Response(upstream.body, {
+      status: upstream.status,
+      headers: respHeaders,
     });
+
+  } catch (err) {
+    console.error("[stream] error:", err);
+    return json({ error: err.message || "Unknown error" }, 500);
   }
 }
+
+function json(obj, status = 200) {
+  return new Response(JSON.stringify(obj), {
+    status,
+    headers: {
+      "Content-Type": "application/json",
+      "Access-Control-Allow-Origin": "*",
+    },
+  });
+    }

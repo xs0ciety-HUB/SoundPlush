@@ -95,6 +95,8 @@
   .chat-me .bubble { background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%); }
   .chat-other .bubble { background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.08); }
 
+  .chat-bubble { user-select: none; -webkit-user-select: none; word-break: break-word; }
+
   .pill-bar { scroll-snap-type: x proximity; }
   .pill-bar > * { scroll-snap-align: start; }
 
@@ -367,7 +369,7 @@
       </div>
       <div class="space-y-[10px] text-[13px]">
         <div class="flex justify-between"><span class="text-white/55">Nama</span><span class="font-semibold">SoundPulse</span></div>
-        <div class="flex justify-between"><span class="text-white/55">Versi</span><span class="font-semibold">v3.1.0</span></div>
+        <div class="flex justify-between"><span class="text-white/55">Versi</span><span class="font-semibold">v3.2.0</span></div>
         <div class="flex justify-between"><span class="text-white/55">Mode Offline PWA</span><span class="font-semibold flex items-center gap-[6px]"><span class="w-[7px] h-[7px] rounded-full bg-green-500"></span>Aktif</span></div>
         <div class="flex justify-between"><span class="text-white/55">Service Worker</span><span class="font-semibold" id="swStatus">Mendaftar...</span></div>
         <div class="flex justify-between items-center pt-2 border-t border-white/[0.05]">
@@ -419,7 +421,7 @@
   </section>
 
   <!-- CHAT -->
-  <section id="view-chat" class="view hidden max-w-[640px] mx-auto pt-6" style="padding-bottom: 80px;">
+  <section id="view-chat" class="view hidden max-w-[640px] mx-auto pt-6" style="padding-bottom: 120px;">
     <div class="px-4 mb-4 flex items-center gap-3">
       <button onclick="switchView('home')" class="w-[36px] h-[36px] rounded-full bg-white/[0.06] flex items-center justify-center tap">
         <i data-lucide="chevron-left" class="w-[18px] h-[18px]"></i>
@@ -511,14 +513,16 @@
               <span class="nav-dot"></span>
             </button>
             <div class="w-[54px] shrink-0"></div>
-            <button onclick="switchView('library')" id="navbtn-library" class="navbtn relative flex flex-col items-center gap-[2px] text-white/50 tap w-[58px] pb-[2px]">
-              <i data-lucide="library" class="w-[20px] h-[20px]"></i>
-              <span class="text-[9px] font-semibold">Library</span>
-              <span class="nav-dot"></span>
-            </button>
             <button onclick="switchView('liked')" id="navbtn-liked" class="navbtn relative flex flex-col items-center gap-[2px] text-white/50 tap w-[58px] pb-[2px]">
               <i data-lucide="heart" class="w-[20px] h-[20px]"></i>
               <span class="text-[9px] font-semibold">Disukai</span>
+              <span class="nav-dot"></span>
+            </button>
+            <button onclick="switchView('profile')" id="navbtn-profile" class="navbtn relative flex flex-col items-center gap-[2px] text-white/50 tap w-[58px] pb-[2px]">
+              <span id="navProfileIcon" class="w-[22px] h-[22px] rounded-full overflow-hidden border border-white/[0.15] flex items-center justify-center bg-white/[0.06]">
+                <i data-lucide="user" class="w-[14px] h-[14px]"></i>
+              </span>
+              <span class="text-[9px] font-semibold">Profil</span>
               <span class="nav-dot"></span>
             </button>
           </div>
@@ -533,12 +537,48 @@
 
   <!-- CHAT INPUT -->
   <div id="chatInputBar" class="chat-input-bar hidden">
+    <!-- Reply preview -->
+    <div id="replyPreview" class="hidden max-w-[640px] mx-auto mb-2 flex items-center gap-2 px-3 py-2 rounded-2xl bg-white/[0.06] border border-white/[0.08]">
+      <div class="w-[3px] h-[32px] rounded-full accent-bg shrink-0"></div>
+      <div class="flex-1 min-w-0">
+        <p id="replyName" class="text-[11px] font-semibold accent-text truncate">—</p>
+        <p id="replyText" class="text-[11px] text-white/50 truncate">—</p>
+      </div>
+      <button onclick="cancelReply()" class="w-[28px] h-[28px] rounded-full flex items-center justify-center text-white/50 tap">
+        <i data-lucide="x" class="w-[14px] h-[14px]"></i>
+      </button>
+    </div>
+
     <div class="max-w-[640px] mx-auto flex items-center gap-2">
+      <input type="file" id="chatFileInput" class="hidden" accept="*/*" onchange="handleChatFile(event)">
+      <input type="file" id="chatImageInput" class="hidden" accept="image/*" onchange="handleChatImage(event)">
+
+      <button onclick="document.getElementById('chatFileInput').click()" class="w-[42px] h-[42px] rounded-full bg-white/[0.06] border border-white/[0.08] flex items-center justify-center text-white/70 tap shrink-0">
+        <i data-lucide="paperclip" class="w-[17px] h-[17px]"></i>
+      </button>
+      <button onclick="document.getElementById('chatImageInput').click()" class="w-[42px] h-[42px] rounded-full bg-white/[0.06] border border-white/[0.08] flex items-center justify-center text-white/70 tap shrink-0">
+        <i data-lucide="image" class="w-[17px] h-[17px]"></i>
+      </button>
       <input id="chatInput" type="text" placeholder="Tulis pesan..." maxlength="500"
         onkeypress="if(event.key==='Enter')sendChat()"
-        class="flex-1 bg-white/[0.06] border border-white/[0.08] rounded-2xl px-[14px] py-[10px] text-[13px] focus:outline-none focus:border-[#a855f7]/60">
-      <button onclick="sendChat()" class="w-[42px] h-[42px] rounded-full accent-bg flex items-center justify-center tap">
+        class="flex-1 bg-white/[0.06] border border-white/[0.08] rounded-2xl px-[14px] py-[10px] text-[13px] focus:outline-none focus:border-[#a855f7]/60 min-w-0">
+      <button onclick="sendChat()" class="w-[42px] h-[42px] rounded-full accent-bg flex items-center justify-center tap shrink-0">
         <i data-lucide="send" class="w-[17px] h-[17px]"></i>
+      </button>
+    </div>
+
+    <!-- Attachment preview -->
+    <div id="attachPreview" class="hidden max-w-[640px] mx-auto mt-2 flex items-center gap-2 px-3 py-2 rounded-2xl bg-white/[0.06] border border-white/[0.08]">
+      <img id="attachPreviewImg" class="hidden w-[42px] h-[42px] rounded-lg object-cover shrink-0">
+      <div id="attachPreviewFile" class="hidden w-[42px] h-[42px] rounded-lg bg-white/[0.08] flex items-center justify-center shrink-0">
+        <i data-lucide="file" class="w-[18px] h-[18px] text-white/70"></i>
+      </div>
+      <div class="flex-1 min-w-0">
+        <p id="attachPreviewName" class="text-[11.5px] font-semibold truncate">—</p>
+        <p id="attachPreviewSize" class="text-[10px] text-white/45">—</p>
+      </div>
+      <button onclick="cancelAttach()" class="w-[28px] h-[28px] rounded-full flex items-center justify-center text-white/50 tap">
+        <i data-lucide="x" class="w-[14px] h-[14px]"></i>
       </button>
     </div>
   </div>
@@ -701,7 +741,6 @@
           <p id="onboardSubtitle" class="text-[12px] text-white/50 mt-[4px]">Lengkapi profil dulu biar yang lain kenal kamu</p>
         </div>
 
-        <!-- Avatar upload -->
         <div class="flex justify-center mb-5">
           <label class="avatar-upload tap">
             <input type="file" accept="image/*" id="onboardAvatarInput" class="hidden" onchange="handleAvatarUpload(event)">
@@ -781,6 +820,8 @@ const state = {
   lyricOffset: 0,
   lyricLines: [],
   currentLyricLine: -1,
+  replyTo: null,
+  attach: null,
 };
 
 const DEFAULT_ART = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23150a1e'/><text x='50%' y='60%' font-family='sans-serif' font-size='42' fill='%23a855f7' text-anchor='middle'>♪</text></svg>";
@@ -1009,6 +1050,16 @@ function updateProfileUI() {
 
   const syncEl = document.getElementById("syncName");
   if (syncEl) syncEl.value = (p && p.name) || "";
+
+  updateNavProfileIcon();
+}
+
+function updateNavProfileIcon() {
+  const el = document.getElementById("navProfileIcon");
+  if (!el) return;
+  const p = state.userProfile;
+  const avatar = (p && p.avatar) || DEFAULT_AVATAR;
+  el.innerHTML = `<img src="${esc(avatar)}" class="w-full h-full object-cover" onerror="this.parentNode.innerHTML='<i data-lucide=&quot;user&quot; class=&quot;w-[14px] h-[14px]&quot;></i>';lucide.createIcons();">`;
 }
 
 /* ============================================================
@@ -1881,6 +1932,9 @@ if ('serviceWorker' in navigator) {
 /* ============================================================
    CHAT
 ============================================================ */
+let _allMessages = [];
+let _longPressTimer = null;
+
 function startChatPoll() { stopChatPoll(); loadChat(); state.chatPollTimer = setInterval(loadChat, 3000); }
 function stopChatPoll() { if (state.chatPollTimer) { clearInterval(state.chatPollTimer); state.chatPollTimer = null; } }
 
@@ -1891,7 +1945,8 @@ async function loadChat() {
     if (data.success) {
       const statusEl = document.getElementById("chatStatus");
       if (statusEl) statusEl.textContent = `Ngombol bareng pendengar SoundPulse (${data.storage === 'kv' ? 'live' : 'lokal'})`;
-      renderChat(data.messages || []);
+      _allMessages = data.messages || [];
+      renderChat(_allMessages);
     }
   } catch (e) { renderChatLocal(); }
 }
@@ -1899,6 +1954,7 @@ async function loadChat() {
 function renderChatLocal() {
   const raw = localStorage.getItem("sp_chat_local");
   const msgs = raw ? JSON.parse(raw) : [];
+  _allMessages = msgs;
   renderChat(msgs);
 }
 
@@ -1908,53 +1964,270 @@ function renderChat(messages) {
     el.innerHTML = `<div class="text-center text-white/35 text-[12px] py-10">Belum ada pesan. Jadi yang pertama!</div>`;
     return;
   }
+
   const myName = state.userProfile?.name || "";
+
   el.innerHTML = messages.map(m => {
     const isMe = myName && m.name === myName;
     const initial = (m.name || "?").charAt(0).toUpperCase();
     const color = colorFromName(m.name || "?");
     const avatarHTML = m.avatar ? `<img src="${esc(m.avatar)}" class="w-full h-full object-cover">` : initial;
+
+    let bodyHTML = "";
+
+    // Reply preview
+    if (m.replyTo) {
+      const r = m.replyTo;
+      const replyPreview = r.hasImage ? "📷 Foto" : r.hasFile ? "📎 File" : (r.text || "Pesan");
+      bodyHTML += `
+        <div class="rounded-xl bg-black/25 border-l-[3px] border-white/40 px-[10px] py-[6px] mb-[6px]">
+          <div class="text-[10px] font-semibold text-white/85">${esc(r.name)}</div>
+          <div class="text-[11px] text-white/60 truncate">${esc(replyPreview)}</div>
+        </div>`;
+    }
+
+    // Gambar
+    if (m.image) {
+      bodyHTML += `<img src="${esc(m.image)}" class="rounded-xl max-w-full mb-[6px] cursor-pointer" style="max-height:280px" onclick="openImageFull('${esc(m.image)}')">`;
+    }
+
+    // File
+    if (m.file) {
+      const sizeKB = Math.round((m.file.size || 0) / 1024);
+      const sizeTxt = sizeKB > 1024 ? (sizeKB/1024).toFixed(1) + " MB" : sizeKB + " KB";
+      bodyHTML += `
+        <a href="${esc(m.file.data)}" download="${esc(m.file.name)}" class="flex items-center gap-2 rounded-xl bg-black/25 border border-white/10 px-[10px] py-[8px] mb-[6px] tap">
+          <div class="w-[34px] h-[34px] rounded-lg bg-white/[0.1] flex items-center justify-center shrink-0">
+            <i data-lucide="file" class="w-[16px] h-[16px]"></i>
+          </div>
+          <div class="min-w-0 flex-1">
+            <div class="text-[11.5px] font-semibold truncate">${esc(m.file.name)}</div>
+            <div class="text-[10px] text-white/55">${sizeTxt}</div>
+          </div>
+          <i data-lucide="download" class="w-[14px] h-[14px] text-white/60 shrink-0"></i>
+        </a>`;
+    }
+
+    // Text
+    if (m.text) {
+      bodyHTML += `<div>${esc(m.text)}</div>`;
+    }
+
+    const bubble = `<div class="bubble chat-bubble px-[14px] py-[9px] text-[13px] leading-snug ${isMe ? 'rounded-2xl rounded-br-md' : 'rounded-2xl rounded-bl-md'}" data-msg-id="${m.id}">${bodyHTML}</div>`;
+    const meta = `<div class="text-[10px] text-white/35 mt-[4px] ${isMe ? 'text-right' : ''}">${fmtAgo(m.ts)}</div>`;
+
     if (isMe) {
-      return `<div class="chat-me flex justify-end"><div class="max-w-[78%]">
-        <div class="bubble px-[14px] py-[9px] rounded-2xl rounded-br-md text-[13px] leading-snug">${esc(m.text)}</div>
-        <div class="text-[10px] text-white/35 mt-[4px] text-right">${fmtAgo(m.ts)}</div>
-      </div></div>`;
+      return `<div class="chat-me flex justify-end"><div class="max-w-[78%]">${bubble}${meta}</div></div>`;
     }
     return `<div class="chat-other flex gap-2">
       <div class="w-[34px] h-[34px] rounded-full shrink-0 overflow-hidden flex items-center justify-center text-[12px] font-bold text-white" style="background:${color}">${avatarHTML}</div>
       <div class="max-w-[78%]">
         <div class="text-[11px] font-semibold mb-[2px]" style="color:${color}">${esc(m.name)}</div>
-        <div class="bubble px-[14px] py-[9px] rounded-2xl rounded-bl-md text-[13px] leading-snug">${esc(m.text)}</div>
-        <div class="text-[10px] text-white/35 mt-[4px]">${fmtAgo(m.ts)}</div>
+        ${bubble}
+        ${meta}
       </div>
     </div>`;
   }).join("");
+
+  attachReplyHandlers();
   window.scrollTo(0, document.body.scrollHeight);
 }
 
+/* ===== Reply ===== */
+function attachReplyHandlers() {
+  document.querySelectorAll(".chat-bubble").forEach(el => {
+    const msgId = el.dataset.msgId;
+    if (!msgId) return;
+
+    const start = () => {
+      _longPressTimer = setTimeout(() => {
+        startReply(msgId);
+        if (navigator.vibrate) navigator.vibrate(30);
+      }, 500);
+    };
+    const cancel = () => clearTimeout(_longPressTimer);
+
+    el.addEventListener("touchstart", start, { passive: true });
+    el.addEventListener("touchend", cancel);
+    el.addEventListener("touchmove", cancel);
+    el.addEventListener("mousedown", start);
+    el.addEventListener("mouseup", cancel);
+    el.addEventListener("mouseleave", cancel);
+    el.addEventListener("contextmenu", (e) => { e.preventDefault(); startReply(msgId); });
+  });
+}
+
+function startReply(msgId) {
+  const msg = _allMessages.find(m => m.id === msgId);
+  if (!msg) return;
+  state.replyTo = msg;
+
+  const bar = document.getElementById("replyPreview");
+  document.getElementById("replyName").textContent = msg.name;
+  const preview = msg.image ? "📷 Foto" : msg.file ? "📎 " + msg.file.name : (msg.text || "");
+  document.getElementById("replyText").textContent = preview;
+  bar.classList.remove("hidden");
+
+  document.getElementById("chatInput").focus();
+  lucide.createIcons();
+}
+
+function cancelReply() {
+  state.replyTo = null;
+  document.getElementById("replyPreview").classList.add("hidden");
+}
+
+/* ===== Attachment ===== */
+function cancelAttach() {
+  state.attach = null;
+  document.getElementById("attachPreview").classList.add("hidden");
+}
+
+function showAttachPreview() {
+  const a = state.attach;
+  if (!a) return cancelAttach();
+
+  const wrap = document.getElementById("attachPreview");
+  const img = document.getElementById("attachPreviewImg");
+  const fileIcon = document.getElementById("attachPreviewFile");
+  const nameEl = document.getElementById("attachPreviewName");
+  const sizeEl = document.getElementById("attachPreviewSize");
+
+  const sizeKB = Math.round((a.size || 0) / 1024);
+  const sizeTxt = sizeKB > 1024 ? (sizeKB/1024).toFixed(1) + " MB" : sizeKB + " KB";
+
+  if (a.type === "image") {
+    img.src = a.data;
+    img.classList.remove("hidden");
+    fileIcon.classList.add("hidden");
+    nameEl.textContent = "Foto";
+  } else {
+    img.classList.add("hidden");
+    fileIcon.classList.remove("hidden");
+    nameEl.textContent = a.name;
+  }
+  sizeEl.textContent = sizeTxt;
+  wrap.classList.remove("hidden");
+  lucide.createIcons();
+}
+
+function handleChatImage(e) {
+  const file = e.target.files?.[0];
+  e.target.value = "";
+  if (!file) return;
+  if (file.size > 5 * 1024 * 1024) { toast("Maksimal 5MB"); return; }
+
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement("canvas");
+      const MAX = 800;
+      let w = img.width, h = img.height;
+      if (w > MAX || h > MAX) {
+        const ratio = Math.min(MAX/w, MAX/h);
+        w = Math.round(w * ratio);
+        h = Math.round(h * ratio);
+      }
+      canvas.width = w;
+      canvas.height = h;
+      canvas.getContext("2d").drawImage(img, 0, 0, w, h);
+      const dataUrl = canvas.toDataURL("image/jpeg", 0.75);
+
+      if (dataUrl.length > 700000) { toast("Foto kegedean, coba yg lebih kecil"); return; }
+
+      state.attach = {
+        type: "image",
+        data: dataUrl,
+        name: file.name || "photo.jpg",
+        size: dataUrl.length,
+        mime: "image/jpeg",
+      };
+      showAttachPreview();
+    };
+    img.onerror = () => toast("Gagal memuat gambar");
+    img.src = ev.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function handleChatFile(e) {
+  const file = e.target.files?.[0];
+  e.target.value = "";
+  if (!file) return;
+  if (file.size > 500 * 1024) { toast("File maksimal 500KB"); return; }
+
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    const dataUrl = ev.target.result;
+    if (dataUrl.length > 700000) { toast("File kegedean"); return; }
+
+    state.attach = {
+      type: "file",
+      data: dataUrl,
+      name: file.name || "file",
+      size: file.size,
+      mime: file.type || "",
+    };
+    showAttachPreview();
+  };
+  reader.readAsDataURL(file);
+}
+
+/* ===== Image fullscreen ===== */
+function openImageFull(src) {
+  const win = window.open("", "_blank");
+  if (win) {
+    win.document.write(`<html><head><title>Foto</title><style>html,body{margin:0;background:#000;display:flex;align-items:center;justify-content:center;min-height:100vh}img{max-width:100%;max-height:100vh}</style></head><body><img src="${src}"></body></html>`);
+  }
+}
+
+/* ===== Send ===== */
 async function sendChat() {
   const input = document.getElementById("chatInput");
   const text = (input.value || "").trim();
-  if (!text) return;
+  const attach = state.attach;
+  const replyTo = state.replyTo;
+
+  if (!text && !attach) return;
   if (!hasProfile()) { openOnboarding(false); return; }
-  input.value = "";
+
   const profile = state.userProfile;
+
+  const payload = {
+    name: profile.name,
+    text: text || "",
+    avatar: profile.avatar || null,
+    bio: profile.bio || null,
+    replyTo: replyTo ? {
+      id: replyTo.id,
+      name: replyTo.name,
+      text: replyTo.text || "",
+      image: replyTo.image || null,
+      file: replyTo.file || null,
+    } : null,
+  };
+
+  if (attach) {
+    if (attach.type === "image") payload.image = attach.data;
+    else payload.file = { name: attach.name, type: attach.mime, size: attach.size, data: attach.data };
+  }
+
+  input.value = "";
+  cancelReply();
+  cancelAttach();
+
   try {
     const r = await fetch("/api/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name: profile.name, text, avatar: profile.avatar || null, bio: profile.bio || null }),
+      body: JSON.stringify(payload),
     });
     const data = await r.json();
     if (!data.success) throw new Error(data.error || "Gagal kirim");
     await loadChat();
   } catch (e) {
-    const raw = localStorage.getItem("sp_chat_local");
-    const msgs = raw ? JSON.parse(raw) : [];
-    msgs.push({ id: Date.now().toString(36), name: profile.name, avatar: profile.avatar, text, ts: Date.now() });
-    localStorage.setItem("sp_chat_local", JSON.stringify(msgs));
-    renderChatLocal();
-    toast("Pesan lokal (server chat belum aktif)");
+    toast("Gagal kirim: " + e.message);
   }
 }
 

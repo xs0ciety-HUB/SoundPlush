@@ -1,118 +1,114 @@
-// api/get-credentials.js
+// api/get-credentials.js - v3
+// Fix: opsi `timeout` di fetch Node TIDAK ada -> request bisa nge-hang sampai function mati (504).
+// Sekarang pakai AbortController. Scrape juga diarahkan ke bundle JS asli (a-v2.sndcdn.com).
+// ID palsu di fallback dihapus.
+
+const UA =
+  "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
+
+// Fallback terakhir. Kalau semua mati, update manual di sini.
+const FALLBACK_IDS = ["KKzJxmw11tYpCs6T24P4uUYhqmjalG6M", "BRKRzTYe4wpIL5Ln9Lg5qMQc6J6W8HMo"];
+
+async function fetchT(url, ms = 4000, opts = {}) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), ms);
+  try {
+    return await fetch(url, { ...opts, signal: controller.signal, headers: { "User-Agent": UA, ...(opts.headers || {}) } });
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+async function isValid(id) {
+  try {
+    const r = await fetchT(
+      `https://api-v2.soundcloud.com/search/tracks?q=lagu&client_id=${id}&limit=1`,
+      4000,
+      { headers: { Accept: "application/json" } }
+    );
+    return r.ok;
+  } catch {
+    return false;
+  }
+}
+
+async function scrapeClientId(attempts) {
+  const home = await fetchT("https://soundcloud.com/", 4000);
+  if (!home.ok) {
+    attempts.push({ step: "home", status: home.status });
+    return null;
+  }
+  const html = await home.text();
+
+  const scripts = [...new Set(html.match(/https:\/\/a-v2\.sndcdn\.com\/assets\/[^"'\s]+\.js/g) || [])];
+  attempts.push({ step: "scripts_found", count: scripts.length });
+
+  // client_id biasanya ada di bundle paling belakang
+  for (const src of scripts.reverse().slice(0, 6)) {
+    try {
+      const r = await fetchT(src, 4000);
+      if (!r.ok) continue;
+      const js = await r.text();
+      const m = js.match(/client_id\s*[:=]\s*["']([a-zA-Z0-9]{32})["']/) || js.match(/client_id=([a-zA-Z0-9]{32})/);
+      if (m && m[1]) return m[1];
+    } catch {}
+  }
+  return null;
+}
+
 export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Cache-Control", "public, max-age=1800"); // 30 menit cache
+  res.setHeader("Cache-Control", "no-store");
 
+  const attempts = [];
   try {
     let clientId = null;
-    const attempts = [];
+    let source = null;
 
-    // Known valid client IDs (update regularly)
-    const FALLBACK_IDS = [
-      "KKzJxmw11tYpCs6T24P4uUYhqmjalG6M",  // Most stable
-      "BRKRzTYe4wpIL5Ln9Lg5qMQc6J6W8HMo",  // Alternative
-      "Ln23Gc3vXZb5rPvmX0B8X0B8X0B8X0B8",  // Backup
-    ];
-
-    // 1. Try scrape dari mobile SoundCloud
     try {
-      const pageRes = await fetch("https://m.soundcloud.com/", {
-        headers: {
-          "User-Agent": "Mozilla/5.0 (Linux; Android 13; SM-A135F) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36"
-        },
-        timeout: 4000
-      });
-      
-      if (pageRes.ok) {
-        const html = await pageRes.text();
-        
-        // Cari di HTML
-        let match = html.match(/client_id['":\s=]+["']([a-zA-Z0-9]{30,40})["']/i);
-        if (match?.[1]) {
-          clientId = match[1];
-          attempts.push({ method: "scrape_html", found: true });
-        }
-
-        // Scan scripts
-        if (!clientId) {
-          const scriptUrls = html.match(/https?:\/\/[^\s"'<>]+\.js/g) || [];
-          for (const url of scriptUrls.slice(0, 5)) {
-            try {
-              const jsRes = await fetch(url, { timeout: 3000 });
-              if (!jsRes.ok) continue;
-              
-              const jsText = await jsRes.text().catch(() => null);
-              if (!jsText) continue;
-              
-              const m = jsText.match(/client_id['\"]?\s*[:=]\s*['""`]?([a-zA-Z0-9]{30,40})['""`]?/);
-              if (m?.[1]) {
-                clientId = m[1];
-                attempts.push({ method: "scrape_script", found: true });
-                break;
-              }
-            } catch (e) {
-              // continue
-            }
-          }
-        }
+      const scraped = await scrapeClientId(attempts);
+      if (scraped && (await isValid(scraped))) {
+        clientId = scraped;
+        source = "scrape";
+      } else if (scraped) {
+        attempts.push({ step: "scraped_invalid" });
       }
-    } catch (fetchErr) {
-      attempts.push({ method: "scrape_failed", error: fetchErr.message });
+    } catch (e) {
+      attempts.push({ step: "scrape_error", error: e.message });
     }
 
-    // 2. If scraping failed, validate fallback IDs
     if (!clientId) {
       for (const id of FALLBACK_IDS) {
-        try {
-          const testRes = await fetch(
-            `https://api-v2.soundcloud.com/search/tracks?q=lagu&client_id=${id}&limit=1`,
-            { 
-              timeout: 4000,
-              headers: {
-                "User-Agent": "Mozilla/5.0 (Linux; Android 13) AppleWebKit/537.36 Chrome/120.0.0.0 Mobile Safari/537.36"
-              }
-            }
-          );
-          
-          if (testRes.ok) {
-            clientId = id;
-            attempts.push({ method: "validate_fallback", id_index: FALLBACK_IDS.indexOf(id), success: true });
-            break;
-          } else {
-            attempts.push({ method: "validate_fallback", id_index: FALLBACK_IDS.indexOf(id), status: testRes.status });
-          }
-        } catch (e) {
-          attempts.push({ method: "validate_fallback", id_index: FALLBACK_IDS.indexOf(id), error: e.message });
+        if (await isValid(id)) {
+          clientId = id;
+          source = "fallback";
+          break;
         }
+        attempts.push({ step: "fallback_dead", id: id.slice(0, 6) + "..." });
       }
     }
 
-    // Last resort
     if (!clientId) {
-      clientId = FALLBACK_IDS[0];
-      attempts.push({ method: "lastresort_fallback" });
+      // Semua gagal: tetap kirim ID pertama biar client punya sesuatu, tapi jangan di-cache
+      return res.status(200).json({
+        success: false,
+        client_id: FALLBACK_IDS[0],
+        warning: "Tidak ada client_id yang tervalidasi",
+        attempts,
+      });
     }
 
-    // Validasi format
-    if (!clientId || clientId.length < 30) {
-      clientId = FALLBACK_IDS[0];
-      attempts.push({ method: "format_validation_fallback" });
-    }
-
-    return res.status(200).json({ 
-      success: true, 
+    // Cache di edge 15 menit hanya kalau ID sudah tervalidasi
+    res.setHeader("Cache-Control", "public, s-maxage=900, stale-while-revalidate=600");
+    return res.status(200).json({
+      success: true,
       client_id: clientId,
+      source,
       timestamp: new Date().toISOString(),
-      debug: process.env.DEBUG ? { attempts, method_count: attempts.length } : undefined
+      debug: process.env.DEBUG ? attempts : undefined,
     });
   } catch (err) {
     console.error("[get-credentials]", err);
-    // Fallback hardcoded jika semuanya gagal
-    return res.status(200).json({ 
-      success: true,
-      client_id: "KKzJxmw11tYpCs6T24P4uUYhqmjalG6M",
-      fallback: true,
-      error_note: err.message
-    });
+    return res.status(200).json({ success: false, client_id: FALLBACK_IDS[0], error_note: err.message });
   }
 }

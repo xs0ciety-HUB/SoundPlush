@@ -2,299 +2,765 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SoundPulse - Streaming Musik</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>SoundPulse</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-  <!-- WAJIB DIMASUKKAN DI FOLDER PUBLIC SEJAJAR DENGAN HTML -->
+  <!-- WAJIB ada di folder public -->
   <script src="/soundpulse-api-client.js"></script>
   <style>
-    body { background: #121212; color: #f3f4f6; }
+    * { -webkit-tap-highlight-color: transparent; }
+    html, body { height: 100%; }
+    body {
+      background: #0e0e10;
+      color: #fff;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", Roboto, sans-serif;
+      font-feature-settings: "cv02","cv03","cv04","cv11";
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
     ::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+
+    /* Accent — single, consistent */
+    .accent-bg { background: linear-gradient(135deg, #ff5a1f 0%, #ff2d00 100%); }
+    .accent-text { color: #ff5a1f; }
+
+    /* Header blur */
+    .glass {
+      background: rgba(14,14,16,.82);
+      backdrop-filter: blur(24px) saturate(160%);
+      -webkit-backdrop-filter: blur(24px) saturate(160%);
+    }
+
+    /* Mini player slide-in */
+    .player-bar {
+      transform: translateY(120%);
+      opacity: 0;
+      transition: transform .4s cubic-bezier(.22,.9,.3,1), opacity .25s ease;
+      will-change: transform;
+    }
+    .player-bar.show { transform: translateY(0); opacity: 1; }
+
+    /* Card press feedback */
+    .tap:active { transform: scale(.975); transition: transform .1s ease; }
+
+    /* Fade for dynamic content */
+    @keyframes fade {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    .fade { animation: fade .3s ease backwards; }
+
+    /* Pill */
+    .pill {
+      transition: background .15s ease, border-color .15s ease, color .15s ease;
+    }
+
+    /* Cover overflow gradient (playlist cards) */
+    .cover::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, transparent 45%, rgba(0,0,0,.72) 100%);
+      border-radius: inherit;
+      pointer-events: none;
+    }
+
+    /* Progress line */
+    .progress-line {
+      transition: width .15s linear;
+    }
+
+    /* Custom safe area */
+    .safe-bottom { padding-bottom: max(env(safe-area-inset-bottom), 0px); }
   </style>
 </head>
-<body class="min-h-screen flex flex-col font-sans pb-28">
+<body class="min-h-screen pb-44">
 
-  <!-- HEADER -->
-  <header class="sticky top-0 z-40 bg-[#121212]/90 backdrop-blur-md px-4 pt-4 pb-3 space-y-3 border-b border-zinc-800/50">
-    <div class="flex items-center justify-between">
-      <div>
-        <p class="text-[10px] tracking-widest text-zinc-400 uppercase font-semibold">SoundCloud API Client</p>
-        <h1 class="text-xl font-bold text-[#ff5500]">SoundPulse</h1>
-      </div>
-      <div class="flex items-center gap-2">
-        <button onclick="toggleSearch()" class="w-9 h-9 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-300 hover:text-white transition">
-          <i data-lucide="search" class="w-4 h-4"></i>
-        </button>
-        <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-orange-600 to-amber-500 flex items-center justify-center text-white shadow-lg">
-          <i data-lucide="user" class="w-4 h-4"></i>
+  <!-- ============================================================
+       HEADER
+  ============================================================ -->
+  <header class="sticky top-0 z-40 glass border-b border-white/[0.06]">
+    <div class="max-w-[640px] mx-auto px-4 pt-5 pb-3">
+
+      <!-- Top row -->
+      <div class="flex items-start justify-between gap-3 mb-4">
+        <div class="min-w-0">
+          <p class="text-[9px] font-semibold tracking-[0.2em] text-white/35 uppercase mb-[6px]">
+            Modern Personal Music Platform
+          </p>
+          <h1 class="text-[26px] leading-none font-extrabold tracking-[-0.02em] accent-text">
+            SoundPulse
+          </h1>
+        </div>
+
+        <div class="flex items-center gap-[6px] shrink-0 mt-1">
+          <button onclick="toggleSearch()"
+            class="w-[38px] h-[38px] rounded-full bg-white/[0.06] border border-white/[0.08] flex items-center justify-center text-white/70 hover:text-white hover:bg-white/[0.1] transition tap">
+            <i data-lucide="search" class="w-[17px] h-[17px]"></i>
+          </button>
+          <button onclick="toast('Chat segera hadir')"
+            class="w-[38px] h-[38px] rounded-full bg-white/[0.06] border border-white/[0.08] flex items-center justify-center text-white/70 hover:text-white hover:bg-white/[0.1] transition tap">
+            <i data-lucide="message-circle" class="w-[17px] h-[17px]"></i>
+          </button>
+          <button onclick="switchNav('profile')"
+            class="w-[38px] h-[38px] rounded-full accent-bg flex items-center justify-center text-white transition tap shadow-[0_4px_14px_-4px_rgba(255,90,31,.55)]">
+            <i data-lucide="user" class="w-[17px] h-[17px]"></i>
+          </button>
         </div>
       </div>
-    </div>
 
-    <!-- SEARCH BAR -->
-    <div id="searchBarWrapper" class="hidden">
-      <input id="searchInput" type="text" onkeypress="handleSearchKey(event)" placeholder="Cari judul lagu atau artis..." class="w-full bg-zinc-900 border border-zinc-700 rounded-full px-4 py-2 text-sm focus:outline-none focus:border-[#ff5500] text-white placeholder-zinc-500 shadow-inner">
-    </div>
+      <!-- Search bar -->
+      <div id="searchBarWrapper" class="hidden mb-4">
+        <div class="relative">
+          <i data-lucide="search" class="w-[15px] h-[15px] absolute left-[15px] top-1/2 -translate-y-1/2 text-white/35"></i>
+          <input id="searchInput" type="text" onkeypress="handleSearchKey(event)"
+            placeholder="Cari judul lagu atau artis"
+            class="w-full bg-white/[0.05] border border-white/[0.08] rounded-2xl pl-10 pr-11 py-[11px] text-[13px] text-white placeholder-white/35 focus:outline-none focus:border-[#ff5a1f]/50 focus:bg-white/[0.07] transition">
+          <button onclick="handleSearchKey({key:'Enter',target:document.getElementById('searchInput')})"
+            class="absolute right-[6px] top-1/2 -translate-y-1/2 w-[30px] h-[30px] rounded-xl accent-bg text-white flex items-center justify-center tap">
+            <i data-lucide="arrow-right" class="w-[14px] h-[14px]"></i>
+          </button>
+        </div>
+      </div>
 
-    <!-- PILL FILTERS -->
-    <div class="flex items-center gap-2 overflow-x-auto no-scrollbar py-1">
-      <button onclick="filterGenre('Semua', this)" class="filter-pill px-4 py-1.5 rounded-full text-xs font-medium bg-[#ff5500] text-black shrink-0 transition shadow font-bold">Semua</button>
-      <button onclick="filterGenre('Chill', this)" class="filter-pill px-4 py-1.5 rounded-full text-xs font-medium bg-zinc-900 border border-zinc-800 text-zinc-300 shrink-0 transition hover:bg-zinc-800">Chill</button>
-      <button onclick="filterGenre('Focus', this)" class="filter-pill px-4 py-1.5 rounded-full text-xs font-medium bg-zinc-900 border border-zinc-800 text-zinc-300 shrink-0 transition hover:bg-zinc-800">Focus</button>
-      <button onclick="filterGenre('Pop Indonesia', this)" class="filter-pill px-4 py-1.5 rounded-full text-xs font-medium bg-zinc-900 border border-zinc-800 text-zinc-300 shrink-0 transition hover:bg-zinc-800">Pop Indo</button>
-      <button onclick="filterGenre('Remix', this)" class="filter-pill px-4 py-1.5 rounded-full text-xs font-medium bg-zinc-900 border border-zinc-800 text-zinc-300 shrink-0 transition hover:bg-zinc-800">Remix / DJ</button>
+      <!-- Filter pills -->
+      <div class="-mx-4 px-4 flex gap-[6px] overflow-x-auto no-scrollbar">
+        <button onclick="filterGenre('Semua', this)"
+          class="filter-pill pill shrink-0 px-[16px] py-[8px] rounded-full text-[12px] font-semibold accent-bg text-white shadow-[0_4px_12px_-4px_rgba(255,90,31,.55)]">
+          Semua
+        </button>
+        <button onclick="filterGenre('Developer Profile', this)"
+          class="filter-pill pill shrink-0 px-[14px] py-[8px] rounded-full text-[12px] font-medium bg-white/[0.05] border border-white/[0.08] text-white/70 hover:bg-white/[0.09] hover:text-white flex items-center gap-[6px]">
+          <i data-lucide="code-2" class="w-[12px] h-[12px]"></i>
+          Developer Profile
+        </button>
+        <button onclick="filterGenre('Chill', this)"
+          class="filter-pill pill shrink-0 px-[14px] py-[8px] rounded-full text-[12px] font-medium bg-white/[0.05] border border-white/[0.08] text-white/70 hover:bg-white/[0.09] hover:text-white flex items-center gap-[6px]">
+          <i data-lucide="coffee" class="w-[12px] h-[12px]"></i>
+          Chill
+        </button>
+        <button onclick="filterGenre('Focus', this)"
+          class="filter-pill pill shrink-0 px-[14px] py-[8px] rounded-full text-[12px] font-medium bg-white/[0.05] border border-white/[0.08] text-white/70 hover:bg-white/[0.09] hover:text-white flex items-center gap-[6px]">
+          <i data-lucide="target" class="w-[12px] h-[12px]"></i>
+          Focus
+        </button>
+        <button onclick="filterGenre('Commute', this)"
+          class="filter-pill pill shrink-0 px-[14px] py-[8px] rounded-full text-[12px] font-medium bg-white/[0.05] border border-white/[0.08] text-white/70 hover:bg-white/[0.09] hover:text-white flex items-center gap-[6px]">
+          <i data-lucide="car" class="w-[12px] h-[12px]"></i>
+          Commute
+        </button>
+        <button onclick="filterGenre('Pop Indonesia', this)"
+          class="filter-pill pill shrink-0 px-[14px] py-[8px] rounded-full text-[12px] font-medium bg-white/[0.05] border border-white/[0.08] text-white/70 hover:bg-white/[0.09] hover:text-white">
+          Pop Indo
+        </button>
+        <button onclick="filterGenre('Remix', this)"
+          class="filter-pill pill shrink-0 px-[14px] py-[8px] rounded-full text-[12px] font-medium bg-white/[0.05] border border-white/[0.08] text-white/70 hover:bg-white/[0.09] hover:text-white">
+          Remix / DJ
+        </button>
+      </div>
     </div>
   </header>
 
-  <!-- MAIN CONTAINER -->
-  <main class="flex-1 px-4 py-4 space-y-6 overflow-y-auto">
-    
+  <!-- ============================================================
+       MAIN
+  ============================================================ -->
+  <main class="max-w-[640px] mx-auto px-4 pt-5 space-y-7">
+
     <!-- TERAKHIR DIPUTAR -->
-    <div class="space-y-3">
-      <h2 class="text-sm font-bold text-zinc-300 flex items-center gap-2">
-        <i data-lucide="history" class="w-4 h-4 text-[#ff5500]"></i> Terakhir Diputar
-      </h2>
+    <section class="fade">
+      <div class="flex items-center gap-[10px] mb-3">
+        <div class="w-[26px] h-[26px] rounded-full bg-[#ff5a1f]/[0.12] border border-[#ff5a1f]/[0.22] flex items-center justify-center">
+          <i data-lucide="history" class="w-[13px] h-[13px] accent-text"></i>
+        </div>
+        <h2 class="text-[14.5px] font-bold tracking-[-0.01em] text-white">Terakhir Diputar</h2>
+      </div>
+
       <div id="recentCardContainer">
-        <div class="bg-zinc-900/60 border border-zinc-800/80 p-3 rounded-2xl flex items-center gap-3">
-          <img src="https://via.placeholder.com/60" class="w-14 h-14 rounded-xl object-cover">
-          <div>
-            <h4 class="text-sm font-semibold text-white">Belum ada lagu diputar</h4>
-            <p class="text-xs text-zinc-400">Pilih lagu di Quick Picks bawah</p>
+        <div class="rounded-2xl border border-white/[0.07] bg-white/[0.025] p-[14px] flex items-center gap-[12px] min-h-[76px]">
+          <div class="w-[52px] h-[52px] rounded-xl bg-white/[0.04] border border-white/[0.06] flex items-center justify-center shrink-0">
+            <i data-lucide="music" class="w-[20px] h-[20px] text-white/25"></i>
+          </div>
+          <div class="flex-1 min-w-0">
+            <h4 class="text-[13.5px] font-semibold text-white truncate">Belum ada lagu diputar</h4>
+            <p class="text-[11px] text-white/45 truncate mt-[2px]">Pilih lagu di Quick Picks</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- QUICK PICKS -->
+    <section class="fade">
+      <div class="flex items-center justify-between mb-3">
+        <div class="flex items-center gap-[10px]">
+          <div class="w-[26px] h-[26px] rounded-full bg-[#ff5a1f]/[0.12] border border-[#ff5a1f]/[0.22] flex items-center justify-center">
+            <i data-lucide="zap" class="w-[13px] h-[13px] accent-text"></i>
+          </div>
+          <h2 class="text-[14.5px] font-bold tracking-[-0.01em] text-white">Quick Picks</h2>
+        </div>
+        <button onclick="loadQuickPicks('Indonesian Pop Hits')"
+          class="text-[11px] font-medium text-white/40 hover:text-[#ff5a1f] flex items-center gap-[4px] transition">
+          Refresh
+          <i data-lucide="refresh-cw" class="w-[11px] h-[11px]"></i>
+        </button>
+      </div>
+
+      <div id="quickPicksGrid" class="grid grid-cols-2 gap-[8px]">
+        <div class="col-span-2 text-white/35 text-[12px] py-8 text-center">Memuat lagu...</div>
+      </div>
+    </section>
+
+    <!-- POPULAR PLAYLISTS -->
+    <section class="fade">
+      <div class="flex items-center gap-[10px] mb-3">
+        <div class="w-[26px] h-[26px] rounded-full bg-[#ff5a1f]/[0.12] border border-[#ff5a1f]/[0.22] flex items-center justify-center">
+          <i data-lucide="disc-3" class="w-[13px] h-[13px] accent-text"></i>
+        </div>
+        <h2 class="text-[14.5px] font-bold tracking-[-0.01em] text-white">Popular Playlists</h2>
+      </div>
+
+      <div class="-mx-4 px-4 flex gap-[10px] overflow-x-auto no-scrollbar pb-1">
+        <!-- Buat Playlist -->
+        <button onclick="toast('Fitur buat playlist segera hadir')"
+          class="tap shrink-0 w-[128px] flex flex-col items-center justify-center rounded-2xl border border-dashed border-white/[0.14] bg-white/[0.02] hover:border-[#ff5a1f]/40 hover:bg-[#ff5a1f]/[0.03] transition"
+          style="height:180px;">
+          <div class="w-[42px] h-[42px] rounded-full bg-white/[0.05] border border-white/[0.08] flex items-center justify-center mb-[10px]">
+            <i data-lucide="plus" class="w-[18px] h-[18px] text-white/50"></i>
+          </div>
+          <span class="text-[11.5px] font-semibold text-white/55">Buat Playlist</span>
+        </button>
+
+        <!-- Playlist 1 -->
+        <button onclick="toast('Membuka playlist')" class="tap shrink-0 w-[128px] text-left">
+          <div class="relative w-[128px] h-[128px] rounded-2xl overflow-hidden cover border border-white/[0.07]"
+            style="background:linear-gradient(135deg,#ff5a1f 0%,#7f1d1d 100%);">
+            <div class="absolute inset-0 flex items-center justify-center">
+              <span class="text-[9px] font-mono font-bold tracking-[0.18em] text-white/60 uppercase">Top Hits</span>
+            </div>
+            <div class="absolute bottom-[8px] left-[8px] z-10">
+              <span class="text-[9px] font-bold tracking-[0.08em] uppercase text-white bg-black/45 px-[7px] py-[2px] rounded-full border border-white/10 backdrop-blur-sm">
+                Playlist
+              </span>
+            </div>
+          </div>
+          <h4 class="text-[12px] font-semibold text-white mt-[8px] truncate">Top Hits Indonesia</h4>
+          <p class="text-[10.5px] text-white/40 truncate mt-[1px]">Redlist</p>
+        </button>
+
+        <!-- Playlist 2 -->
+        <button onclick="toast('Membuka playlist')" class="tap shrink-0 w-[128px] text-left">
+          <div class="relative w-[128px] h-[128px] rounded-2xl overflow-hidden cover border border-white/[0.07]"
+            style="background:linear-gradient(135deg,#f59e0b 0%,#b45309 100%);">
+            <div class="absolute inset-0 flex items-center justify-center">
+              <span class="text-[9px] font-mono font-bold tracking-[0.18em] text-white/60 uppercase">Spotify Hits</span>
+            </div>
+          </div>
+          <h4 class="text-[12px] font-semibold text-white mt-[8px] truncate">Spotify Hits</h4>
+          <p class="text-[10.5px] text-white/40 truncate mt-[1px]">INDmusic</p>
+        </button>
+
+        <!-- Playlist 3 -->
+        <button onclick="toast('Membuka playlist')" class="tap shrink-0 w-[128px] text-left">
+          <div class="relative w-[128px] h-[128px] rounded-2xl overflow-hidden cover border border-white/[0.07]"
+            style="background:linear-gradient(135deg,#dc2626 0%,#7f1d1d 100%);">
+            <div class="absolute inset-0 flex items-center justify-center">
+              <span class="text-[9px] font-mono font-bold tracking-[0.18em] text-white/60 uppercase">Pop Terbaru</span>
+            </div>
+          </div>
+          <h4 class="text-[12px] font-semibold text-white mt-[8px] truncate">Lagu Pop Terbaru</h4>
+          <p class="text-[10.5px] text-white/40 truncate mt-[1px]">Maz_Denz</p>
+        </button>
+
+        <!-- Playlist 4 -->
+        <button onclick="toast('Membuka playlist')" class="tap shrink-0 w-[128px] text-left">
+          <div class="relative w-[128px] h-[128px] rounded-2xl overflow-hidden cover border border-white/[0.07]"
+            style="background:linear-gradient(135deg,#ea580c 0%,#831843 100%);">
+            <div class="absolute inset-0 flex items-center justify-center">
+              <span class="text-[9px] font-mono font-bold tracking-[0.18em] text-white/60 uppercase">Indie</span>
+            </div>
+          </div>
+          <h4 class="text-[12px] font-semibold text-white mt-[8px] truncate">Indie Lokal</h4>
+          <p class="text-[10.5px] text-white/40 truncate mt-[1px]">SoundPulse</p>
+        </button>
+      </div>
+    </section>
+
+    <!-- TOP ARTISTS -->
+    <section class="fade">
+      <div class="flex items-center gap-[10px] mb-3">
+        <div class="w-[26px] h-[26px] rounded-full bg-[#ff5a1f]/[0.12] border border-[#ff5a1f]/[0.22] flex items-center justify-center">
+          <i data-lucide="users" class="w-[13px] h-[13px] accent-text"></i>
+        </div>
+        <h2 class="text-[14.5px] font-bold tracking-[-0.01em] text-white">Top Artists</h2>
+      </div>
+
+      <div class="-mx-4 px-4 flex gap-[14px] overflow-x-auto no-scrollbar pb-1">
+        <button onclick="loadQuickPicks('Raim Laode')" class="tap shrink-0 w-[104px] text-center">
+          <div class="w-[104px] h-[104px] rounded-full overflow-hidden border border-white/[0.07] flex items-center justify-center"
+            style="background:linear-gradient(135deg,#ff5a1f 0%,#7f1d1d 100%);">
+            <i data-lucide="mic-vocal" class="w-[32px] h-[32px] text-white/45"></i>
+          </div>
+          <h4 class="text-[12px] font-semibold text-white mt-[8px] truncate">Raim Laode</h4>
+          <p class="text-[9.5px] text-white/35 uppercase tracking-[0.1em] mt-[2px]">Artist</p>
+        </button>
+
+        <button onclick="loadQuickPicks('Tulus')" class="tap shrink-0 w-[104px] text-center">
+          <div class="w-[104px] h-[104px] rounded-full overflow-hidden border border-white/[0.07] flex items-center justify-center"
+            style="background:linear-gradient(135deg,#f59e0b 0%,#7f1d1d 100%);">
+            <i data-lucide="mic-vocal" class="w-[32px] h-[32px] text-white/45"></i>
+          </div>
+          <h4 class="text-[12px] font-semibold text-white mt-[8px] truncate">Tulus</h4>
+          <p class="text-[9.5px] text-white/35 uppercase tracking-[0.1em] mt-[2px]">Artist</p>
+        </button>
+
+        <button onclick="loadQuickPicks('Hindia')" class="tap shrink-0 w-[104px] text-center">
+          <div class="w-[104px] h-[104px] rounded-full overflow-hidden border border-white/[0.07] flex items-center justify-center"
+            style="background:linear-gradient(135deg,#dc2626 0%,#450a0a 100%);">
+            <i data-lucide="mic-vocal" class="w-[32px] h-[32px] text-white/45"></i>
+          </div>
+          <h4 class="text-[12px] font-semibold text-white mt-[8px] truncate">Hindia</h4>
+          <p class="text-[9.5px] text-white/35 uppercase tracking-[0.1em] mt-[2px]">Artist</p>
+        </button>
+
+        <button onclick="loadQuickPicks('Mahalini')" class="tap shrink-0 w-[104px] text-center">
+          <div class="w-[104px] h-[104px] rounded-full overflow-hidden border border-white/[0.07] flex items-center justify-center"
+            style="background:linear-gradient(135deg,#ea580c 0%,#831843 100%);">
+            <i data-lucide="mic-vocal" class="w-[32px] h-[32px] text-white/45"></i>
+          </div>
+          <h4 class="text-[12px] font-semibold text-white mt-[8px] truncate">Mahalini</h4>
+          <p class="text-[9.5px] text-white/35 uppercase tracking-[0.1em] mt-[2px]">Artist</p>
+        </button>
+
+        <button onclick="loadQuickPicks('Nadin Amizah')" class="tap shrink-0 w-[104px] text-center">
+          <div class="w-[104px] h-[104px] rounded-full overflow-hidden border border-white/[0.07] flex items-center justify-center"
+            style="background:linear-gradient(135deg,#b45309 0%,#7f1d1d 100%);">
+            <i data-lucide="mic-vocal" class="w-[32px] h-[32px] text-white/45"></i>
+          </div>
+          <h4 class="text-[12px] font-semibold text-white mt-[8px] truncate">Nadin Amizah</h4>
+          <p class="text-[9.5px] text-white/35 uppercase tracking-[0.1em] mt-[2px]">Artist</p>
+        </button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ============================================================
+       MINI PLAYER
+  ============================================================ -->
+  <div id="audioPlayerBar" class="player-bar fixed left-0 right-0 bottom-[88px] z-50 px-4">
+    <div class="max-w-[640px] mx-auto">
+      <div class="glass border border-white/[0.08] rounded-2xl shadow-[0_8px_40px_-8px_rgba(0,0,0,.75)] overflow-hidden">
+        <!-- Progress -->
+        <div class="h-[2.5px] bg-white/[0.06]">
+          <div id="progressBar" class="progress-line h-full accent-bg" style="width:0%"></div>
+        </div>
+
+        <div class="px-[12px] py-[10px] flex items-center gap-[12px]">
+          <!-- Artwork -->
+          <div class="w-[46px] h-[46px] rounded-xl overflow-hidden shrink-0 border border-white/[0.08] bg-white/[0.03]">
+            <img id="playerArtwork" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 60'><rect width='60' height='60' fill='%231a1a1a'/><text x='50%' y='54%' font-family='sans-serif' font-size='22' fill='%23555' text-anchor='middle'>♪</text></svg>" class="w-full h-full object-cover">
+          </div>
+
+          <!-- Info -->
+          <div class="flex-1 min-w-0">
+            <h4 id="playerTitle" class="text-[12.5px] font-semibold text-white truncate leading-tight">Pilih Lagu</h4>
+            <p id="playerArtist" class="text-[10.5px] text-white/45 truncate mt-[2px]">SoundPulse</p>
+          </div>
+
+          <!-- Controls -->
+          <div class="flex items-center gap-[2px] shrink-0">
+            <button onclick="toggleLikeCurrent()" id="playerLikeBtn"
+              class="w-[34px] h-[34px] rounded-full flex items-center justify-center text-white/50 hover:text-[#ff5a1f] transition tap">
+              <i data-lucide="heart" class="w-[16px] h-[16px]"></i>
+            </button>
+            <button onclick="playPrev()"
+              class="w-[34px] h-[34px] rounded-full flex items-center justify-center text-white/70 hover:text-white transition tap">
+              <i data-lucide="skip-back" class="w-[16px] h-[16px]"></i>
+            </button>
+            <button id="playBtn" onclick="togglePlay()"
+              class="w-[38px] h-[38px] rounded-full accent-bg text-white flex items-center justify-center shadow-[0_4px_14px_-4px_rgba(255,90,31,.55)] tap">
+              <i data-lucide="play" class="w-[16px] h-[16px] fill-current ml-[1px]"></i>
+            </button>
+            <button onclick="playNext()"
+              class="w-[34px] h-[34px] rounded-full flex items-center justify-center text-white/70 hover:text-white transition tap">
+              <i data-lucide="skip-forward" class="w-[16px] h-[16px]"></i>
+            </button>
+            <button onclick="closePlayer()"
+              class="w-[34px] h-[34px] rounded-full flex items-center justify-center text-white/40 hover:text-white transition tap">
+              <i data-lucide="x" class="w-[16px] h-[16px]"></i>
+            </button>
           </div>
         </div>
       </div>
     </div>
+  </div>
 
-    <!-- QUICK PICKS -->
-    <div class="space-y-3">
-      <h2 class="text-sm font-bold text-zinc-300 flex items-center gap-2">
-        <i data-lucide="zap" class="w-4 h-4 text-[#ff5500]"></i> Quick Picks
-      </h2>
-      <div id="quickPicksGrid" class="grid grid-cols-1 md:grid-cols-2 gap-3">
-        <div class="text-zinc-500 text-xs py-4 col-span-2">Memuat rekomendasi lagu...</div>
+  <!-- ============================================================
+       BOTTOM NAV
+  ============================================================ -->
+  <nav class="fixed bottom-0 left-0 right-0 z-40 glass border-t border-white/[0.06] safe-bottom">
+    <div class="max-w-[640px] mx-auto px-6 pt-[10px] pb-[12px]">
+      <div class="flex items-end justify-between relative">
+
+        <button onclick="switchNav('home')" id="nav-home"
+          class="flex flex-col items-center gap-[3px] text-[#ff5a1f] transition tap w-[52px]">
+          <i data-lucide="home" class="w-[20px] h-[20px]"></i>
+          <span class="text-[9.5px] font-semibold">Home</span>
+        </button>
+
+        <button onclick="switchNav('search')" id="nav-search"
+          class="flex flex-col items-center gap-[3px] text-white/45 hover:text-white transition tap w-[52px]">
+          <i data-lucide="search" class="w-[20px] h-[20px]"></i>
+          <span class="text-[9.5px] font-semibold">Cari</span>
+        </button>
+
+        <!-- Center FAB -->
+        <button onclick="scrollToPlayer()"
+          class="tap relative -mt-[20px] w-[54px] h-[54px] rounded-full accent-bg flex items-center justify-center text-white shadow-[0_8px_22px_-4px_rgba(255,90,31,.65)] border-[3px] border-[#0e0e10]">
+          <i data-lucide="disc-3" class="w-[22px] h-[22px]"></i>
+        </button>
+
+        <button onclick="switchNav('likes')" id="nav-likes"
+          class="flex flex-col items-center gap-[3px] text-white/45 hover:text-white transition tap w-[52px]">
+          <i data-lucide="heart" class="w-[20px] h-[20px]"></i>
+          <span class="text-[9.5px] font-semibold">Disukai</span>
+        </button>
+
+        <button onclick="switchNav('profile')" id="nav-profile"
+          class="flex flex-col items-center gap-[3px] text-white/45 hover:text-white transition tap w-[52px]">
+          <i data-lucide="user" class="w-[20px] h-[20px]"></i>
+          <span class="text-[9.5px] font-semibold">Profil</span>
+        </button>
       </div>
     </div>
-
-  </main>
-
-  <!-- FLOATING MUSIC PLAYER -->
-  <footer id="audioPlayerBar" class="fixed bottom-16 left-3 right-3 bg-zinc-900/95 backdrop-blur-xl border border-zinc-800/80 p-3 rounded-2xl flex items-center justify-between z-50 shadow-2xl transition-all duration-300 translate-y-24 opacity-0">
-    <div class="flex items-center gap-3 overflow-hidden w-[55%]">
-      <img id="playerArtwork" src="https://via.placeholder.com/50" class="w-11 h-11 rounded-xl object-cover shrink-0 border border-zinc-700">
-      <div class="truncate">
-        <h4 id="playerTitle" class="text-xs font-bold text-white truncate">Pilih Lagu</h4>
-        <p id="playerArtist" class="text-[10px] text-zinc-400 truncate">SoundPulse Streamer</p>
-      </div>
-    </div>
-
-    <div class="flex items-center gap-3 shrink-0">
-      <button onclick="playPrev()" class="text-zinc-400 hover:text-white"><i data-lucide="skip-back" class="w-4 h-4"></i></button>
-      <button id="playBtn" onclick="togglePlay()" class="bg-[#ff5500] text-black p-2 rounded-full shadow transition hover:scale-105 font-bold">
-        <i data-lucide="play" class="w-4 h-4 fill-current"></i>
-      </button>
-      <button onclick="playNext()" class="text-zinc-400 hover:text-white"><i data-lucide="skip-forward" class="w-4 h-4"></i></button>
-      <button onclick="toggleLikeCurrent()" id="playerLikeBtn" class="text-zinc-400 hover:text-red-500 transition"><i data-lucide="heart" class="w-4 h-4"></i></button>
-    </div>
-  </footer>
-
-  <!-- BOTTOM NAVIGATION -->
-  <nav class="fixed bottom-0 left-0 right-0 bg-[#121212]/95 backdrop-blur-md border-t border-zinc-900 px-6 py-2.5 flex items-center justify-between z-40 text-zinc-400">
-    <button onclick="switchNav('home')" class="flex flex-col items-center gap-0.5 text-[#ff5500]" id="nav-home">
-      <i data-lucide="home" class="w-5 h-5"></i>
-      <span class="text-[10px]">Home</span>
-    </button>
-    <button onclick="switchNav('search')" class="flex flex-col items-center gap-0.5 hover:text-white transition" id="nav-search">
-      <i data-lucide="search" class="w-5 h-5"></i>
-      <span class="text-[10px]">Cari</span>
-    </button>
-    <button onclick="switchNav('likes')" class="flex flex-col items-center gap-0.5 hover:text-white transition" id="nav-likes">
-      <i data-lucide="heart" class="w-5 h-5"></i>
-      <span class="text-[10px]">Disukai</span>
-    </button>
   </nav>
+
+  <!-- ============================================================
+       TOAST
+  ============================================================ -->
+  <div id="toast"
+    class="fixed top-[88px] left-1/2 z-[100] px-[16px] py-[9px] rounded-full glass border border-white/[0.09] text-[12px] font-medium text-white shadow-[0_8px_30px_-8px_rgba(0,0,0,.7)] opacity-0 pointer-events-none transition-all duration-300 whitespace-nowrap"
+    style="transform:translate(-50%,-10px)">Notifikasi</div>
 
   <audio id="audioEngine" class="hidden"></audio>
 
   <script>
     lucide.createIcons();
-    const apiClient = new SoundPulseAPI();
-    let state = {
+
+    /* ============================================================
+       STATE
+       ============================================================ */
+    const apiClient = window.SoundPulseAPI ? new SoundPulseAPI() : null;
+
+    const state = {
       tracks: [],
       currentIndex: -1,
       likes: JSON.parse(localStorage.getItem("sp_likes") || "[]"),
-      recent: JSON.parse(localStorage.getItem("sp_recent") || "null")
+      recent: JSON.parse(localStorage.getItem("sp_recent") || "null"),
+      currentTrack: null
     };
 
     const audio = document.getElementById("audioEngine");
     let hlsPlayer = null;
+    const DEFAULT_ART = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%231a1a1a'/><text x='50%' y='58%' font-family='sans-serif' font-size='38' fill='%23ff5a1f' text-anchor='middle'>♪</text></svg>";
 
+    /* ============================================================
+       INIT
+       ============================================================ */
     async function init() {
       loadRecentPlayed();
-      loadQuickPicks("Indonesian Pop Hits");
+      await loadQuickPicks("Indonesian Pop Hits");
+    }
+
+    /* ============================================================
+       HELPERS
+       ============================================================ */
+    function esc(s) {
+      return String(s || "").replace(/[&<>"']/g, c =>
+        ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    }
+
+    function toast(msg) {
+      const el = document.getElementById("toast");
+      el.textContent = msg;
+      el.style.opacity = "1";
+      el.style.transform = "translate(-50%, 0)";
+      clearTimeout(el._t);
+      el._t = setTimeout(() => {
+        el.style.opacity = "0";
+        el.style.transform = "translate(-50%, -10px)";
+      }, 2100);
     }
 
     function toggleSearch() {
       const bar = document.getElementById("searchBarWrapper");
       bar.classList.toggle("hidden");
-      if(!bar.classList.contains("hidden")) document.getElementById("searchInput").focus();
+      if (!bar.classList.contains("hidden")) document.getElementById("searchInput").focus();
     }
 
     function filterGenre(genre, btn) {
-      if(btn) {
+      if (btn) {
         document.querySelectorAll('.filter-pill').forEach(p => {
-          p.className = "filter-pill px-4 py-1.5 rounded-full text-xs font-medium bg-zinc-900 border border-zinc-800 text-zinc-300 shrink-0 transition hover:bg-zinc-800";
+          p.className = "filter-pill pill shrink-0 px-[14px] py-[8px] rounded-full text-[12px] font-medium bg-white/[0.05] border border-white/[0.08] text-white/70 hover:bg-white/[0.09] hover:text-white flex items-center gap-[6px]";
         });
-        btn.className = "filter-pill px-4 py-1.5 rounded-full text-xs font-medium bg-[#ff5500] text-black shrink-0 transition shadow font-bold";
+        btn.className = "filter-pill pill shrink-0 px-[16px] py-[8px] rounded-full text-[12px] font-semibold accent-bg text-white shadow-[0_4px_12px_-4px_rgba(255,90,31,.55)] flex items-center gap-[6px]";
       }
       loadQuickPicks(genre === 'Semua' ? 'Indonesian Pop Hits' : genre);
     }
 
+    function switchNav(tab) {
+      document.querySelectorAll('nav button[id^="nav-"]').forEach(b => {
+        b.className = "flex flex-col items-center gap-[3px] text-white/45 hover:text-white transition tap w-[52px]";
+      });
+      const target = document.getElementById(`nav-${tab}`);
+      if (target) target.className = "flex flex-col items-center gap-[3px] text-[#ff5a1f] transition tap w-[52px]";
+
+      if (tab === 'likes') {
+        if (!state.likes.length) {
+          toast('Belum ada lagu yang disukai');
+        } else {
+          state.tracks = state.likes.slice();
+          renderQuickPicks(state.likes);
+          window.scrollTo({ top: 320, behavior: 'smooth' });
+        }
+      } else if (tab === 'search') {
+        toggleSearch();
+      } else if (tab === 'home') {
+        loadQuickPicks('Indonesian Pop Hits');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else if (tab === 'profile') {
+        toast('Profil kamu');
+      }
+    }
+
+    function scrollToPlayer() {
+      const player = document.getElementById("audioPlayerBar");
+      if (!player.classList.contains("show")) { toast('Belum ada lagu diputar'); return; }
+      player.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    /* ============================================================
+       LOAD & RENDER
+       ============================================================ */
     async function loadQuickPicks(query) {
       const grid = document.getElementById("quickPicksGrid");
-      grid.innerHTML = `<div class="text-zinc-500 text-xs py-4 col-span-2">Memuat lagu ${query}...</div>`;
+      grid.innerHTML = `<div class="col-span-2 text-white/35 text-[12px] py-8 text-center">Memuat "${esc(query)}"...</div>`;
+
+      if (!apiClient) {
+        grid.innerHTML = `<div class="col-span-2 text-red-400/80 text-[12px] py-6 text-center">API client tidak tersedia</div>`;
+        return;
+      }
 
       try {
         const data = await apiClient.search(query);
-        state.tracks = data.collection || [];
+        state.tracks = (data.collection || []).filter(t => t && t.title).slice(0, 20);
         renderQuickPicks(state.tracks);
-      } catch(e) {
-        grid.innerHTML = `<div class="text-red-400 text-xs py-4">Gagal memuat lagu: ${e.message}</div>`;
+      } catch (e) {
+        grid.innerHTML = `<div class="col-span-2 text-red-400/80 text-[12px] py-6 text-center">Gagal memuat: ${esc(e.message)}</div>`;
       }
     }
 
     function renderQuickPicks(list) {
       const grid = document.getElementById("quickPicksGrid");
-      if(!list.length) {
-        grid.innerHTML = `<div class="text-zinc-500 text-xs py-4 col-span-2">Tidak ada lagu ditemukan.</div>`;
+
+      if (!list.length) {
+        grid.innerHTML = `<div class="col-span-2 text-white/35 text-[12px] py-8 text-center">Tidak ada lagu ditemukan.</div>`;
         return;
       }
 
-      grid.innerHTML = list.map((t, idx) => `
-        <div onclick="playTrack(${idx})" class="bg-zinc-900/60 border border-zinc-800/80 p-2.5 rounded-2xl flex items-center gap-3 cursor-pointer hover:border-[#ff5500]/40 transition group">
-          <img src="${t.artwork_url || (t.user ? t.user.avatar_url : '') || 'https://via.placeholder.com/100'}" class="w-12 h-12 rounded-xl object-cover shrink-0">
-          <div class="truncate flex-1">
-            <h4 class="text-xs font-bold text-white truncate group-hover:text-[#ff5500] transition">${t.title}</h4>
-            <p class="text-[10px] text-zinc-400 truncate">${t.user ? t.user.username : 'Unknown Artist'}</p>
+      grid.innerHTML = list.map((t, i) => {
+        const art = t.artwork_url || (t.user && t.user.avatar_url) || DEFAULT_ART;
+        const artist = (t.user && t.user.username) || "Unknown Artist";
+        const liked = state.likes.some(l => l.id === t.id);
+        const isPlaying = state.currentTrack && state.currentTrack.id === t.id;
+        return `
+          <div onclick="playTrack(${i})"
+            class="tap fade group cursor-pointer rounded-xl border border-white/[0.06] hover:border-[#ff5a1f]/[0.35] bg-white/[0.025] hover:bg-white/[0.045] p-[10px] flex items-center gap-[10px] transition"
+            style="animation-delay:${Math.min(i,10)*0.02}s">
+            <div class="relative w-[46px] h-[46px] rounded-lg overflow-hidden shrink-0 border border-white/[0.06] bg-white/[0.03]">
+              <img src="${art}" class="w-full h-full object-cover" onerror="this.src='${DEFAULT_ART}'">
+              ${isPlaying ? `
+                <div class="absolute inset-0 bg-black/45 flex items-center justify-center">
+                  <i data-lucide="pause" class="w-[16px] h-[16px] text-white fill-current"></i>
+                </div>` : ''}
+            </div>
+            <div class="flex-1 min-w-0">
+              <h4 class="text-[12.5px] font-semibold text-white truncate leading-tight group-hover:text-[#ff5a1f] transition">${esc(t.title)}</h4>
+              <p class="text-[10.5px] text-white/45 truncate mt-[2px]">${esc(artist)}</p>
+            </div>
+            ${liked ? '<i data-lucide="heart" class="w-[12px] h-[12px] text-[#ff5a1f] fill-[#ff5a1f] shrink-0 mr-[2px]"></i>' : ''}
           </div>
-          <div class="w-8 h-8 bg-zinc-800 group-hover:bg-[#ff5500] rounded-full flex items-center justify-center text-black shrink-0 transition shadow">
-            <i data-lucide="play" class="w-3.5 h-3.5 fill-current ml-0.5"></i>
-          </div>
-        </div>
-      `).join('');
+        `;
+      }).join('');
+
       lucide.createIcons();
     }
 
+    /* ============================================================
+       PLAYER
+       ============================================================ */
     function playTrack(idx) {
       const t = state.tracks[idx];
-      if(!t) return;
+      if (!t) return;
 
       state.currentIndex = idx;
-      document.getElementById("playerTitle").innerText = t.title;
-      document.getElementById("playerArtist").innerText = t.user ? t.user.username : 'Unknown';
-      document.getElementById("playerArtwork").src = t.artwork_url || 'https://via.placeholder.com/50';
+      state.currentTrack = t;
 
-      const playerBar = document.getElementById("audioPlayerBar");
-      playerBar.classList.remove("translate-y-24", "opacity-0");
+      document.getElementById("playerTitle").textContent = t.title || "Unknown";
+      document.getElementById("playerArtist").textContent = (t.user && t.user.username) || "Unknown";
+      document.getElementById("playerArtwork").src =
+        t.artwork_url || (t.user && t.user.avatar_url) || DEFAULT_ART;
+
+      document.getElementById("audioPlayerBar").classList.add("show");
 
       state.recent = t;
       localStorage.setItem("sp_recent", JSON.stringify(t));
       loadRecentPlayed();
 
-      const rawStream = apiClient.getStreamUrl(t);
-      const streamUrl = `/api/stream?url=${encodeURIComponent(rawStream)}&client_id=${apiClient.clientId}`;
-
-      if (hlsPlayer) {
-        hlsPlayer.destroy();
-        hlsPlayer = null;
+      let streamUrl = null;
+      if (apiClient && typeof apiClient.getStreamUrl === "function") {
+        const raw = apiClient.getStreamUrl(t);
+        if (raw) streamUrl = `/api/stream?url=${encodeURIComponent(raw)}&client_id=${apiClient.clientId || ""}`;
       }
 
-      if (Hls.isSupported() && rawStream && rawStream.includes('hls')) {
+      if (hlsPlayer) { hlsPlayer.destroy(); hlsPlayer = null; }
+
+      if (!streamUrl) { toast('Stream tidak tersedia'); return; }
+
+      if (typeof Hls !== "undefined" && Hls.isSupported() && streamUrl.includes("hls")) {
         hlsPlayer = new Hls();
         hlsPlayer.loadSource(streamUrl);
         hlsPlayer.attachMedia(audio);
-        hlsPlayer.on(Hls.Events.MANIFEST_PARSED, () => {
-          audio.play();
-        });
+        hlsPlayer.on(Hls.Events.MANIFEST_PARSED, () => audio.play().catch(() => {}));
       } else {
         audio.src = streamUrl;
-        audio.play().catch(err => alert("Gagal memutar audio: " + err.message));
+        audio.play().catch(err => toast("Gagal memutar: " + err.message));
       }
 
-      document.getElementById("playBtn").innerHTML = `<i data-lucide="pause" class="w-4 h-4 fill-current"></i>`;
+      setPlayIcon(true);
       updateLikeButtonState(t.id);
-      lucide.createIcons();
+      renderQuickPicks(state.tracks);
     }
 
     function togglePlay() {
-      if(!audio.src && !hlsPlayer) return;
-      if(audio.paused) {
-        audio.play();
-        document.getElementById("playBtn").innerHTML = `<i data-lucide="pause" class="w-4 h-4 fill-current"></i>`;
+      if (!audio.src && !hlsPlayer) return;
+      if (audio.paused) {
+        audio.play().catch(() => {});
+        setPlayIcon(true);
       } else {
         audio.pause();
-        document.getElementById("playBtn").innerHTML = `<i data-lucide="play" class="w-4 h-4 fill-current"></i>`;
+        setPlayIcon(false);
       }
+    }
+
+    function setPlayIcon(isPlaying) {
+      document.getElementById("playBtn").innerHTML = isPlaying
+        ? `<i data-lucide="pause" class="w-[16px] h-[16px] fill-current"></i>`
+        : `<i data-lucide="play" class="w-[16px] h-[16px] fill-current ml-[1px]"></i>`;
       lucide.createIcons();
     }
 
-    function playNext() { if(state.currentIndex + 1 < state.tracks.length) playTrack(state.currentIndex + 1); }
-    function playPrev() { if(state.currentIndex > 0) playTrack(state.currentIndex - 1); }
+    function playNext() { if (state.currentIndex + 1 < state.tracks.length) playTrack(state.currentIndex + 1); }
+    function playPrev() { if (state.currentIndex > 0) playTrack(state.currentIndex - 1); }
 
+    function closePlayer() {
+      audio.pause();
+      audio.src = "";
+      if (hlsPlayer) { hlsPlayer.destroy(); hlsPlayer = null; }
+      document.getElementById("audioPlayerBar").classList.remove("show");
+      state.currentTrack = null;
+      loadRecentPlayed();
+      renderQuickPicks(state.tracks);
+    }
+
+    audio.addEventListener("timeupdate", () => {
+      if (audio.duration && isFinite(audio.duration)) {
+        document.getElementById("progressBar").style.width = (audio.currentTime / audio.duration * 100) + "%";
+      }
+    });
+    audio.addEventListener("ended", () => playNext());
+
+    /* ============================================================
+       RECENT
+       ============================================================ */
     function loadRecentPlayed() {
       const container = document.getElementById("recentCardContainer");
-      if(!state.recent) return;
+      if (!state.recent) {
+        container.innerHTML = `
+          <div class="rounded-2xl border border-white/[0.07] bg-white/[0.025] p-[14px] flex items-center gap-[12px] min-h-[76px]">
+            <div class="w-[52px] h-[52px] rounded-xl bg-white/[0.04] border border-white/[0.06] flex items-center justify-center shrink-0">
+              <i data-lucide="music" class="w-[20px] h-[20px] text-white/25"></i>
+            </div>
+            <div class="flex-1 min-w-0">
+              <h4 class="text-[13.5px] font-semibold text-white truncate">Belum ada lagu diputar</h4>
+              <p class="text-[11px] text-white/45 truncate mt-[2px]">Pilih lagu di Quick Picks</p>
+            </div>
+          </div>`;
+        lucide.createIcons();
+        return;
+      }
+
       const t = state.recent;
+      const art = t.artwork_url || (t.user && t.user.avatar_url) || DEFAULT_ART;
+      const playing = state.currentTrack && state.currentTrack.id === t.id;
 
       container.innerHTML = `
-        <div onclick="playTrack(state.currentIndex >= 0 ? state.currentIndex : 0)" class="bg-zinc-900/80 border border-zinc-800 p-3 rounded-2xl flex items-center gap-3 cursor-pointer hover:border-[#ff5500]/50 transition">
-          <img src="${t.artwork_url || 'https://via.placeholder.com/60'}" class="w-14 h-14 rounded-xl object-cover shadow">
-          <div class="flex-1 truncate">
-            <h4 class="text-sm font-bold text-white truncate">${t.title}</h4>
-            <p class="text-xs text-zinc-400 truncate">${t.user ? t.user.username : 'Unknown'}</p>
+        <div onclick="playRecentTrack()"
+          class="tap fade cursor-pointer rounded-2xl border border-white/[0.07] bg-white/[0.025] hover:bg-white/[0.04] hover:border-[#ff5a1f]/[0.3] transition p-[12px] flex items-center gap-[12px]">
+          <img src="${art}" class="w-[52px] h-[52px] rounded-xl object-cover border border-white/[0.06] shrink-0" onerror="this.src='${DEFAULT_ART}'">
+          <div class="flex-1 min-w-0">
+            <h4 class="text-[13.5px] font-semibold text-white truncate leading-tight">${esc(t.title)}</h4>
+            <p class="text-[11px] text-white/45 truncate mt-[3px]">${esc((t.user && t.user.username) || "Unknown")}</p>
           </div>
-          <div class="w-9 h-9 bg-[#ff5500] text-black rounded-full flex items-center justify-center shadow font-bold">
-            <i data-lucide="play" class="w-4 h-4 fill-current ml-0.5"></i>
+          <div class="w-[38px] h-[38px] rounded-full ${playing ? 'accent-bg' : 'bg-white/[0.06] border border-white/[0.08]'} flex items-center justify-center shrink-0">
+            <i data-lucide="${playing ? 'pause' : 'play'}" class="w-[15px] h-[15px] ${playing ? 'fill-white text-white' : 'fill-white/70 text-white/70 ml-[1px]'}"></i>
           </div>
-        </div>
-      `;
+        </div>`;
       lucide.createIcons();
     }
 
-    async function handleSearchKey(e) {
-      if(e.key === 'Enter') {
-        const q = e.target.value.trim();
-        if(q) loadQuickPicks(q);
-      }
+    function playRecentTrack() {
+      if (!state.recent) return;
+      const idx = state.tracks.findIndex(t => t.id === state.recent.id);
+      if (idx >= 0) playTrack(idx);
+      else { state.tracks.unshift(state.recent); playTrack(0); }
     }
 
+    /* ============================================================
+       LIKES
+       ============================================================ */
     function toggleLikeCurrent() {
-      if(!state.recent) return;
-      const t = state.recent;
+      if (!state.currentTrack) { toast('Belum ada lagu'); return; }
+      const t = state.currentTrack;
       const idx = state.likes.findIndex(item => item.id === t.id);
-      if(idx >= 0) state.likes.splice(idx, 1);
-      else state.likes.push(t);
+      if (idx >= 0) { state.likes.splice(idx, 1); toast('Dihapus dari Disukai'); }
+      else { state.likes.push(t); toast('Ditambahkan ke Disukai'); }
       localStorage.setItem("sp_likes", JSON.stringify(state.likes));
       updateLikeButtonState(t.id);
+      renderQuickPicks(state.tracks);
     }
 
     function updateLikeButtonState(trackId) {
-      const isLiked = state.likes.some(item => item.id === trackId);
+      const liked = state.likes.some(item => item.id === trackId);
       const btn = document.getElementById("playerLikeBtn");
-      btn.innerHTML = `<i data-lucide="heart" class="w-4 h-4 ${isLiked ? 'fill-red-500 text-red-500' : ''}"></i>`;
+      btn.className = `w-[34px] h-[34px] rounded-full flex items-center justify-center ${liked ? 'text-[#ff5a1f]' : 'text-white/50 hover:text-[#ff5a1f]'} transition tap`;
+      btn.innerHTML = `<i data-lucide="heart" class="w-[16px] h-[16px] ${liked ? 'fill-current' : ''}"></i>`;
       lucide.createIcons();
     }
 
-    function switchNav(tab) {
-      document.querySelectorAll('nav button').forEach(b => b.className = "flex flex-col items-center gap-0.5 text-zinc-400 hover:text-white transition");
-      document.getElementById(`nav-${tab}`).className = "flex flex-col items-center gap-0.5 text-[#ff5500]";
-
-      if(tab === 'likes') {
-        renderQuickPicks(state.likes);
-      } else if(tab === 'search') {
-        toggleSearch();
-      }
+    /* ============================================================
+       SEARCH
+       ============================================================ */
+    function handleSearchKey(e) {
+      if (e.key !== 'Enter') return;
+      const q = (e.target.value || '').trim();
+      if (!q) return;
+      loadQuickPicks(q);
+      document.getElementById("searchBarWrapper").classList.add("hidden");
+      window.scrollTo({ top: 320, behavior: 'smooth' });
     }
 
     init();

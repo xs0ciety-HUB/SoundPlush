@@ -1,5 +1,5 @@
 // v5: cache app shell + library CDN + cover art supaya UI tetap kebuka offline
-const CACHE = "xs0ciety-v5";
+const CACHE = "soundpulse-v6";
 const LOCAL = ["/", "/index.html", "/soundpulse-api-client.js", "/audio.js", "/manifest.json", "/icon-192.png", "/icon-512.png"];
 const CDN = [
   "https://cdn.tailwindcss.com",

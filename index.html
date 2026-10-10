@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SoundPulse - Public Streamer</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #121212; }
+    ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #ff5500; }
+  </style>
+</head>
+<body class="bg-zinc-950 text-zinc-100 min-h-screen flex flex-col font-sans antialiased selection:bg-orange-500 selection:text-black">
+
+  <!-- HEADER / NAVBAR -->
+  <header class="bg-zinc-900/80 backdrop-blur-md border-b border-zinc-800 sticky top-0 z-40 px-4 py-3 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <div class="bg-gradient-to-tr from-orange-600 to-amber-500 p-2 rounded-xl shadow-lg shadow-orange-500/20">
+        <i data-lucide="radio" class="w-6 h-6 text-white"></i>
+      </div>
+      <span class="font-bold text-lg tracking-wider text-white">SOUND<span class="text-orange-500">PULSE</span></span>
+    </div>
+
+    <!-- SEARCH BAR -->
+    <div class="flex-1 max-w-md mx-4">
+      <div class="relative">
+        <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400"></i>
+        <input id="searchInput" type="text" onkeypress="handleSearchKey(event)" placeholder="Cari lagu, artis, atau genre (Tekan Enter)..." class="w-full bg-zinc-800/80 border border-zinc-700/60 rounded-full pl-9 pr-4 py-1.5 text-sm focus:outline-none focus:border-orange-500 text-zinc-100 placeholder-zinc-500 transition">
+      </div>
+    </div>
+
+    <div class="flex items-center gap-2">
+      <span class="text-xs bg-orange-500/10 text-orange-400 border border-orange-500/20 px-3 py-1 rounded-full font-medium">Public Mode</span>
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <div class="flex-1 flex overflow-hidden">
+    
+    <!-- SIDEBAR -->
+    <aside class="w-64 bg-zinc-900/50 border-r border-zinc-800 p-4 hidden md:flex flex-col justify-between">
+      <div class="space-y-6">
+        <nav class="space-y-1">
+          <button onclick="switchTab('discover')" id="tab-discover" class="nav-btn flex items-center gap-3 w-full px-3 py-2 rounded-lg text-sm font-medium text-orange-500 bg-orange-500/10 transition">
+            <i data-lucide="compass" class="w-4 h-4"></i> Discover & Search
+          </button>
+          <button onclick="switchTab('offline')" id="tab-offline" class="nav-btn flex items-center gap-3 w-full px-3 py-2 rounded-lg text-sm font-medium text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/50 transition">
+            <i data-lucide="hard-drive-download" class="w-4 h-4"></i> Offline Tracks
+          </button>
+        </nav>
+      </div>
+
+      <!-- INFO -->
+      <div class="bg-zinc-900 border border-zinc-800 p-3 rounded-xl text-xs space-y-2">
+        <div class="flex justify-between text-zinc-400">
+          <span>Client ID:</span>
+          <span id="activeClientIdStatus" class="font-mono text-orange-400 truncate max-w-[90px]">Active</span>
+        </div>
+        <div class="flex justify-between text-zinc-400">
+          <span>Offline Saved:</span>
+          <span id="offlineCount" class="font-semibold text-zinc-200">0 Lagu</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- TRACK CONTENT -->
+    <main class="flex-1 overflow-y-auto p-4 md:p-6 pb-28">
+      <div class="flex items-center justify-between mb-6">
+        <h2 id="sectionTitle" class="text-xl font-bold text-white flex items-center gap-2">
+          <i data-lucide="sparkles" class="w-5 h-5 text-orange-500"></i> Hasil Pencarian & Trending
+        </h2>
+      </div>
+
+      <div id="trackContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div class="col-span-full text-center py-16 text-zinc-500">
+          Ketik judul lagu di kolom pencarian atas lalu tekan <b>Enter</b> untuk mulai memutar musik!
+        </div>
+      </div>
+    </main>
+
+  </div>
+
+  <!-- PLAYER FOOTER -->
+  <footer class="fixed bottom-0 left-0 right-0 bg-zinc-900/95 backdrop-blur-xl border-t border-zinc-800 px-4 py-3 flex items-center justify-between z-50">
+    <div class="flex items-center gap-3 w-1/4 min-w-[180px]">
+      <img id="playerArtwork" src="https://via.placeholder.com/60" class="w-12 h-12 rounded-lg object-cover border border-zinc-700">
+      <div class="truncate">
+        <h4 id="playerTitle" class="text-sm font-semibold text-white truncate">Pilih Lagu</h4>
+        <p id="playerArtist" class="text-xs text-zinc-400 truncate">SoundPulse Streamer</p>
+      </div>
+    </div>
+
+    <!-- CONTROLS -->
+    <div class="flex flex-col items-center gap-1.5 w-1/2 max-w-xl">
+      <div class="flex items-center gap-4">
+        <button onclick="playPrev()" class="text-zinc-300 hover:text-white transition"><i data-lucide="skip-back" class="w-5 h-5"></i></button>
+        <button id="playBtn" onclick="togglePlay()" class="bg-orange-500 hover:bg-orange-400 text-black p-2.5 rounded-full transition shadow-lg shadow-orange-500/30">
+          <i data-lucide="play" class="w-5 h-5 fill-current"></i>
+        </button>
+        <button onclick="playNext()" class="text-zinc-300 hover:text-white transition"><i data-lucide="skip-forward" class="w-5 h-5"></i></button>
+        <button onclick="saveForOffline(currentIndex)" class="text-zinc-400 hover:text-orange-400 transition" title="Simpan Offline"><i data-lucide="download" class="w-4 h-4"></i></button>
+      </div>
+
+      <div class="w-full flex items-center gap-2 text-xs font-mono text-zinc-400">
+        <span id="currentTime">0:00</span>
+        <input id="progressBar" type="range" value="0" min="0" max="100" oninput="seekAudio(this.value)" class="flex-1 h-1 bg-zinc-700 rounded-lg appearance-none cursor-pointer accent-orange-500">
+        <span id="duration">0:00</span>
+      </div>
+    </div>
+
+    <!-- VOLUME -->
+    <div class="flex items-center gap-2 w-1/4 justify-end">
+      <i data-lucide="volume-2" class="w-4 h-4 text-zinc-400"></i>
+      <input type="range" min="0" max="1" step="0.01" value="1" oninput="setVolume(this.value)" class="w-20 h-1 bg-zinc-700 rounded-lg appearance-none cursor-pointer accent-orange-500">
+    </div>
+  </footer>
+
+  <audio id="audioEngine" class="hidden"></audio>
+
+  <script>
+    lucide.createIcons();
+
+    let state = {
+      clientId: "KKzJxmw11tYpCs6T24P4uUYhqmjalG6M",
+      tracks: [],
+      offlineTracks: JSON.parse(localStorage.getItem("sp_offline_meta") || "[]")
+    };
+
+    let currentIndex = -1;
+    const audio = document.getElementById("audioEngine");
+
+    async function init() {
+      try {
+        const res = await fetch("/api/get-credentials");
+        const data = await res.json();
+        if(data.client_id) {
+          state.clientId = data.client_id;
+          document.getElementById("activeClientIdStatus").innerText = state.clientId;
+        }
+      } catch(e) {}
+      loadOfflineTracks();
+      
+      // Load lagu default (Trending/Lo-fi) pas pertama buka
+      searchDefaultTracks("lo-fi hip hop");
+    }
+
+    async function searchDefaultTracks(query) {
+      try {
+        const res = await fetch(`https://api-v2.soundcloud.com/search/tracks?q=${encodeURIComponent(query)}&client_id=${state.clientId}&limit=12`);
+        const data = await res.json();
+        state.tracks = data.collection || [];
+        renderTracks(state.tracks);
+      } catch(err) {}
+    }
+
+    async function handleSearchKey(e) {
+      if(e.key === 'Enter') {
+        const query = e.target.value.trim();
+        if(!query) return;
+
+        const container = document.getElementById("trackContainer");
+        container.innerHTML = `<div class="col-span-full text-center py-16 text-zinc-400 animate-pulse">Mencari lagu "${query}"...</div>`;
+
+        try {
+          const res = await fetch(`https://api-v2.soundcloud.com/search/tracks?q=${encodeURIComponent(query)}&client_id=${state.clientId}&limit=18`);
+          const data = await res.json();
+          state.tracks = data.collection || [];
+          renderTracks(state.tracks);
+        } catch(err) {
+          container.innerHTML = `<div class="col-span-full text-center py-16 text-red-400">Gagal mencari lagu: ${err.message}</div>`;
+        }
+      }
+    }
+
+    function renderTracks(list) {
+      const container = document.getElementById("trackContainer");
+      if(!list.length) {
+        container.innerHTML = `<div class="col-span-full text-center py-16 text-zinc-500">Lagu tidak ditemukan.</div>`;
+        return;
+      }
+
+      container.innerHTML = list.map((t, idx) => `
+        <div class="bg-zinc-900/60 border border-zinc-800/80 p-3 rounded-2xl flex items-center justify-between hover:border-orange-500/40 transition group">
+          <div class="flex items-center gap-3 overflow-hidden">
+            <img src="${t.artwork_url || (t.user ? t.user.avatar_url : '') || 'https://via.placeholder.com/100'}" class="w-12 h-12 rounded-xl object-cover">
+            <div class="truncate">
+              <h4 class="text-sm font-semibold text-white truncate">${t.title}</h4>
+              <p class="text-xs text-zinc-400 truncate">${t.user ? t.user.username : 'Unknown Artist'}</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="playTrack(${idx})" class="p-2 bg-orange-500 hover:bg-orange-400 text-black rounded-full shadow-lg transition">
+              <i data-lucide="play" class="w-4 h-4 fill-current"></i>
+            </button>
+            <button onclick="saveForOffline(${idx})" class="p-2 text-zinc-400 hover:text-orange-400 transition" title="Simpan Offline">
+              <i data-lucide="hard-drive-download" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+      `).join('');
+      lucide.createIcons();
+    }
+
+    function playTrack(idx) {
+      const t = state.tracks[idx];
+      if(!t) return;
+
+      currentIndex = idx;
+      document.getElementById("playerTitle").innerText = t.title;
+      document.getElementById("playerArtist").innerText = t.user ? t.user.username : 'Unknown';
+      document.getElementById("playerArtwork").src = t.artwork_url || 'https://via.placeholder.com/60';
+
+      const streamUrl = `${t.stream_url || (t.media && t.media.transcodings ? t.media.transcodings[0].url : '')}?client_id=${state.clientId}`;
+      audio.src = streamUrl;
+      audio.play();
+      
+      document.getElementById("playBtn").innerHTML = `<i data-lucide="pause" class="w-5 h-5 fill-current"></i>`;
+      lucide.createIcons();
+    }
+
+    function togglePlay() {
+      if(!audio.src) return;
+      if(audio.paused) {
+        audio.play();
+        document.getElementById("playBtn").innerHTML = `<i data-lucide="pause" class="w-5 h-5 fill-current"></i>`;
+      } else {
+        audio.pause();
+        document.getElementById("playBtn").innerHTML = `<i data-lucide="play" class="w-5 h-5 fill-current"></i>`;
+      }
+      lucide.createIcons();
+    }
+
+    function playNext() { if(currentIndex + 1 < state.tracks.length) playTrack(currentIndex + 1); }
+    function playPrev() { if(currentIndex - 1 >= 0) playTrack(currentIndex - 1); }
+
+    audio.ontimeupdate = () => {
+      if(audio.duration) {
+        document.getElementById("progressBar").value = (audio.currentTime / audio.duration) * 100;
+        document.getElementById("currentTime").innerText = formatTime(audio.currentTime);
+        document.getElementById("duration").innerText = formatTime(audio.duration);
+      }
+    };
+
+    function seekAudio(val) { if(audio.duration) audio.currentTime = (val / 100) * audio.duration; }
+    function setVolume(v) { audio.volume = v; }
+    function formatTime(secs) {
+      const m = Math.floor(secs / 60);
+      const s = Math.floor(secs % 60);
+      return `${m}:${s < 10 ? '0' : ''}${s}`;
+    }
+
+    async function saveForOffline(idx) {
+      const t = state.tracks[idx];
+      if(!t) { alert("Pilih lagu yang sedang diputar terlebih dahulu!"); return; }
+
+      try {
+        const cache = await caches.open("soundpulse-offline-audio");
+        const streamUrl = `${t.stream_url || t.media.transcodings[0].url}?client_id=${state.clientId}`;
+        await cache.add(streamUrl);
+
+        if(!state.offlineTracks.some(item => item.id === t.id)) {
+          state.offlineTracks.push(t);
+          localStorage.setItem("sp_offline_meta", JSON.stringify(state.offlineTracks));
+          loadOfflineTracks();
+        }
+        alert(`Lagu "${t.title}" berhasil disimpan offline!`);
+      } catch(e) {
+        alert("Gagal simpan offline (terhalang proteksi stream): " + e.message);
+      }
+    }
+
+    function loadOfflineTracks() {
+      document.getElementById("offlineCount").innerText = `${state.offlineTracks.length} Lagu`;
+    }
+
+    function switchTab(tab) {
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.className = "nav-btn flex items-center gap-3 w-full px-3 py-2 rounded-lg text-sm font-medium text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/50 transition";
+      });
+      document.getElementById(`tab-${tab}`).className = "nav-btn flex items-center gap-3 w-full px-3 py-2 rounded-lg text-sm font-medium text-orange-500 bg-orange-500/10 transition";
+
+      if(tab === 'offline') {
+        document.getElementById("sectionTitle").innerHTML = `<i data-lucide="hard-drive-download" class="w-5 h-5 text-orange-500"></i> Offline Saved Tracks`;
+        renderTracks(state.offlineTracks);
+      } else {
+        document.getElementById("sectionTitle").innerHTML = `<i data-lucide="sparkles" class="w-5 h-5 text-orange-500"></i> Hasil Pencarian & Trending`;
+        renderTracks(state.tracks);
+      }
+    }
+
+    init();
+  </script>
+</body>
+</html>

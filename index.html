@@ -6,6 +6,8 @@
   <title>SoundPulse - Streaming Musik</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Load HLS.js untuk memutar format audio .m3u8 SoundCloud -->
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
   <style>
     body { background: #121212; color: #f3f4f6; }
     ::-webkit-scrollbar { display: none; }
@@ -126,6 +128,7 @@
     };
 
     const audio = document.getElementById("audioEngine");
+    let hls = null;
 
     async function init() {
       try {
@@ -190,7 +193,7 @@
       lucide.createIcons();
     }
 
-    function playTrack(idx) {
+    async function playTrack(idx) {
       const t = state.tracks[idx];
       if(!t) return;
 
@@ -206,20 +209,54 @@
       localStorage.setItem("sp_recent", JSON.stringify(t));
       loadRecentPlayed();
 
-      const transcode = (t.media && t.media.transcodings) ? t.media.transcodings.find(tr => tr.format.protocol === 'progressive' || tr.format.mime_type.includes('mpeg')) || t.media.transcodings[0] : null;
-      const streamSource = transcode ? transcode.url : (t.stream_url || '');
+      // Ambil URL HLS / Transcoding pertama yang tersedia dari data track SoundCloud
+      let streamSource = "";
+      if (t.media && t.media.transcodings && t.media.transcodings.length > 0) {
+        streamSource = t.media.transcodings[0].url;
+      } else {
+        streamSource = t.stream_url || "";
+      }
+
       const streamUrl = `/api/stream?url=${encodeURIComponent(streamSource)}&client_id=${state.clientId}`;
 
-      audio.src = streamUrl;
-      audio.play().catch(err => alert("Gagal memutar audio: " + err.message));
+      // Ambil file HLS metadata aslinya via proxy
+      try {
+        const res = await fetch(streamUrl);
+        const data = await res.json();
+        if (data && data.url) {
+          playAudioStream(data.url);
+        } else {
+          alert("Gagal mengurai stream audio.");
+        }
+      } catch (err) {
+        alert("Gagal memuat lagu: " + err.message);
+      }
+    }
+
+    function playAudioStream(mp3OrHlsUrl) {
+      if (hls) {
+        hls.destroy();
+      }
+
+      if (Hls.isSupported() && mp3OrHlsUrl.includes('.m3u8')) {
+        hls = new Hls();
+        hls.loadSource(mp3OrHlsUrl);
+        hls.attachMedia(audio);
+        hls.on(Hls.Events.MANIFEST_PARSED, () => {
+          audio.play().catch(err => alert("Gagal memutar HLS: " + err.message));
+        });
+      } else {
+        audio.src = mp3OrHlsUrl;
+        audio.play().catch(err => alert("Gagal memutar audio: " + err.message));
+      }
 
       document.getElementById("playBtn").innerHTML = `<i data-lucide="play" class="w-4 h-4 fill-current"></i>`;
-      updateLikeButtonState(t.id);
+      updateLikeButtonState(state.tracks[state.currentIndex]?.id);
       lucide.createIcons();
     }
 
     function togglePlay() {
-      if(!audio.src) return;
+      if(!audio.src && !hls) return;
       if(audio.paused) {
         audio.play();
         document.getElementById("playBtn").innerHTML = `<i data-lucide="pause" class="w-4 h-4 fill-current"></i>`;
@@ -271,6 +308,7 @@
     }
 
     function updateLikeButtonState(trackId) {
+      if(!trackId) return;
       const isLiked = state.likes.some(item => item.id === trackId);
       const btn = document.getElementById("playerLikeBtn");
       btn.innerHTML = `<i data-lucide="heart" class="w-4 h-4 ${isLiked ? 'fill-red-500 text-red-500' : ''}"></i>`;

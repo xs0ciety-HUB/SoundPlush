@@ -9,6 +9,9 @@ try {
 
 const memStore = { messages: [] };
 
+// Prefix unik biar ga bentrok sama project lain di database yang sama
+const KEY = "soundpulse:chat:messages";
+
 export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
@@ -20,12 +23,16 @@ export default async function handler(req, res) {
   const useKV = kv && process.env.KV_REST_API_URL;
 
   try {
+    // ============ GET ============
     if (req.method === "GET") {
       let messages = [];
       if (useKV) {
-        const raw = await kv.lrange("chat:messages", 0, 99);
+        const raw = await kv.lrange(KEY, 0, 99);
         messages = raw
-          .map(m => { try { return typeof m === "string" ? JSON.parse(m) : m; } catch { return null; } })
+          .map(m => {
+            try { return typeof m === "string" ? JSON.parse(m) : m; }
+            catch { return null; }
+          })
           .filter(Boolean);
       } else {
         messages = [...memStore.messages].slice(-100);
@@ -37,6 +44,7 @@ export default async function handler(req, res) {
       });
     }
 
+    // ============ POST ============
     if (req.method === "POST") {
       const body = typeof req.body === "string" ? JSON.parse(req.body) : req.body;
       const { name, text, avatar, bio } = body || {};
@@ -48,7 +56,6 @@ export default async function handler(req, res) {
       const cleanName = String(name).slice(0, 24).trim();
       const cleanText = String(text).slice(0, 500).trim();
       const cleanBio = bio ? String(bio).slice(0, 100).trim() : null;
-      // Avatar: base64 jpeg ~10KB max — batasi ukuran biar ga bengkak KV
       const cleanAvatar = avatar && typeof avatar === "string" && avatar.length < 30000
         ? avatar : null;
 
@@ -66,8 +73,8 @@ export default async function handler(req, res) {
       };
 
       if (useKV) {
-        await kv.lpush("chat:messages", JSON.stringify(msg));
-        await kv.ltrim("chat:messages", 0, 199);
+        await kv.lpush(KEY, JSON.stringify(msg));
+        await kv.ltrim(KEY, 0, 199);
       } else {
         memStore.messages.push(msg);
         if (memStore.messages.length > 200) memStore.messages.shift();
@@ -81,4 +88,4 @@ export default async function handler(req, res) {
     console.error("[chat]", err);
     return res.status(500).json({ success: false, error: err.message });
   }
-}
+      }

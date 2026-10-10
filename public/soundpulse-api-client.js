@@ -171,6 +171,17 @@ class SoundPulseAPI {
   }
 }
 
+/* ============================================================
+   EXPORT — dukung CommonJS (Node) DAN global (browser classic script)
+   ============================================================
+   PENTING: Di browser, `class Foo {}` di top-level classic script
+   TIDAK otomatis jadi `window.Foo`. Makanya kita harus attach manual
+   ke `window` agar `window.SoundPulseAPI` bisa diakses dari index.html.
+============================================================ */
 if (typeof module !== "undefined" && module.exports) {
+  // Node / CommonJS environment
   module.exports = SoundPulseAPI;
-      }
+} else if (typeof window !== "undefined") {
+  // Browser classic script — attach ke window
+  window.SoundPulseAPI = SoundPulseAPI;
+          }

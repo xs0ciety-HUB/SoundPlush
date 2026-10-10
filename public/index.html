@@ -335,6 +335,65 @@ function skipBy(sec){
 }
 try { applyTheme(localStorage.getItem("sp_theme") || "magenta"); } catch {}
 </script>
+<script>
+/* ===== OFFLINE: simpan file audio beneran ke IndexedDB ===== */
+function offOpen(){
+  return new Promise((res, rej) => {
+    const q = indexedDB.open("sp_offline", 1);
+    q.onupgradeneeded = () => q.result.createObjectStore("audio");
+    q.onsuccess = () => res(q.result);
+    q.onerror = () => rej(q.error);
+  });
+}
+async function offTx(mode, fn){
+  const db = await offOpen();
+  return new Promise((res, rej) => {
+    const tx = db.transaction("audio", mode);
+    const r = fn(tx.objectStore("audio"));
+    tx.oncomplete = () => res(r && r.result !== undefined ? r.result : null);
+    tx.onerror = () => rej(tx.error);
+    tx.onabort = () => rej(tx.error);
+  });
+}
+const offGet = (id) => offTx("readonly", st => st.get(String(id)));
+const offPut = (id, blob) => offTx("readwrite", st => st.put(blob, String(id)));
+const offDel = (id) => offTx("readwrite", st => st.delete(String(id)));
+let offUrl = null;
+
+async function fetchAudioBlob(url, onProgress){
+  const r = await fetch(url);
+  if (!r.ok) throw new Error("HTTP " + r.status);
+  const type = r.headers.get("content-type") || "audio/mpeg";
+  if (/json|html|text/i.test(type)) throw new Error("Respon bukan audio");
+  const total = +r.headers.get("content-length") || 0;
+  const reader = r.body.getReader();
+  const chunks = []; let got = 0;
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    chunks.push(value); got += value.length;
+    if (total && onProgress) onProgress(got / total);
+  }
+  const blob = new Blob(chunks, { type });
+  if (blob.size < 50000) throw new Error("File terlalu kecil");
+  return blob;
+}
+
+/* bersihkan data lama: dulu "download" cuma simpan judul, bukan audio */
+window.addEventListener("load", async () => {
+  try {
+    if (!navigator.onLine && typeof switchView === "function") switchView("offline");
+    if (!window.indexedDB || typeof state === "undefined") return;
+    const keep = [];
+    for (const d of state.downloaded) { if (await offGet(d.id)) keep.push(d); }
+    if (keep.length !== state.downloaded.length) {
+      state.downloaded = keep;
+      localStorage.setItem("sp_downloaded", JSON.stringify(keep));
+      if (state.view === "offline" && typeof renderOffline === "function") renderOffline();
+    }
+  } catch {}
+});
+</script>
 </head>
 <body class="grad-bg min-h-screen">
 
@@ -1402,6 +1461,31 @@ async function playTrack(idx, opts = {}) {
   localStorage.setItem("sp_recent", JSON.stringify(t));
   renderRecent();
 
+  let offBlob = null;
+  try { offBlob = await offGet(t.id); } catch {}
+  if (myToken !== hlsToken) return;
+  if (offBlob) {
+    if (hlsPlayer) { try { hlsPlayer.destroy(); } catch {} hlsPlayer = null; }
+    if (offUrl) URL.revokeObjectURL(offUrl);
+    offUrl = URL.createObjectURL(offBlob);
+    audio.src = offUrl;
+    if (opts.resumeAt > 0) {
+      audio.addEventListener("loadedmetadata", () => { try { audio.currentTime = opts.resumeAt; } catch {} }, { once: true });
+    }
+    audio.play().catch(err => {
+      if (err.name === "AbortError") return;
+      if (myToken === hlsToken) toast("Gagal putar: " + err.message);
+    });
+    setPlayIcon(true);
+    updateHeartUI(t.id);
+    updateDownloadUI(t.id);
+    resetLyrics();
+    if (state.view === "home") renderTrackList(state.tracks, "quickPicksGrid");
+    if (state.view === "liked") renderLiked();
+    if (state.view === "offline") renderOffline();
+    return;
+  }
+
   let raw = null;
   if (apiClient && typeof apiClient.getStreamUrl === "function") raw = apiClient.getStreamUrl(t);
   if (!raw) { toast('Stream tidak tersedia'); return; }
@@ -1793,16 +1877,46 @@ function updateHeartUI(trackId) {
   }
 }
 
-function downloadTrackById(trackId) {
-  const t = state.tracks.find(x => x.id == trackId) || (state.currentTrack && state.currentTrack.id == trackId ? state.currentTrack : null);
+const _dlBusy = new Set();
+async function downloadTrackById(trackId) {
+  const t = state.tracks.find(x => x.id == trackId)
+    || state.downloaded.find(x => x.id == trackId)
+    || (state.currentTrack && state.currentTrack.id == trackId ? state.currentTrack : null);
   if (!t) return;
-  const exist = state.downloaded.some(d => d.id === t.id);
-  if (exist) {
+  if (_dlBusy.has(t.id)) return toast("Lagi mengunduh, tunggu ya...");
+
+  let hasBlob = false;
+  try { hasBlob = !!(await offGet(t.id)); } catch {}
+
+  if (hasBlob) {
+    try { await offDel(t.id); } catch {}
     state.downloaded = state.downloaded.filter(d => d.id !== t.id);
-    toast('Dihapus dari Offline');
+    toast("Dihapus dari Offline");
   } else {
-    state.downloaded.push(t);
-    toast('"' + t.title + '" tersimpan offline');
+    const raw = apiClient.getStreamUrl(t);
+    if (!raw || raw.includes("hls") || t.stream_type === "hls") {
+      return toast("Lagu ini nggak bisa disimpan offline");
+    }
+    _dlBusy.add(t.id);
+    try {
+      const cid = apiClient.clientId || await apiClient.getCredentials();
+      let url = `/api/stream?url=${encodeURIComponent(raw)}&client_id=${encodeURIComponent(cid)}`;
+      if (t.track_authorization) url += `&track_authorization=${encodeURIComponent(t.track_authorization)}`;
+      let lastStep = -1;
+      const prog = p => { const step = Math.floor(p * 10); if (step !== lastStep) { lastStep = step; toast("Mengunduh " + Math.round(p * 100) + "%"); } };
+      toast("Mengunduh...");
+      let blob;
+      try { blob = await fetchAudioBlob(url, prog); }
+      catch { blob = await fetchAudioBlob(url + "&proxy=1", prog); }  // CDN tanpa CORS -> lewat server
+      await offPut(t.id, blob);
+      if (!state.downloaded.some(d => d.id === t.id)) state.downloaded.push(t);
+      toast('"' + t.title + '" tersimpan offline');
+      try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch {}
+    } catch (e) {
+      toast("Gagal unduh: " + e.message);
+    } finally {
+      _dlBusy.delete(t.id);
+    }
   }
   localStorage.setItem("sp_downloaded", JSON.stringify(state.downloaded));
   updateDownloadUI(t.id);
@@ -2521,4 +2635,4 @@ initApp();
 </script>
 
 </body>
-  </html>
+ </html>

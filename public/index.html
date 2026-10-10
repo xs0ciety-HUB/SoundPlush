@@ -90,11 +90,13 @@
     opacity: .55;
   }
 
+  .progress-line { transition: width .15s linear; }
+
   .chat-me .bubble { background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%); }
   .chat-other .bubble { background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.08); }
 
   .chat-bubble { user-select: none; -webkit-user-select: none; word-break: break-word; }
-  .chat-bubble img.chat-img { display: block; max-width: 100%; max-height: 280px; border-radius: 12px; margin-bottom: 6px; }
+  .chat-bubble img { display: block; max-width: 100%; max-height: 280px; border-radius: 12px; margin-bottom: 6px; }
 
   .pill-bar { scroll-snap-type: x proximity; }
   .pill-bar > * { scroll-snap-align: start; }
@@ -168,12 +170,14 @@
     overflow: hidden;
     border: 3px solid rgba(168,85,247,.5);
     box-shadow: 0 8px 30px -8px rgba(168,85,247,.7);
+    transition: border-color .2s ease;
     background: linear-gradient(135deg, rgba(168,85,247,.25) 0%, rgba(236,72,153,.25) 100%);
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
     display: flex; align-items: center; justify-content: center;
   }
+  .avatar-upload:hover { border-color: rgba(168,85,247,.9); }
   .avatar-upload .placeholder {
     width: 100%; height: 100%;
     display: flex; align-items: center; justify-content: center;
@@ -207,14 +211,21 @@
     gap: 12px;
     align-items: center;
   }
-  .song-actions { display: flex; align-items: center; gap: 4px; }
-  @media (max-width: 380px) { .song-actions button { width: 30px; height: 30px; } }
+  .song-actions {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  @media (max-width: 380px) {
+    .song-actions button { width: 30px; height: 30px; }
+  }
 </style>
 </head>
 <body class="grad-bg min-h-screen">
 
 <div id="app">
 
+  <!-- HOME -->
   <section id="view-home" class="view max-w-[640px] mx-auto px-4 pt-6">
     <div class="flex items-start justify-between mb-5">
       <div>
@@ -289,6 +300,7 @@
     </section>
   </section>
 
+  <!-- SEARCH -->
   <section id="view-search" class="view hidden max-w-[640px] mx-auto px-4 pt-6">
     <h1 class="text-[26px] font-extrabold mb-4">Cari</h1>
     <div class="relative mb-4">
@@ -297,16 +309,19 @@
         class="w-full bg-white/[0.05] border border-white/[0.08] rounded-2xl pl-10 pr-[70px] py-[12px] text-[13px] focus:outline-none focus:border-[#a855f7]/60">
       <button onclick="handleSearchKey({key:'Enter'})" class="absolute right-[6px] top-1/2 -translate-y-1/2 px-[14px] py-[7px] rounded-xl accent-bg text-[12px] font-semibold">Cari</button>
     </div>
+
     <div class="flex gap-[6px] mb-5 overflow-x-auto no-scrollbar">
       <button class="search-tab pill shrink-0 px-[16px] py-[7px] rounded-full text-[12px] font-semibold accent-bg" data-type="tracks" onclick="switchSearchTab('tracks',this)">Musik</button>
       <button class="search-tab pill shrink-0 px-[16px] py-[7px] rounded-full text-[12px] font-medium bg-white/[0.05] border border-white/[0.08] text-white/70" data-type="playlists" onclick="switchSearchTab('playlists',this)">Playlist</button>
       <button class="search-tab pill shrink-0 px-[16px] py-[7px] rounded-full text-[12px] font-medium bg-white/[0.05] border border-white/[0.08] text-white/70" data-type="users" onclick="switchSearchTab('users',this)">Artis</button>
     </div>
+
     <div id="searchResults" class="space-y-2">
       <div class="text-white/40 text-[12px] text-center py-10">Ketik sesuatu untuk mencari</div>
     </div>
   </section>
 
+  <!-- LIBRARY -->
   <section id="view-library" class="view hidden max-w-[640px] mx-auto px-4 pt-6">
     <h1 class="text-[26px] font-extrabold mb-4">Library</h1>
     <div class="flex gap-[6px] mb-5">
@@ -319,6 +334,7 @@
     <div id="libraryContent"></div>
   </section>
 
+  <!-- LIKED -->
   <section id="view-liked" class="view hidden max-w-[640px] mx-auto px-4 pt-6">
     <div class="flex items-center justify-between mb-4">
       <div>
@@ -332,6 +348,7 @@
     <div id="likedList" class="space-y-2"></div>
   </section>
 
+  <!-- PROFILE -->
   <section id="view-profile" class="view hidden max-w-[640px] mx-auto px-4 pt-6 pb-10">
     <h1 class="text-[26px] font-extrabold mb-5">Profil</h1>
 
@@ -406,6 +423,7 @@
     </button>
   </section>
 
+  <!-- CHAT -->
   <section id="view-chat" class="view hidden max-w-[640px] mx-auto pt-6" style="padding-bottom: 120px;">
     <div class="px-4 mb-4 flex items-center gap-3">
       <button onclick="switchView('home')" class="w-[36px] h-[36px] rounded-full bg-white/[0.06] flex items-center justify-center tap">
@@ -424,6 +442,7 @@
     </div>
   </section>
 
+  <!-- OFFLINE -->
   <section id="view-offline" class="view hidden max-w-[640px] mx-auto px-4 pt-6">
     <div class="flex items-center justify-between mb-4">
       <div>
@@ -443,6 +462,7 @@
     <div id="offlineList" class="space-y-2"></div>
   </section>
 
+  <!-- MINI PLAYER -->
   <div id="miniPlayer" class="fixed left-0 right-0 bottom-[78px] z-40 px-3 hidden">
     <div class="max-w-[640px] mx-auto">
       <div class="glass border border-white/[0.08] rounded-2xl shadow-[0_10px_40px_-8px_rgba(0,0,0,.9)] overflow-hidden">
@@ -479,6 +499,7 @@
     </div>
   </div>
 
+  <!-- BOTTOM NAV -->
   <nav id="bottomNav" class="fixed bottom-0 left-0 right-0 z-40 safe-bottom px-3 pb-2">
     <div class="max-w-[640px] mx-auto">
       <div class="relative">
@@ -509,6 +530,7 @@
             </button>
           </div>
         </div>
+
         <button onclick="openFullPlayer()" class="tap absolute left-1/2 -translate-x-1/2 -top-[26px] w-[56px] h-[56px] rounded-full accent-bg flex items-center justify-center text-white border-[3px] border-[#0a0612]" style="box-shadow: 0 0 24px 2px rgba(168,85,247,.6), 0 10px 30px -6px rgba(168,85,247,.9);">
           <i data-lucide="disc-3" class="w-[24px] h-[24px]"></i>
         </button>
@@ -516,6 +538,7 @@
     </div>
   </nav>
 
+  <!-- CHAT INPUT -->
   <div id="chatInputBar" class="chat-input-bar hidden">
     <div id="replyPreview" class="hidden max-w-[640px] mx-auto mb-2 flex items-center gap-2 px-3 py-2 rounded-2xl bg-white/[0.06] border border-white/[0.08]">
       <div class="w-[3px] h-[32px] rounded-full accent-bg shrink-0"></div>
@@ -527,9 +550,11 @@
         <i data-lucide="x" class="w-[14px] h-[14px]"></i>
       </button>
     </div>
+
     <div class="max-w-[640px] mx-auto flex items-center gap-2">
       <input type="file" id="chatFileInput" class="hidden" accept="*/*" onchange="handleChatFile(event)">
       <input type="file" id="chatImageInput" class="hidden" accept="image/*" onchange="handleChatImage(event)">
+
       <button onclick="document.getElementById('chatFileInput').click()" class="w-[42px] h-[42px] rounded-full bg-white/[0.06] border border-white/[0.08] flex items-center justify-center text-white/70 tap shrink-0">
         <i data-lucide="paperclip" class="w-[17px] h-[17px]"></i>
       </button>
@@ -543,6 +568,7 @@
         <i data-lucide="send" class="w-[17px] h-[17px]"></i>
       </button>
     </div>
+
     <div id="attachPreview" class="hidden max-w-[640px] mx-auto mt-2 flex items-center gap-2 px-3 py-2 rounded-2xl bg-white/[0.06] border border-white/[0.08]">
       <img id="attachPreviewImg" class="hidden w-[42px] h-[42px] rounded-lg object-cover shrink-0">
       <div id="attachPreviewFile" class="hidden w-[42px] h-[42px] rounded-lg bg-white/[0.08] flex items-center justify-center shrink-0">
@@ -558,6 +584,7 @@
     </div>
   </div>
 
+  <!-- FULL PLAYER -->
   <div id="fullPlayer" class="full-player">
     <div id="playerAmbient" class="ambient-blur"></div>
     <div class="absolute inset-0" style="background: linear-gradient(180deg, rgba(10,6,18,.35) 0%, rgba(10,6,18,.9) 70%, #0a0612 100%);"></div>
@@ -676,6 +703,7 @@
     </div>
   </div>
 
+  <!-- FULL LYRICS MODAL -->
   <div id="fullLyricsModal" class="modal-overlay hidden" style="z-index: 500;">
     <div class="relative h-full flex flex-col p-4">
       <div class="flex items-center justify-between mb-4 max-w-[640px] mx-auto w-full shrink-0">
@@ -698,6 +726,7 @@
     </div>
   </div>
 
+  <!-- ONBOARDING MODAL -->
   <div id="onboardingModal" class="modal-overlay hidden">
     <div class="relative h-full flex items-end sm:items-center justify-center p-4 overflow-y-auto">
       <div class="modal-card w-full max-w-[400px] rounded-3xl glass border border-white/[0.1] p-6 shadow-[0_20px_60px_-15px_rgba(168,85,247,.5)] relative">
@@ -752,6 +781,7 @@
     </div>
   </div>
 
+  <!-- TOAST -->
   <div id="toast" class="fixed top-[20px] left-1/2 z-[600] px-[16px] py-[10px] rounded-2xl glass border border-white/[0.09] text-[12.5px] font-medium opacity-0 pointer-events-none transition-all duration-300 whitespace-nowrap" style="transform: translate(-50%, -12px);">
     Notifikasi
   </div>
@@ -760,15 +790,24 @@
 
 <audio id="audioEngine" crossorigin="anonymous"></audio>
 
+<!-- ============================================================
+     ENHANCED AUDIO MONITORING
+     Loaded AFTER <audio> so it can access the element.
+     Handles: freeze detection, buffer failures, recovery attempts.
+============================================================ -->
+<script src="/audio.js"></script>
+
 <script>
+/* ============================================================
+   INIT
+============================================================ */
 lucide.createIcons();
 
 const apiClient = window.SoundPulseAPI ? new SoundPulseAPI() : null;
 const audio = document.getElementById("audioEngine");
 let hlsPlayer = null;
 let hlsToken = 0;
-let streamRetryCount = 0;
-let lastStreamUrl = null;
+let recoveringStream = false;
 
 const state = {
   tracks: [],
@@ -807,6 +846,9 @@ const GENRE_QUERY = {
   "Remix / DJ": "remix dj",
 };
 
+/* ============================================================
+   UTILS
+============================================================ */
 function esc(s) {
   return String(s || "").replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }
@@ -851,6 +893,9 @@ function colorFromName(name) {
   return `hsl(${Math.abs(hash) % 360}, 65%, 55%)`;
 }
 
+/* ============================================================
+   NAV
+============================================================ */
 function switchView(name) {
   if (state.view === "chat" && name !== "chat") stopChatPoll();
   if (name === "chat" && !hasProfile()) { state.view = "chat"; openOnboarding(false); return; }
@@ -883,6 +928,9 @@ function openSearch() {
   setTimeout(() => document.getElementById("searchInput").focus(), 100);
 }
 
+/* ============================================================
+   PROFILE / ONBOARDING
+============================================================ */
 function hasProfile() {
   return state.userProfile && state.userProfile.name && state.userProfile.name.trim().length > 0;
 }
@@ -927,8 +975,11 @@ function renderOnboardAvatar() {
   const label = document.getElementById("onboardAvatarLabel");
   const ph = document.getElementById("onboardAvatarPlaceholder");
   if (!label) return;
+
   if (state.tempAvatar) {
     label.style.backgroundImage = `url("${state.tempAvatar}")`;
+    label.style.backgroundSize = "cover";
+    label.style.backgroundPosition = "center";
     if (ph) ph.classList.add("hidden");
   } else {
     label.style.backgroundImage = "";
@@ -952,7 +1003,9 @@ function handleAvatarUpload(e) {
       canvas.width = SIZE; canvas.height = SIZE;
       const ctx = canvas.getContext("2d");
       const min = Math.min(img.width, img.height);
-      ctx.drawImage(img, (img.width-min)/2, (img.height-min)/2, min, min, 0, 0, SIZE, SIZE);
+      const sx = (img.width - min) / 2;
+      const sy = (img.height - min) / 2;
+      ctx.drawImage(img, sx, sy, min, min, 0, 0, SIZE, SIZE);
       state.tempAvatar = canvas.toDataURL("image/jpeg", 0.85);
       renderOnboardAvatar();
       toast("Foto terpilih, tap Simpan");
@@ -972,6 +1025,7 @@ document.addEventListener("input", (e) => {
 function submitOnboarding() {
   const name = (document.getElementById("onboardName").value || "").trim();
   const bio = (document.getElementById("onboardBio").value || "").trim();
+
   if (!name) { toast("Nama wajib diisi"); return; }
   if (name.length < 2) { toast("Nama minimal 2 karakter"); return; }
 
@@ -1002,11 +1056,11 @@ function updateProfileUI() {
   document.getElementById("profileName").textContent = name;
   document.getElementById("profileBio").textContent = bio;
 
-  document.getElementById("profileAvatarBox").innerHTML =
-    `<img src="${esc(avatar)}" class="w-full h-full object-cover" onerror="this.parentNode.innerHTML='<span>${initial}</span>'">`;
+  const box = document.getElementById("profileAvatarBox");
+  box.innerHTML = `<img src="${esc(avatar)}" class="w-full h-full object-cover" onerror="this.parentNode.innerHTML='<span>${initial}</span>'">`;
 
-  document.getElementById("chatAvatarBox").innerHTML =
-    `<img src="${esc(avatar)}" class="w-full h-full object-cover" onerror="this.parentNode.innerHTML='<span>${initial}</span>'">`;
+  const chatBox = document.getElementById("chatAvatarBox");
+  chatBox.innerHTML = `<img src="${esc(avatar)}" class="w-full h-full object-cover" onerror="this.parentNode.innerHTML='<span>${initial}</span>'">`;
 
   const syncEl = document.getElementById("syncName");
   if (syncEl) syncEl.value = (p && p.name) || "";
@@ -1022,6 +1076,9 @@ function updateNavProfileIcon() {
   el.innerHTML = `<img src="${esc(avatar)}" class="w-full h-full object-cover" onerror="this.parentNode.innerHTML='<i data-lucide=&quot;user&quot; class=&quot;w-[14px] h-[14px]&quot;></i>';lucide.createIcons();">`;
 }
 
+/* ============================================================
+   GENRE
+============================================================ */
 function renderGenrePills() {
   const wrap = document.getElementById("genrePills");
   wrap.innerHTML = GENRES.map((g, i) => `
@@ -1045,6 +1102,9 @@ function reloadQuickPicks() {
   loadQuickPicks(document.getElementById("picksTitle").dataset.query || "Indonesian Pop Hits");
 }
 
+/* ============================================================
+   QUICK PICKS
+============================================================ */
 async function loadQuickPicks(query) {
   const grid = document.getElementById("quickPicksGrid");
   document.getElementById("picksTitle").dataset.query = query;
@@ -1111,6 +1171,9 @@ function playTrackByList(idx, containerId) {
   playTrack(idx);
 }
 
+/* ============================================================
+   PLAYLISTS & ARTISTS
+============================================================ */
 async function loadPopularPlaylists() {
   const row = document.getElementById("playlistsRow");
   if (!apiClient) { row.innerHTML = `<div class="shrink-0 text-red-400/70 text-[12px] py-4">API client tidak siap</div>`; return; }
@@ -1193,6 +1256,9 @@ async function openArtist(name) {
   } catch (e) { grid.innerHTML = `<div class="text-red-400/80 text-[12px] py-6 text-center">Gagal: ${esc(e.message)}</div>`; }
 }
 
+/* ============================================================
+   RECENT
+============================================================ */
 function renderRecent() {
   const c = document.getElementById("recentCard");
   if (!state.recent) {
@@ -1234,25 +1300,23 @@ function playRecent() {
 }
 
 /* ============================================================
-   PLAYER — pakai proxy /api/stream
+   PLAYER
 ============================================================ */
 function playTrack(idx) {
   const t = state.tracks[idx];
   if (!t) return;
   if (t.streamable === false) { toast('Lagu ini tidak bisa diputar'); return; }
 
+  recoveringStream = false;
   state.currentIndex = idx;
   state.currentTrack = t;
-  streamRetryCount = 0;
 
-  // UI mini player
   document.getElementById("miniPlayer").classList.remove("hidden");
   document.getElementById("miniPlayer").style.display = "";
   document.getElementById("miniTitle").textContent = t.title || "Unknown";
   document.getElementById("miniArtist").textContent = (t.user && t.user.username) || "Unknown";
   document.getElementById("miniArt").src = t.artwork_url || (t.user && t.user.avatar_url) || DEFAULT_ART;
 
-  // UI full player
   const art = t.artwork_url || (t.user && t.user.avatar_url) || DEFAULT_ART;
   document.getElementById("fullTitle").textContent = t.title || "Unknown";
   document.getElementById("fullArtist").textContent = (t.user && t.user.username) || "Unknown";
@@ -1266,20 +1330,15 @@ function playTrack(idx) {
   document.getElementById("fullLyricTitle").textContent = t.title || "—";
   document.getElementById("fullLyricArtist").textContent = (t.user && t.user.username) || "—";
 
-  // Recent
   state.recent = t;
   localStorage.setItem("sp_recent", JSON.stringify(t));
   renderRecent();
 
-  // Stream URL
   let raw = null;
   if (apiClient && typeof apiClient.getStreamUrl === "function") raw = apiClient.getStreamUrl(t);
   if (!raw) { toast('Stream tidak tersedia'); return; }
-
   const clientId = apiClient.clientId || "";
-  // Proxy URL — browser fetch ke /api/stream, server yang handle ke SoundCloud
-  const proxyUrl = `/api/stream?url=${encodeURIComponent(raw)}&client_id=${encodeURIComponent(clientId)}`;
-  lastStreamUrl = proxyUrl;
+  const streamUrl = `/api/stream?url=${encodeURIComponent(raw)}&client_id=${clientId}`;
 
   const myToken = ++hlsToken;
   if (hlsPlayer) { try { hlsPlayer.destroy(); } catch {} hlsPlayer = null; }
@@ -1288,13 +1347,11 @@ function playTrack(idx) {
 
   if (needHls && typeof Hls !== "undefined" && Hls.isSupported()) {
     hlsPlayer = new Hls({
-      // Buffer config agresif biar ga putus
       maxBufferLength: 60,
       maxMaxBufferLength: 120,
       maxBufferSize: 60 * 1000 * 1000,
       enableWorker: true,
       lowLatencyMode: false,
-      // Retry
       manifestLoadingMaxRetry: 6,
       manifestLoadingRetryDelay: 500,
       manifestLoadingMaxRetryTimeout: 8000,
@@ -1305,25 +1362,19 @@ function playTrack(idx) {
       fragLoadingRetryDelay: 500,
       fragLoadingMaxRetryTimeout: 10000,
       appendErrorMaxRetry: 5,
-      // Karena lewat proxy, xhr timeout lebih lega
-      xhrSetup: (xhr) => { xhr.withCredentials = false; },
     });
 
-    hlsPlayer.loadSource(proxyUrl);
+    hlsPlayer.loadSource(streamUrl);
     hlsPlayer.attachMedia(audio);
 
     hlsPlayer.on(Hls.Events.MANIFEST_PARSED, () => {
       if (myToken !== hlsToken) return;
-      audio.play().catch(err => {
-        if (myToken === hlsToken) toast("Gagal putar: " + err.message);
-      });
+      audio.play().catch(err => { if (myToken === hlsToken) toast("Gagal putar: " + err.message); });
     });
 
     hlsPlayer.on(Hls.Events.ERROR, (e, data) => {
       if (myToken !== hlsToken) return;
       if (!data.fatal) return;
-
-      console.warn("[hls] fatal:", data.type, data.details);
 
       if (data.type === Hls.ErrorTypes.NETWORK_ERROR) {
         toast("Koneksi lambat, reconnect...");
@@ -1335,18 +1386,16 @@ function playTrack(idx) {
         try { hlsPlayer.recoverMediaError(); } catch {}
       } else {
         toast("Stream mati, skip...");
-        setTimeout(() => { if (myToken === hlsToken) playNext(); }, 1200);
+        setTimeout(() => {
+          if (myToken !== hlsToken) return;
+          playNext();
+        }, 1200);
       }
     });
 
   } else {
-    // Progressive — single file via proxy
-    audio.src = proxyUrl;
-    audio.load();
-    audio.play().catch(err => {
-      console.warn("[audio.play]", err);
-      toast("Gagal putar: " + err.message);
-    });
+    audio.src = streamUrl;
+    audio.play().catch(err => toast("Gagal putar: " + err.message));
   }
 
   setPlayIcon(true);
@@ -1464,6 +1513,7 @@ async function fetchLyrics() {
 
     const fc = document.getElementById("fullLyricContent");
     if (fc) fc.textContent = lines.join("\n");
+
     renderLyricLines();
   } catch {
     c.innerHTML = `<div class="text-center text-white/45 py-10 text-[13px]">Lirik tidak tersedia untuk lagu ini.</div>`;
@@ -1567,57 +1617,43 @@ audio.addEventListener("timeupdate", () => {
   }
 });
 
-audio.addEventListener("loadedmetadata", () => {
-  document.getElementById("timeTotal").textContent = fmtTime(audio.duration);
-});
-
 audio.addEventListener("ended", () => {
   if (state.repeat === "one") { audio.currentTime = 0; audio.play(); return; }
   playNext();
 });
 
-audio.addEventListener("error", async () => {
-  if (!state.currentTrack) { setPlayIcon(false); return; }
-
-  // Progressive gagal → coba HLS sebagai fallback
-  const t = state.currentTrack;
-  if (t.stream_type === "progressive" && !t._triedHls) {
-    t._triedHls = true;
-    toast("Coba metode lain...");
-    setTimeout(() => {
-      if (state.currentTrack && state.currentTrack.id === t.id) {
-        state.currentTrack.stream_type = "hls";
-        playTrack(state.currentIndex);
-      }
-    }, 500);
+audio.addEventListener("error", async (e) => {
+  if (recoveringStream) return;
+  if (!state.currentTrack || state.currentIndex < 0) {
+    toast("Stream gagal diputar.");
+    setPlayIcon(false);
     return;
   }
-
-  // Sudah coba 2x, refresh client_id + retry
-  if (streamRetryCount < 2) {
-    streamRetryCount++;
-    toast(`Retry ${streamRetryCount}/2...`);
-    try {
-      if (apiClient) {
-        apiClient.clientId = null;
-        await apiClient.getCredentials(true);
-      }
-      const idx = state.currentIndex;
-      setTimeout(() => {
-        if (state.currentTrack && state.currentTrack.id === t.id) playTrack(idx);
-      }, 700);
-      return;
-    } catch {}
+  recoveringStream = true;
+  toast("Stream putus, refreshing...");
+  try {
+    if (apiClient) {
+      apiClient.clientId = null;
+      await apiClient.getCredentials(true);
+    }
+    const idx = state.currentIndex;
+    setTimeout(() => {
+      recoveringStream = false;
+      playTrack(idx);
+    }, 700);
+  } catch {
+    recoveringStream = false;
+    toast("Stream gagal. Coba lagu lain.");
+    setPlayIcon(false);
   }
-
-  toast("Stream gagal. Coba lagu lain.");
-  setPlayIcon(false);
 });
 
 audio.addEventListener("play", () => setPlayIcon(true));
 audio.addEventListener("pause", () => setPlayIcon(false));
 
-/* ===== LIKES + DOWNLOADS ===== */
+/* ============================================================
+   LIKES + DOWNLOADS
+============================================================ */
 function toggleLikeById(trackId) {
   const t = state.currentTrack && state.currentTrack.id === trackId
     ? state.currentTrack
@@ -1662,16 +1698,7 @@ function downloadTrackById(trackId) {
     state.downloaded = state.downloaded.filter(d => d.id !== t.id);
     toast('Dihapus dari Offline');
   } else {
-    // Simpen METADATA aja — bukan file audio (SoundCloud ga bisa di-cache lewat proxy ke localStorage)
-    state.downloaded.push({
-      id: t.id,
-      title: t.title,
-      user: t.user,
-      artwork_url: t.artwork_url,
-      duration: t.duration,
-      stream_url: t.stream_url,
-      stream_type: t.stream_type,
-    });
+    state.downloaded.push(t);
     toast('"' + t.title + '" tersimpan offline');
   }
   localStorage.setItem("sp_downloaded", JSON.stringify(state.downloaded));
@@ -1717,7 +1744,9 @@ function renderLiked() {
   renderTrackList(state.likes, "likedList");
 }
 
-/* ===== SEARCH ===== */
+/* ============================================================
+   SEARCH
+============================================================ */
 let lastSearchQuery = "";
 function handleSearchKey(e) {
   if (e.key !== 'Enter') return;
@@ -1788,7 +1817,9 @@ function renderSearch() {
   }
 }
 
-/* ===== LIBRARY ===== */
+/* ============================================================
+   LIBRARY
+============================================================ */
 let libTab = "playlists";
 function switchLibTab(tab, btn) {
   libTab = tab;
@@ -1870,7 +1901,9 @@ function deletePlaylist(i) {
   renderLibrary();
 }
 
-/* ===== OFFLINE ===== */
+/* ============================================================
+   OFFLINE
+============================================================ */
 function renderOffline() {
   const el = document.getElementById("offlineList");
   document.getElementById("offlineCount").textContent = state.downloaded.length + " LAGU TERSIMPAN";
@@ -1905,7 +1938,9 @@ function updateNetBadge() {
 window.addEventListener("online", updateNetBadge);
 window.addEventListener("offline", updateNetBadge);
 
-/* ===== SYNC / PWA ===== */
+/* ============================================================
+   SYNC / PWA
+============================================================ */
 function syncSave() {
   const n = document.getElementById("syncName").value.trim();
   if (!n) return toast('Isi nama dulu');
@@ -1971,7 +2006,9 @@ if ('serviceWorker' in navigator) {
   });
 }
 
-/* ===== CHAT ===== */
+/* ============================================================
+   CHAT
+============================================================ */
 let _allMessages = [];
 let _longPressTimer = null;
 const CHAT_CACHE_KEY = "sp_chat_cache";
@@ -1985,9 +2022,12 @@ function loadChatCache() {
 
 function saveChatCache(msgs) {
   try {
-    localStorage.setItem(CHAT_CACHE_KEY, JSON.stringify(msgs.slice(-200)));
-  } catch {
-    try { localStorage.setItem(CHAT_CACHE_KEY, JSON.stringify(msgs.slice(-50))); } catch {}
+    const trimmed = msgs.slice(-200);
+    localStorage.setItem(CHAT_CACHE_KEY, JSON.stringify(trimmed));
+  } catch (e) {
+    try {
+      localStorage.setItem(CHAT_CACHE_KEY, JSON.stringify(msgs.slice(-50)));
+    } catch {}
   }
 }
 
@@ -2003,13 +2043,19 @@ function mergeMessages(serverMsgs, localMsgs) {
 function startChatPoll() {
   stopChatPoll();
   const cached = loadChatCache();
-  if (cached.length) { _allMessages = cached; renderChat(_allMessages); }
+  if (cached.length) {
+    _allMessages = cached;
+    renderChat(_allMessages);
+  }
   loadChat();
   state.chatPollTimer = setInterval(loadChat, 3000);
 }
 
 function stopChatPoll() {
-  if (state.chatPollTimer) { clearInterval(state.chatPollTimer); state.chatPollTimer = null; }
+  if (state.chatPollTimer) {
+    clearInterval(state.chatPollTimer);
+    state.chatPollTimer = null;
+  }
 }
 
 async function loadChat() {
@@ -2022,6 +2068,7 @@ async function loadChat() {
 
       const serverMsgs = data.messages || [];
       const cachedMsgs = loadChatCache();
+
       const merged = data.storage === 'kv'
         ? serverMsgs
         : mergeMessages(serverMsgs, cachedMsgs);
@@ -2032,7 +2079,10 @@ async function loadChat() {
     }
   } catch (e) {
     const cached = loadChatCache();
-    if (cached.length) { _allMessages = cached; renderChat(cached); }
+    if (cached.length) {
+      _allMessages = cached;
+      renderChat(cached);
+    }
   }
 }
 
@@ -2083,7 +2133,9 @@ function renderChat(messages) {
         </a>`;
     }
 
-    if (m.text) bodyHTML += `<div>${esc(m.text)}</div>`;
+    if (m.text) {
+      bodyHTML += `<div>${esc(m.text)}</div>`;
+    }
 
     const bubble = `<div class="bubble chat-bubble px-[14px] py-[9px] text-[13px] leading-snug ${isMe ? 'rounded-2xl rounded-br-md' : 'rounded-2xl rounded-bl-md'}" data-msg-id="${esc(m.id)}">${bodyHTML}</div>`;
     const meta = `<div class="text-[10px] text-white/35 mt-[4px] ${isMe ? 'text-right' : ''}">${fmtAgo(m.ts)}</div>`;
@@ -2149,10 +2201,13 @@ function startReply(msgId) {
   const msg = _allMessages.find(m => m.id === msgId);
   if (!msg) return;
   state.replyTo = msg;
+
+  const bar = document.getElementById("replyPreview");
   document.getElementById("replyName").textContent = msg.name;
   const preview = msg.image ? "📷 Foto" : msg.file ? "📎 " + msg.file.name : (msg.text || "");
   document.getElementById("replyText").textContent = preview;
-  document.getElementById("replyPreview").classList.remove("hidden");
+  bar.classList.remove("hidden");
+
   document.getElementById("chatInput").focus();
   lucide.createIcons();
 }
@@ -2170,6 +2225,7 @@ function cancelAttach() {
 function showAttachPreview() {
   const a = state.attach;
   if (!a) return cancelAttach();
+
   const wrap = document.getElementById("attachPreview");
   const img = document.getElementById("attachPreviewImg");
   const fileIcon = document.getElementById("attachPreviewFile");
@@ -2180,7 +2236,8 @@ function showAttachPreview() {
   const sizeTxt = sizeKB > 1024 ? (sizeKB/1024).toFixed(1) + " MB" : sizeKB + " KB";
 
   if (a.type === "image") {
-    img.src = a.data; img.classList.remove("hidden");
+    img.src = a.data;
+    img.classList.remove("hidden");
     fileIcon.classList.add("hidden");
     nameEl.textContent = "Foto";
   } else {
@@ -2208,15 +2265,26 @@ function handleChatImage(e) {
       let w = img.width, h = img.height;
       if (w > MAX || h > MAX) {
         const ratio = Math.min(MAX/w, MAX/h);
-        w = Math.round(w * ratio); h = Math.round(h * ratio);
+        w = Math.round(w * ratio);
+        h = Math.round(h * ratio);
       }
-      canvas.width = w; canvas.height = h;
+      canvas.width = w;
+      canvas.height = h;
       canvas.getContext("2d").drawImage(img, 0, 0, w, h);
       const dataUrl = canvas.toDataURL("image/jpeg", 0.75);
-      if (dataUrl.length > 700000) { toast("Foto kegedean"); return; }
-      state.attach = { type: "image", data: dataUrl, name: file.name || "photo.jpg", size: dataUrl.length, mime: "image/jpeg" };
+
+      if (dataUrl.length > 700000) { toast("Foto kegedean, coba yg lebih kecil"); return; }
+
+      state.attach = {
+        type: "image",
+        data: dataUrl,
+        name: file.name || "photo.jpg",
+        size: dataUrl.length,
+        mime: "image/jpeg",
+      };
       showAttachPreview();
     };
+    img.onerror = () => toast("Gagal memuat gambar");
     img.src = ev.target.result;
   };
   reader.readAsDataURL(file);
@@ -2232,7 +2300,14 @@ function handleChatFile(e) {
   reader.onload = (ev) => {
     const dataUrl = ev.target.result;
     if (dataUrl.length > 700000) { toast("File kegedean"); return; }
-    state.attach = { type: "file", data: dataUrl, name: file.name || "file", size: file.size, mime: file.type || "" };
+
+    state.attach = {
+      type: "file",
+      data: dataUrl,
+      name: file.name || "file",
+      size: file.size,
+      mime: file.type || "",
+    };
     showAttachPreview();
   };
   reader.readAsDataURL(file);
@@ -2255,15 +2330,18 @@ async function sendChat() {
   if (!hasProfile()) { openOnboarding(false); return; }
 
   const profile = state.userProfile;
+
   const payload = {
     name: profile.name,
     text: text || "",
     avatar: profile.avatar || null,
     bio: profile.bio || null,
     replyTo: replyTo ? {
-      id: replyTo.id, name: replyTo.name,
+      id: replyTo.id,
+      name: replyTo.name,
       text: replyTo.text || "",
-      image: replyTo.image || null, file: replyTo.file || null,
+      image: replyTo.image || null,
+      file: replyTo.file || null,
     } : null,
   };
 
@@ -2278,10 +2356,15 @@ async function sendChat() {
 
   const optimisticMsg = {
     id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
-    name: profile.name, text: payload.text,
-    avatar: profile.avatar || null, bio: profile.bio || null,
-    image: payload.image || null, file: payload.file || null,
-    replyTo: payload.replyTo, ts: Date.now(), _pending: true,
+    name: profile.name,
+    text: payload.text,
+    avatar: profile.avatar || null,
+    bio: profile.bio || null,
+    image: payload.image || null,
+    file: payload.file || null,
+    replyTo: payload.replyTo,
+    ts: Date.now(),
+    _pending: true,
   };
   const cached = loadChatCache();
   cached.push(optimisticMsg);
@@ -2303,6 +2386,9 @@ async function sendChat() {
   }
 }
 
+/* ============================================================
+   INIT
+============================================================ */
 async function initApp() {
   renderGenrePills();
   renderRecent();
@@ -2312,7 +2398,9 @@ async function initApp() {
 
   if (hasProfile()) {
     const cached = loadChatCache();
-    if (cached.length) _allMessages = cached;
+    if (cached.length) {
+      _allMessages = cached;
+    }
   }
 
   await Promise.allSettled([
@@ -2326,5 +2414,6 @@ async function initApp() {
 
 initApp();
 </script>
+
 </body>
-                                         </html>
+</html>

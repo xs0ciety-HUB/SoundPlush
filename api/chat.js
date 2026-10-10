@@ -8,8 +8,6 @@ try {
 }
 
 const memStore = { messages: [] };
-
-// Prefix unik biar ga bentrok sama project lain di database yang sama
 const KEY = "soundpulse:chat:messages";
 
 export default async function handler(req, res) {
@@ -29,10 +27,7 @@ export default async function handler(req, res) {
       if (useKV) {
         const raw = await kv.lrange(KEY, 0, 99);
         messages = raw
-          .map(m => {
-            try { return typeof m === "string" ? JSON.parse(m) : m; }
-            catch { return null; }
-          })
+          .map(m => { try { return typeof m === "string" ? JSON.parse(m) : m; } catch { return null; } })
           .filter(Boolean);
       } else {
         messages = [...memStore.messages].slice(-100);
@@ -47,19 +42,43 @@ export default async function handler(req, res) {
     // ============ POST ============
     if (req.method === "POST") {
       const body = typeof req.body === "string" ? JSON.parse(req.body) : req.body;
-      const { name, text, avatar, bio } = body || {};
+      const { name, text, avatar, bio, image, file, replyTo } = body || {};
 
-      if (!name || !text) {
-        return res.status(400).json({ success: false, error: "name dan text wajib" });
+      // Validasi: harus ada text atau image atau file
+      if (!name || (!text && !image && !file)) {
+        return res.status(400).json({ success: false, error: "Pesan kosong" });
       }
 
       const cleanName = String(name).slice(0, 24).trim();
-      const cleanText = String(text).slice(0, 500).trim();
+      const cleanText = text ? String(text).slice(0, 500).trim() : "";
       const cleanBio = bio ? String(bio).slice(0, 100).trim() : null;
       const cleanAvatar = avatar && typeof avatar === "string" && avatar.length < 30000
         ? avatar : null;
 
-      if (!cleanName || !cleanText) {
+      // Batasi ukuran attachment biar ga overload KV (max 500KB)
+      const cleanImage = image && typeof image === "string" && image.length < 700000
+        ? image : null;
+      const cleanFile = file && typeof file === "object" && file.data && file.data.length < 700000
+        ? {
+            name: String(file.name || "file").slice(0, 100),
+            type: String(file.type || "").slice(0, 60),
+            size: Number(file.size) || 0,
+            data: file.data,
+          }
+        : null;
+
+      // Reply metadata (ringan)
+      const cleanReply = replyTo && typeof replyTo === "object"
+        ? {
+            id: String(replyTo.id || "").slice(0, 30),
+            name: String(replyTo.name || "").slice(0, 24),
+            text: String(replyTo.text || "").slice(0, 100),
+            hasImage: !!replyTo.image,
+            hasFile: !!replyTo.file,
+          }
+        : null;
+
+      if (!cleanName || (!cleanText && !cleanImage && !cleanFile)) {
         return res.status(400).json({ success: false, error: "Isi pesan kosong" });
       }
 
@@ -69,6 +88,9 @@ export default async function handler(req, res) {
         text: cleanText,
         avatar: cleanAvatar,
         bio: cleanBio,
+        image: cleanImage,
+        file: cleanFile,
+        replyTo: cleanReply,
         ts: Date.now(),
       };
 

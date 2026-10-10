@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SoundPulse - Streaming Musik</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+  <!-- WAJIB DIMASUKKAN DI FOLDER PUBLIC SEJAJAR DENGAN HTML -->
+  <script src="/soundpulse-api-client.js"></script>
+  <style>
+    body { background: #121212; color: #f3f4f6; }
+    ::-webkit-scrollbar { display: none; }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col font-sans pb-28">
+
+  <!-- HEADER -->
+  <header class="sticky top-0 z-40 bg-[#121212]/90 backdrop-blur-md px-4 pt-4 pb-3 space-y-3 border-b border-zinc-800/50">
+    <div class="flex items-center justify-between">
+      <div>
+        <p class="text-[10px] tracking-widest text-zinc-400 uppercase font-semibold">SoundCloud API Client</p>
+        <h1 class="text-xl font-bold text-[#ff5500]">SoundPulse</h1>
+      </div>
+      <div class="flex items-center gap-2">
+        <button onclick="toggleSearch()" class="w-9 h-9 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-300 hover:text-white transition">
+          <i data-lucide="search" class="w-4 h-4"></i>
+        </button>
+        <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-orange-600 to-amber-500 flex items-center justify-center text-white shadow-lg">
+          <i data-lucide="user" class="w-4 h-4"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- SEARCH BAR -->
+    <div id="searchBarWrapper" class="hidden">
+      <input id="searchInput" type="text" onkeypress="handleSearchKey(event)" placeholder="Cari judul lagu atau artis..." class="w-full bg-zinc-900 border border-zinc-700 rounded-full px-4 py-2 text-sm focus:outline-none focus:border-[#ff5500] text-white placeholder-zinc-500 shadow-inner">
+    </div>
+
+    <!-- PILL FILTERS -->
+    <div class="flex items-center gap-2 overflow-x-auto no-scrollbar py-1">
+      <button onclick="filterGenre('Semua', this)" class="filter-pill px-4 py-1.5 rounded-full text-xs font-medium bg-[#ff5500] text-black shrink-0 transition shadow font-bold">Semua</button>
+      <button onclick="filterGenre('Chill', this)" class="filter-pill px-4 py-1.5 rounded-full text-xs font-medium bg-zinc-900 border border-zinc-800 text-zinc-300 shrink-0 transition hover:bg-zinc-800">Chill</button>
+      <button onclick="filterGenre('Focus', this)" class="filter-pill px-4 py-1.5 rounded-full text-xs font-medium bg-zinc-900 border border-zinc-800 text-zinc-300 shrink-0 transition hover:bg-zinc-800">Focus</button>
+      <button onclick="filterGenre('Pop Indonesia', this)" class="filter-pill px-4 py-1.5 rounded-full text-xs font-medium bg-zinc-900 border border-zinc-800 text-zinc-300 shrink-0 transition hover:bg-zinc-800">Pop Indo</button>
+      <button onclick="filterGenre('Remix', this)" class="filter-pill px-4 py-1.5 rounded-full text-xs font-medium bg-zinc-900 border border-zinc-800 text-zinc-300 shrink-0 transition hover:bg-zinc-800">Remix / DJ</button>
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <main class="flex-1 px-4 py-4 space-y-6 overflow-y-auto">
+    
+    <!-- TERAKHIR DIPUTAR -->
+    <div class="space-y-3">
+      <h2 class="text-sm font-bold text-zinc-300 flex items-center gap-2">
+        <i data-lucide="history" class="w-4 h-4 text-[#ff5500]"></i> Terakhir Diputar
+      </h2>
+      <div id="recentCardContainer">
+        <div class="bg-zinc-900/60 border border-zinc-800/80 p-3 rounded-2xl flex items-center gap-3">
+          <img src="https://via.placeholder.com/60" class="w-14 h-14 rounded-xl object-cover">
+          <div>
+            <h4 class="text-sm font-semibold text-white">Belum ada lagu diputar</h4>
+            <p class="text-xs text-zinc-400">Pilih lagu di Quick Picks bawah</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- QUICK PICKS -->
+    <div class="space-y-3">
+      <h2 class="text-sm font-bold text-zinc-300 flex items-center gap-2">
+        <i data-lucide="zap" class="w-4 h-4 text-[#ff5500]"></i> Quick Picks
+      </h2>
+      <div id="quickPicksGrid" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div class="text-zinc-500 text-xs py-4 col-span-2">Memuat rekomendasi lagu...</div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- FLOATING MUSIC PLAYER -->
+  <footer id="audioPlayerBar" class="fixed bottom-16 left-3 right-3 bg-zinc-900/95 backdrop-blur-xl border border-zinc-800/80 p-3 rounded-2xl flex items-center justify-between z-50 shadow-2xl transition-all duration-300 translate-y-24 opacity-0">
+    <div class="flex items-center gap-3 overflow-hidden w-[55%]">
+      <img id="playerArtwork" src="https://via.placeholder.com/50" class="w-11 h-11 rounded-xl object-cover shrink-0 border border-zinc-700">
+      <div class="truncate">
+        <h4 id="playerTitle" class="text-xs font-bold text-white truncate">Pilih Lagu</h4>
+        <p id="playerArtist" class="text-[10px] text-zinc-400 truncate">SoundPulse Streamer</p>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-3 shrink-0">
+      <button onclick="playPrev()" class="text-zinc-400 hover:text-white"><i data-lucide="skip-back" class="w-4 h-4"></i></button>
+      <button id="playBtn" onclick="togglePlay()" class="bg-[#ff5500] text-black p-2 rounded-full shadow transition hover:scale-105 font-bold">
+        <i data-lucide="play" class="w-4 h-4 fill-current"></i>
+      </button>
+      <button onclick="playNext()" class="text-zinc-400 hover:text-white"><i data-lucide="skip-forward" class="w-4 h-4"></i></button>
+      <button onclick="toggleLikeCurrent()" id="playerLikeBtn" class="text-zinc-400 hover:text-red-500 transition"><i data-lucide="heart" class="w-4 h-4"></i></button>
+    </div>
+  </footer>
+
+  <!-- BOTTOM NAVIGATION -->
+  <nav class="fixed bottom-0 left-0 right-0 bg-[#121212]/95 backdrop-blur-md border-t border-zinc-900 px-6 py-2.5 flex items-center justify-between z-40 text-zinc-400">
+    <button onclick="switchNav('home')" class="flex flex-col items-center gap-0.5 text-[#ff5500]" id="nav-home">
+      <i data-lucide="home" class="w-5 h-5"></i>
+      <span class="text-[10px]">Home</span>
+    </button>
+    <button onclick="switchNav('search')" class="flex flex-col items-center gap-0.5 hover:text-white transition" id="nav-search">
+      <i data-lucide="search" class="w-5 h-5"></i>
+      <span class="text-[10px]">Cari</span>
+    </button>
+    <button onclick="switchNav('likes')" class="flex flex-col items-center gap-0.5 hover:text-white transition" id="nav-likes">
+      <i data-lucide="heart" class="w-5 h-5"></i>
+      <span class="text-[10px]">Disukai</span>
+    </button>
+  </nav>
+
+  <audio id="audioEngine" class="hidden"></audio>
+
+  <script>
+    lucide.createIcons();
+    const apiClient = new SoundPulseAPI();
+    let state = {
+      tracks: [],
+      currentIndex: -1,
+      likes: JSON.parse(localStorage.getItem("sp_likes") || "[]"),
+      recent: JSON.parse(localStorage.getItem("sp_recent") || "null")
+    };
+
+    const audio = document.getElementById("audioEngine");
+    let hlsPlayer = null;
+
+    async function init() {
+      loadRecentPlayed();
+      loadQuickPicks("Indonesian Pop Hits");
+    }
+
+    function toggleSearch() {
+      const bar = document.getElementById("searchBarWrapper");
+      bar.classList.toggle("hidden");
+      if(!bar.classList.contains("hidden")) document.getElementById("searchInput").focus();
+    }
+
+    function filterGenre(genre, btn) {
+      if(btn) {
+        document.querySelectorAll('.filter-pill').forEach(p => {
+          p.className = "filter-pill px-4 py-1.5 rounded-full text-xs font-medium bg-zinc-900 border border-zinc-800 text-zinc-300 shrink-0 transition hover:bg-zinc-800";
+        });
+        btn.className = "filter-pill px-4 py-1.5 rounded-full text-xs font-medium bg-[#ff5500] text-black shrink-0 transition shadow font-bold";
+      }
+      loadQuickPicks(genre === 'Semua' ? 'Indonesian Pop Hits' : genre);
+    }
+
+    async function loadQuickPicks(query) {
+      const grid = document.getElementById("quickPicksGrid");
+      grid.innerHTML = `<div class="text-zinc-500 text-xs py-4 col-span-2">Memuat lagu ${query}...</div>`;
+
+      try {
+        const data = await apiClient.search(query);
+        state.tracks = data.collection || [];
+        renderQuickPicks(state.tracks);
+      } catch(e) {
+        grid.innerHTML = `<div class="text-red-400 text-xs py-4">Gagal memuat lagu: ${e.message}</div>`;
+      }
+    }
+
+    function renderQuickPicks(list) {
+      const grid = document.getElementById("quickPicksGrid");
+      if(!list.length) {
+        grid.innerHTML = `<div class="text-zinc-500 text-xs py-4 col-span-2">Tidak ada lagu ditemukan.</div>`;
+        return;
+      }
+
+      grid.innerHTML = list.map((t, idx) => `
+        <div onclick="playTrack(${idx})" class="bg-zinc-900/60 border border-zinc-800/80 p-2.5 rounded-2xl flex items-center gap-3 cursor-pointer hover:border-[#ff5500]/40 transition group">
+          <img src="${t.artwork_url || (t.user ? t.user.avatar_url : '') || 'https://via.placeholder.com/100'}" class="w-12 h-12 rounded-xl object-cover shrink-0">
+          <div class="truncate flex-1">
+            <h4 class="text-xs font-bold text-white truncate group-hover:text-[#ff5500] transition">${t.title}</h4>
+            <p class="text-[10px] text-zinc-400 truncate">${t.user ? t.user.username : 'Unknown Artist'}</p>
+          </div>
+          <div class="w-8 h-8 bg-zinc-800 group-hover:bg-[#ff5500] rounded-full flex items-center justify-center text-black shrink-0 transition shadow">
+            <i data-lucide="play" class="w-3.5 h-3.5 fill-current ml-0.5"></i>
+          </div>
+        </div>
+      `).join('');
+      lucide.createIcons();
+    }
+
+    function playTrack(idx) {
+      const t = state.tracks[idx];
+      if(!t) return;
+
+      state.currentIndex = idx;
+      document.getElementById("playerTitle").innerText = t.title;
+      document.getElementById("playerArtist").innerText = t.user ? t.user.username : 'Unknown';
+      document.getElementById("playerArtwork").src = t.artwork_url || 'https://via.placeholder.com/50';
+
+      const playerBar = document.getElementById("audioPlayerBar");
+      playerBar.classList.remove("translate-y-24", "opacity-0");
+
+      state.recent = t;
+      localStorage.setItem("sp_recent", JSON.stringify(t));
+      loadRecentPlayed();
+
+      const rawStream = apiClient.getStreamUrl(t);
+      const streamUrl = `/api/stream?url=${encodeURIComponent(rawStream)}&client_id=${apiClient.clientId}`;
+
+      if (hlsPlayer) {
+        hlsPlayer.destroy();
+        hlsPlayer = null;
+      }
+
+      if (Hls.isSupported() && rawStream && rawStream.includes('hls')) {
+        hlsPlayer = new Hls();
+        hlsPlayer.loadSource(streamUrl);
+        hlsPlayer.attachMedia(audio);
+        hlsPlayer.on(Hls.Events.MANIFEST_PARSED, () => {
+          audio.play();
+        });
+      } else {
+        audio.src = streamUrl;
+        audio.play().catch(err => alert("Gagal memutar audio: " + err.message));
+      }
+
+      document.getElementById("playBtn").innerHTML = `<i data-lucide="pause" class="w-4 h-4 fill-current"></i>`;
+      updateLikeButtonState(t.id);
+      lucide.createIcons();
+    }
+
+    function togglePlay() {
+      if(!audio.src && !hlsPlayer) return;
+      if(audio.paused) {
+        audio.play();
+        document.getElementById("playBtn").innerHTML = `<i data-lucide="pause" class="w-4 h-4 fill-current"></i>`;
+      } else {
+        audio.pause();
+        document.getElementById("playBtn").innerHTML = `<i data-lucide="play" class="w-4 h-4 fill-current"></i>`;
+      }
+      lucide.createIcons();
+    }
+
+    function playNext() { if(state.currentIndex + 1 < state.tracks.length) playTrack(state.currentIndex + 1); }
+    function playPrev() { if(state.currentIndex > 0) playTrack(state.currentIndex - 1); }
+
+    function loadRecentPlayed() {
+      const container = document.getElementById("recentCardContainer");
+      if(!state.recent) return;
+      const t = state.recent;
+
+      container.innerHTML = `
+        <div onclick="playTrack(state.currentIndex >= 0 ? state.currentIndex : 0)" class="bg-zinc-900/80 border border-zinc-800 p-3 rounded-2xl flex items-center gap-3 cursor-pointer hover:border-[#ff5500]/50 transition">
+          <img src="${t.artwork_url || 'https://via.placeholder.com/60'}" class="w-14 h-14 rounded-xl object-cover shadow">
+          <div class="flex-1 truncate">
+            <h4 class="text-sm font-bold text-white truncate">${t.title}</h4>
+            <p class="text-xs text-zinc-400 truncate">${t.user ? t.user.username : 'Unknown'}</p>
+          </div>
+          <div class="w-9 h-9 bg-[#ff5500] text-black rounded-full flex items-center justify-center shadow font-bold">
+            <i data-lucide="play" class="w-4 h-4 fill-current ml-0.5"></i>
+          </div>
+        </div>
+      `;
+      lucide.createIcons();
+    }
+
+    async function handleSearchKey(e) {
+      if(e.key === 'Enter') {
+        const q = e.target.value.trim();
+        if(q) loadQuickPicks(q);
+      }
+    }
+
+    function toggleLikeCurrent() {
+      if(!state.recent) return;
+      const t = state.recent;
+      const idx = state.likes.findIndex(item => item.id === t.id);
+      if(idx >= 0) state.likes.splice(idx, 1);
+      else state.likes.push(t);
+      localStorage.setItem("sp_likes", JSON.stringify(state.likes));
+      updateLikeButtonState(t.id);
+    }
+
+    function updateLikeButtonState(trackId) {
+      const isLiked = state.likes.some(item => item.id === trackId);
+      const btn = document.getElementById("playerLikeBtn");
+      btn.innerHTML = `<i data-lucide="heart" class="w-4 h-4 ${isLiked ? 'fill-red-500 text-red-500' : ''}"></i>`;
+      lucide.createIcons();
+    }
+
+    function switchNav(tab) {
+      document.querySelectorAll('nav button').forEach(b => b.className = "flex flex-col items-center gap-0.5 text-zinc-400 hover:text-white transition");
+      document.getElementById(`nav-${tab}`).className = "flex flex-col items-center gap-0.5 text-[#ff5500]";
+
+      if(tab === 'likes') {
+        renderQuickPicks(state.likes);
+      } else if(tab === 'search') {
+        toggleSearch();
+      }
+    }
+
+    init();
+  </script>
+</body>
+</html>

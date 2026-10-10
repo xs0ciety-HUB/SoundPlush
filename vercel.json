@@ -1,9 +1,10 @@
 {
   "version": 2,
-  "rewrites": [
+  "outputDirectory": "public",
+  "headers": [
     {
-      "source": "/((?!api/).*)",
-      "destination": "/public/$1"
+      "source": "/sw.js",
+      "headers": [{ "key": "Cache-Control", "value": "no-cache" }]
     }
   ]
 }

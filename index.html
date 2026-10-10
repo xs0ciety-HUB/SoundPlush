@@ -13,7 +13,7 @@
 </head>
 <body class="min-h-screen flex flex-col font-sans pb-28">
 
-  <!-- TOP APP HEADER -->
+  <!-- HEADER -->
   <header class="sticky top-0 z-40 bg-[#121212]/90 backdrop-blur-md px-4 pt-4 pb-3 space-y-3 border-b border-zinc-800/50">
     <div class="flex items-center justify-between">
       <div>
@@ -35,7 +35,7 @@
       <input id="searchInput" type="text" onkeypress="handleSearchKey(event)" placeholder="Cari judul lagu atau artis..." class="w-full bg-zinc-900 border border-zinc-700 rounded-full px-4 py-2 text-sm focus:outline-none focus:border-[#ff5500] text-white placeholder-zinc-500 shadow-inner">
     </div>
 
-    <!-- FILTER PILLS -->
+    <!-- PILL FILTERS -->
     <div class="flex items-center gap-2 overflow-x-auto no-scrollbar py-1">
       <button onclick="filterGenre('Semua', this)" class="filter-pill px-4 py-1.5 rounded-full text-xs font-medium bg-[#ff5500] text-black shrink-0 transition shadow font-bold">Semua</button>
       <button onclick="filterGenre('Chill', this)" class="filter-pill px-4 py-1.5 rounded-full text-xs font-medium bg-zinc-900 border border-zinc-800 text-zinc-300 shrink-0 transition hover:bg-zinc-800">Chill</button>
@@ -45,11 +45,11 @@
     </div>
   </header>
 
-  <!-- MAIN CONTENT -->
+  <!-- MAIN CONTAINER -->
   <main class="flex-1 px-4 py-4 space-y-6 overflow-y-auto">
     
     <!-- TERAKHIR DIPUTAR -->
-    <div id="recentSection" class="space-y-3">
+    <div class="space-y-3">
       <h2 class="text-sm font-bold text-zinc-300 flex items-center gap-2">
         <i data-lucide="history" class="w-4 h-4 text-[#ff5500]"></i> Terakhir Diputar
       </h2>
@@ -76,7 +76,7 @@
 
   </main>
 
-  <!-- FLOATING MUSIC PLAYER (BOTTOM BAR) -->
+  <!-- FLOATING MUSIC PLAYER -->
   <footer id="audioPlayerBar" class="fixed bottom-16 left-3 right-3 bg-zinc-900/95 backdrop-blur-xl border border-zinc-800/80 p-3 rounded-2xl flex items-center justify-between z-50 shadow-2xl transition-all duration-300 translate-y-24 opacity-0">
     <div class="flex items-center gap-3 overflow-hidden w-[55%]">
       <img id="playerArtwork" src="https://via.placeholder.com/50" class="w-11 h-11 rounded-xl object-cover shrink-0 border border-zinc-700">
@@ -96,7 +96,7 @@
     </div>
   </footer>
 
-  <!-- BOTTOM NAVIGATION BAR -->
+  <!-- BOTTOM NAVIGATION -->
   <nav class="fixed bottom-0 left-0 right-0 bg-[#121212]/95 backdrop-blur-md border-t border-zinc-900 px-6 py-2.5 flex items-center justify-between z-40 text-zinc-400">
     <button onclick="switchNav('home')" class="flex flex-col items-center gap-0.5 text-[#ff5500]" id="nav-home">
       <i data-lucide="home" class="w-5 h-5"></i>
@@ -141,9 +141,7 @@
     function toggleSearch() {
       const bar = document.getElementById("searchBarWrapper");
       bar.classList.toggle("hidden");
-      if(!bar.classList.contains("hidden")) {
-        document.getElementById("searchInput").focus();
-      }
+      if(!bar.classList.contains("hidden")) document.getElementById("searchInput").focus();
     }
 
     function filterGenre(genre, btn) {
@@ -208,13 +206,12 @@
       localStorage.setItem("sp_recent", JSON.stringify(t));
       loadRecentPlayed();
 
-      const streamSource = t.resolved_stream_url || t.stream_url || (t.media && t.media.transcodings ? t.media.transcodings[0].url : '');
-      const streamUrl = `/api/stream?url=${encodeURIComponent(streamSource + (streamSource.includes('?') ? '&' : '?') + "client_id=" + state.clientId)}`;
+      const transcode = (t.media && t.media.transcodings) ? t.media.transcodings.find(tr => tr.format.protocol === 'progressive') || t.media.transcodings[0] : null;
+      const streamSource = transcode ? transcode.url : (t.stream_url || '');
+      const streamUrl = `/api/stream?url=${encodeURIComponent(streamSource)}&client_id=${state.clientId}`;
 
       audio.src = streamUrl;
-      audio.play().catch(err => {
-        alert("Gagal memutar audio: " + err.message);
-      });
+      audio.play().catch(err => alert("Gagal memutar audio: " + err.message));
 
       document.getElementById("playBtn").innerHTML = `<i data-lucide="play" class="w-4 h-4 fill-current"></i>`;
       updateLikeButtonState(t.id);
@@ -225,7 +222,7 @@
       if(!audio.src) return;
       if(audio.paused) {
         audio.play();
-        document.getElementById("playBtn").innerHTML = `<i data-lucide="play" class="w-4 h-4 fill-current"></i>`;
+        document.getElementById("playBtn").innerHTML = `<i data-lucide="pause" class="w-4 h-4 fill-current"></i>`;
       } else {
         audio.pause();
         document.getElementById("playBtn").innerHTML = `<i data-lucide="play" class="w-4 h-4 fill-current"></i>`;
@@ -248,7 +245,7 @@
             <h4 class="text-sm font-bold text-white truncate">${t.title}</h4>
             <p class="text-xs text-zinc-400 truncate">${t.user ? t.user.username : 'Unknown'}</p>
           </div>
-          <div class="w-9 h-9 bg-[#ff5500] text-black rounded-full flex items-center justify-center text-black shadow font-bold">
+          <div class="w-9 h-9 bg-[#ff5500] text-black rounded-full flex items-center justify-center shadow font-bold">
             <i data-lucide="play" class="w-4 h-4 fill-current ml-0.5"></i>
           </div>
         </div>
@@ -267,11 +264,8 @@
       if(!state.recent) return;
       const t = state.recent;
       const idx = state.likes.findIndex(item => item.id === t.id);
-      if(idx >= 0) {
-        state.likes.splice(idx, 1);
-      } else {
-        state.likes.push(t);
-      }
+      if(idx >= 0) state.likes.splice(idx, 1);
+      else state.likes.push(t);
       localStorage.setItem("sp_likes", JSON.stringify(state.likes));
       updateLikeButtonState(t.id);
     }

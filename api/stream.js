@@ -5,6 +5,7 @@ export default async function handler(req, res) {
   try {
     let targetUrl = url;
 
+    // Jika berupa endpoint transcodings, ambil dulu JSON-nya untuk mendapatkan direct stream URL asli
     if (url.includes('/transcodings/') || !url.startsWith('http')) {
       const fetchUrl = url.startsWith('http') ? url : `https://${url}`;
       const tokenRes = await fetch(`${fetchUrl}?client_id=${client_id}`, {
@@ -20,19 +21,8 @@ export default async function handler(req, res) {
       targetUrl = `${url}${url.includes('?') ? '&' : '?'}client_id=${client_id}`;
     }
 
-    const audioRes = await fetch(targetUrl, {
-      headers: {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-        "Accept": "*/*"
-      },
-      redirect: "follow"
-    });
-
-    res.setHeader("Content-Type", audioRes.headers.get("content-type") || "audio/mpeg");
-    res.setHeader("Access-Control-Allow-Origin", "*");
-
-    const buffer = await audioRes.arrayBuffer();
-    return res.status(200).send(Buffer.from(buffer));
+    // Gunakan redirect 302 agar browser HP langsung mengambil stream audio dari server SoundCloud secara resmi
+    return res.redirect(302, targetUrl);
   } catch (err) {
     return res.status(500).json({ error: err.message });
   }

@@ -9,7 +9,9 @@
     "dev": "vercel dev --debug",
     "test": "node -e \"console.log('Test passed')\""
   },
-  "dependencies": {},
+  "dependencies": {
+    "@vercel/kv": "^1.0.1"
+  },
   "devDependencies": {},
   "engines": {
     "node": ">=18.0.0"

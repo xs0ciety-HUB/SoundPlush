@@ -1,5 +1,6 @@
-// v5: cache app shell + library CDN + cover art supaya UI tetap kebuka offline
-const CACHE = "soundpulse-v6";
+// v7: FIX cache runtime. Sebelumnya res.clone() dipanggil setelah response dipakai browser
+// -> gagal diam-diam -> library CDN (Tailwind/lucide/hls) tidak pernah tersimpan -> offline = layar rusak.
+const CACHE = "soundpulse-v7";
 const LOCAL = ["/", "/index.html", "/soundpulse-api-client.js", "/audio.js", "/manifest.json", "/icon-192.png", "/icon-512.png"];
 const CDN = [
   "https://cdn.tailwindcss.com",
@@ -12,7 +13,8 @@ self.addEventListener("install", (e) => {
   e.waitUntil((async () => {
     const c = await caches.open(CACHE);
     await Promise.all(LOCAL.map(u => c.add(u).catch(() => {})));
-    await Promise.all(CDN.map(u => c.add(new Request(u, { mode: "no-cors" })).catch(() => {})));
+    // cache.add menolak response opaque, jadi ambil manual lalu put
+    await Promise.all(CDN.map(u => fetch(u, { mode: "no-cors" }).then(r => c.put(u, r)).catch(() => {})));
   })());
   self.skipWaiting();
 });
@@ -22,7 +24,13 @@ self.addEventListener("activate", (e) => {
   self.clients.claim();
 });
 
-const putCopy = (req, res) => { if (res && (res.ok || res.type === "opaque")) caches.open(CACHE).then(c => c.put(req, res.clone())).catch(() => {}); return res; };
+function putCopy(req, res) {
+  if (res && (res.ok || res.type === "opaque")) {
+    const copy = res.clone();                       // WAJIB sinkron, sebelum res dikembalikan
+    caches.open(CACHE).then(c => c.put(req, copy)).catch(() => {});
+  }
+  return res;
+}
 
 self.addEventListener("fetch", (e) => {
   const req = e.request;
@@ -43,9 +51,13 @@ self.addEventListener("fetch", (e) => {
 
   if (url.pathname.startsWith("/api/")) return;
 
-  // file sendiri: network-first, fallback cache
+  // file sendiri: network-first, fallback cache (halaman utama jadi fallback untuk navigasi)
   e.respondWith(
-    fetch(req).then(r => putCopy(req, r))
-      .catch(() => caches.match(req).then(hit => hit || caches.match("/index.html")))
+    fetch(req).then(r => putCopy(req, r)).catch(async () => {
+      const hit = await caches.match(req, { ignoreSearch: true });
+      if (hit) return hit;
+      if (req.mode === "navigate") return (await caches.match("/index.html")) || (await caches.match("/"));
+      return Response.error();
+    })
   );
 });

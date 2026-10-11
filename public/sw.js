@@ -1,7 +1,7 @@
 // v7: FIX cache runtime. Sebelumnya res.clone() dipanggil setelah response dipakai browser
 // -> gagal diam-diam -> library CDN (Tailwind/lucide/hls) tidak pernah tersimpan -> offline = layar rusak.
-const CACHE = "soundpulse-v7";
-const LOCAL = ["/", "/index.html", "/soundpulse-api-client.js", "/audio.js", "/manifest.json", "/icon-192.png", "/icon-512.png"];
+const CACHE = "soundpulse-v8";
+const LOCAL = ["/", "/index.html", "/soundpulse-api-client.js", "/audio.js", "/manifest.json", "/icon-192.png", "/icon-512.png", "/avatar.jpg", "/favicon.png", "/apple-touch-icon.png"];
 const CDN = [
   "https://cdn.tailwindcss.com",
   "https://unpkg.com/lucide@latest",

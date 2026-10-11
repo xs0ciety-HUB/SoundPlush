@@ -336,6 +336,12 @@ function skipBy(sec){
 try { applyTheme(localStorage.getItem("sp_theme") || "magenta"); } catch {}
 </script>
 <script>
+window.addEventListener("beforeinstallprompt", (e) => { e.preventDefault(); window.__bip = e; });
+window.addEventListener("appinstalled", () => { window.__bip = null; });
+function refreshOfflineCount(){
+  const el = document.getElementById("offlineCount");
+  if (el && typeof state !== "undefined") el.textContent = state.downloaded.length + " lagu";
+}
 /* ===== OFFLINE: simpan file audio beneran ke IndexedDB ===== */
 function offOpen(){
   return new Promise((res, rej) => {
@@ -391,6 +397,7 @@ window.addEventListener("load", async () => {
       localStorage.setItem("sp_downloaded", JSON.stringify(keep));
       if (state.view === "offline" && typeof renderOffline === "function") renderOffline();
     }
+    refreshOfflineCount();
   } catch {}
 });
 </script>
@@ -547,9 +554,10 @@ window.addEventListener("load", async () => {
         </div>
         <div class="space-y-[14px] text-[16px]">
           <div class="flex justify-between"><span class="row-k">Nama</span><span class="row-v">SoundPulse</span></div>
-          <div class="flex justify-between"><span class="row-k">Versi</span><span class="row-v">v3.6.0</span></div>
+          <div class="flex justify-between"><span class="row-k">Versi</span><span class="row-v">v3.7.0</span></div>
           <div class="flex justify-between"><span class="row-k">Mode Offline PWA</span><span class="row-v flex items-center gap-2 text-emerald-400"><span class="w-[8px] h-[8px] rounded-full bg-emerald-400"></span>Aktif</span></div>
           <div class="flex justify-between"><span class="row-k">Service Worker</span><span class="row-v" id="swStatus">Mendaftar...</span></div>
+          <div class="flex justify-between"><span class="row-k">Lagu offline</span><span class="row-v" id="offlineCount">0 lagu</span></div>
           <div class="flex justify-between items-center pt-3 border-t border-white/[0.07] text-[13.5px]">
             <span class="row-k">Cache PWA tersimpan</span>
             <button onclick="clearCache()" class="font-bold underline underline-offset-2" style="color:var(--a3)">Bersihkan Cache</button>
@@ -1918,6 +1926,7 @@ async function downloadTrackById(trackId) {
     }
   }
   localStorage.setItem("sp_downloaded", JSON.stringify(state.downloaded));
+  refreshOfflineCount();
   updateDownloadUI(t.id);
   if (state.view === "home") renderTrackList(state.tracks, "quickPicksGrid");
   if (state.view === "offline") renderOffline();
@@ -2201,17 +2210,29 @@ async function clearCache() {
   }
 }
 
-let deferredPrompt = null;
-window.addEventListener("beforeinstallprompt", (e) => {
-  e.preventDefault();
-  deferredPrompt = e;
-  document.getElementById("installBtn").classList.remove("hidden");
-});
+async function installPWA() {
+  const standalone = window.matchMedia("(display-mode: standalone)").matches || navigator.standalone;
+  if (standalone) return toast("Aplikasi sudah terinstall");
 
-function installPWA() {
-  if (!deferredPrompt) return toast('Aplikasi sudah terinstall atau tidak didukung');
-  deferredPrompt.prompt();
-  deferredPrompt.userChoice.then(r => { if (r.outcome === "accepted") toast("Terinstall!"); deferredPrompt = null; });
+  const ev = window.__bip;
+  if (ev) {
+    ev.prompt();
+    ev.userChoice.then(r => { if (r.outcome === "accepted") toast("Terinstall!"); window.__bip = null; });
+    return;
+  }
+
+  // Chrome belum kasih izin install otomatis -> cari tahu kenapa
+  try {
+    const m = await (await fetch("/manifest.json", { cache: "no-store" })).json();
+    for (const ic of (m.icons || [])) {
+      const r = await fetch(ic.src, { cache: "no-store" });
+      if (!r.ok) return toast("Ikon " + ic.src + " tidak ditemukan (" + r.status + "). Upload ke folder public/");
+    }
+    if (!navigator.serviceWorker || !navigator.serviceWorker.controller) {
+      return toast("Service worker belum aktif. Reload halaman 2x lalu coba lagi");
+    }
+  } catch { return toast("Manifest gagal dibaca, cek koneksi"); }
+  toast("Install lewat menu Chrome (⋮) → Install aplikasi / Tambahkan ke layar utama");
 }
 
 if ('serviceWorker' in navigator) {
@@ -2658,4 +2679,4 @@ initApp();
 </script>
 
 </body>
-                   </html>
+       </html>

@@ -2,12 +2,11 @@
   "name": "soundpulse-soundcloud-player",
   "version": "2.0.0",
   "description": "SoundCloud Mobile Web Player Proxy & Streamer - Enhanced",
-  "main": "api/index.js",
   "type": "module",
   "scripts": {
     "start": "vercel dev",
     "dev": "vercel dev --debug",
-    "test": "node -e \"console.log('Test passed')\""
+    "test": "node --check api/auth.js && node --check api/chat.js && node --check api/get-credentials.js && node --check api/lyrics.js && node --check api/search.js && node --check api/stream.js && node --check lib/cookies.js && node --check lib/session.js && node --check public/audio.js && node --check public/soundpulse-api-client.js && node --check sw.js"
   },
   "dependencies": {
     "@vercel/kv": "^3.0.0"

@@ -1,1 +1,95 @@
-const _0x6cdd47=_0x4fac;(function(_0x31708f,_0x2d61b2){const _0x20cf75=_0x4fac,_0x264ba5=_0x31708f();while(!![]){try{const _0x1a8ca4=parseInt(_0x20cf75(0x13f))/(-0x2*-0x75b+-0x2*0x880+-0x1*-0x24b)*(-parseInt(_0x20cf75(0x137))/(0x2*0xa94+-0x26a4+-0x8bf*-0x2))+-parseInt(_0x20cf75(0x14d))/(-0x1866+0x261a*-0x1+-0xd*-0x4cf)+-parseInt(_0x20cf75(0xeb))/(0x1b85+-0x1aab+-0xd6)+-parseInt(_0x20cf75(0x115))/(-0x49*0x53+-0x2*0x966+-0xa9f*-0x4)+-parseInt(_0x20cf75(0x12f))/(0x24bc*-0x1+0x266e+0x2*-0xd6)*(-parseInt(_0x20cf75(0x117))/(-0x998+0xbbd+0x10f*-0x2))+parseInt(_0x20cf75(0xf2))/(0xaba*-0x1+-0x1*-0x1274+-0x7b2*0x1)*(parseInt(_0x20cf75(0x105))/(-0x654+-0x18f5*0x1+0x1f52*0x1))+parseInt(_0x20cf75(0x143))/(-0x1b82+0x21e0+-0xa2*0xa);if(_0x1a8ca4===_0x2d61b2)break;else _0x264ba5['push'](_0x264ba5['shift']());}catch(_0x2a5b90){_0x264ba5['push'](_0x264ba5['shift']());}}}(_0x31cb,0x7765c+-0x13d7c8+0x1793f9));function _0x4fac(_0x4c9b6c,_0xe0bb4f){_0x4c9b6c=_0x4c9b6c-(0x50b*0x3+0x12d2+0x38*-0x97);const _0x4c8379=_0x31cb();let _0x1a2b62=_0x4c8379[_0x4c9b6c];return _0x1a2b62;}const CACHE=_0x6cdd47(0x116)+_0x6cdd47(0x100),LOCAL=['/',_0x6cdd47(0x129)+'l',_0x6cdd47(0xec)+_0x6cdd47(0x114)+_0x6cdd47(0x131),_0x6cdd47(0x125),_0x6cdd47(0x10c)+_0x6cdd47(0xef),_0x6cdd47(0xf0)+_0x6cdd47(0x147),_0x6cdd47(0x13b)+_0x6cdd47(0x147),_0x6cdd47(0x14c)+'g',_0x6cdd47(0x12e)+'ng',_0x6cdd47(0x11e)+_0x6cdd47(0x142)+'g'],CDN=[_0x6cdd47(0x127)+_0x6cdd47(0x11f)+_0x6cdd47(0x150),_0x6cdd47(0x12d)+_0x6cdd47(0xff)+_0x6cdd47(0x134)+'t',_0x6cdd47(0x127)+_0x6cdd47(0x149)+_0x6cdd47(0x113)+_0x6cdd47(0x11c)],CDN_HOSTS=[_0x6cdd47(0x14b)+_0x6cdd47(0x13a),_0x6cdd47(0xfe),_0x6cdd47(0xf8)+_0x6cdd47(0x122),_0x6cdd47(0x118)+_0x6cdd47(0xed),_0x6cdd47(0x104)+_0x6cdd47(0xf7),_0x6cdd47(0x144)+_0x6cdd47(0xfd)];self[_0x6cdd47(0x120)+_0x6cdd47(0x145)](_0x6cdd47(0x139),_0x1ed3de=>{const _0x1d5c48=_0x6cdd47;_0x1ed3de[_0x1d5c48(0x121)](((async()=>{const _0x36b16c=_0x1d5c48,_0x15d7a9=await caches[_0x36b16c(0x111)](CACHE);await Promise[_0x36b16c(0x133)](LOCAL[_0x36b16c(0x14e)](_0x6abd70=>_0x15d7a9[_0x36b16c(0x108)](_0x6abd70)[_0x36b16c(0x110)](()=>{}))),await Promise[_0x36b16c(0x133)](CDN[_0x36b16c(0x14e)](_0x29344c=>fetch(_0x29344c,{'mode':_0x36b16c(0x11a)})[_0x36b16c(0xfa)](_0x1c3a75=>_0x15d7a9[_0x36b16c(0xf4)](_0x29344c,_0x1c3a75))[_0x36b16c(0x110)](()=>{})));})())),self[_0x1d5c48(0x11b)+'g']();}),self[_0x6cdd47(0x120)+_0x6cdd47(0x145)](_0x6cdd47(0x12c),_0x198787=>{const _0x33a934=_0x6cdd47;_0x198787[_0x33a934(0x121)](caches[_0x33a934(0x136)]()[_0x33a934(0xfa)](_0x37d940=>Promise[_0x33a934(0x133)](_0x37d940[_0x33a934(0x10b)](_0x1ea1ed=>_0x1ea1ed!==CACHE)[_0x33a934(0x14e)](_0x53428b=>caches[_0x33a934(0x106)](_0x53428b))))),self[_0x33a934(0x13d)][_0x33a934(0x10e)]();});function _0x31cb(){const _0x296f81=['fonts.gsta','stener','fetch','png','mOpVl','n.jsdelivr','match','cdn.tailwi','/avatar.jp','1522446lKgoMe','map','destinatio','css.com','eYlCm','296220XVuXgL','/soundpuls','dflare.com','range','json','/icon-192.','navigate','1459032xijhue','test','put','/api/','clone','leapis.com','cdn.jsdeli','method','then','image','type','tic.com','unpkg.com','pkg.com/lu','-v10','HixlC','CsNgC','ypaYZ','fonts.goog','27mSIjRS','delete','origin','add','headers','WvviM','filter','/manifest.','ljnZJ','claim','mode','catch','open','zabGL','.net/npm/h','e-api-clie','2499885CERiUP','soundpulse','52171gELHAl','cdnjs.clou','has','no-cors','skipWaitin','ls.js@1','includes','/apple-tou','n.tailwind','addEventLi','waitUntil','vr.net','opaque','hostname','/audio.js','respondWit','https://cd','error','/index.htm','pathname','KwswE','activate','https://un','/favicon.p','48dVzkBR','startsWith','nt.js','GET','all','cide@lates','YpQWP','keys','2yuiOoX','gtjsr','install','ndcss.com','/icon-512.','request','clients','JXjHa','710155zkdRkn','MNMZW','url','ch-icon.pn','19187450qHHRUT'];_0x31cb=function(){return _0x296f81;};return _0x31cb();}function putCopy(_0x45484b,_0x759fee){const _0xc3e9b6=_0x6cdd47,_0x13f4f9={'eYlCm':function(_0x451ac7,_0x4f8155){return _0x451ac7===_0x4f8155;},'zabGL':_0xc3e9b6(0x123)};if(_0x759fee&&(_0x759fee['ok']||_0x13f4f9[_0xc3e9b6(0x151)](_0x759fee[_0xc3e9b6(0xfc)],_0x13f4f9[_0xc3e9b6(0x112)]))){const _0x195306=_0x759fee[_0xc3e9b6(0xf6)]();caches[_0xc3e9b6(0x111)](CACHE)[_0xc3e9b6(0xfa)](_0xdb6c80=>_0xdb6c80[_0xc3e9b6(0xf4)](_0x45484b,_0x195306))[_0xc3e9b6(0x110)](()=>{});}return _0x759fee;}self[_0x6cdd47(0x120)+_0x6cdd47(0x145)](_0x6cdd47(0x146),_0x3b7177=>{const _0x41f159=_0x6cdd47,_0x263b53={'KwswE':function(_0x5b3092,_0x57babf){return _0x5b3092(_0x57babf);},'CsNgC':function(_0x3eb1be,_0x33e96c){return _0x3eb1be===_0x33e96c;},'JXjHa':_0x41f159(0xf1),'WvviM':_0x41f159(0x129)+'l','YpQWP':function(_0x58570f,_0x34d638){return _0x58570f!==_0x34d638;},'ljnZJ':_0x41f159(0x132),'MNMZW':_0x41f159(0xee),'gtjsr':function(_0x1df618,_0x581f96){return _0x1df618!==_0x581f96;},'HixlC':function(_0x354d1a,_0x3da90b){return _0x354d1a===_0x3da90b;},'ypaYZ':_0x41f159(0xfb),'mOpVl':_0x41f159(0xf5)},_0x43486d=_0x3b7177[_0x41f159(0x13c)];if(_0x263b53[_0x41f159(0x135)](_0x43486d[_0x41f159(0xf9)],_0x263b53[_0x41f159(0x10d)])||_0x43486d[_0x41f159(0x109)][_0x41f159(0x119)](_0x263b53[_0x41f159(0x140)]))return;const _0x1fe651=new URL(_0x43486d[_0x41f159(0x141)]);if(_0x263b53[_0x41f159(0x138)](_0x1fe651[_0x41f159(0x107)],location[_0x41f159(0x107)])){const _0x1871ae=CDN_HOSTS[_0x41f159(0x11d)](_0x1fe651[_0x41f159(0x124)]),_0x8788fb=_0x263b53[_0x41f159(0x101)](_0x43486d[_0x41f159(0x14f)+'n'],_0x263b53[_0x41f159(0x103)])&&/sndcdn\.com$/[_0x41f159(0xf3)](_0x1fe651[_0x41f159(0x124)]);if(!_0x1871ae&&!_0x8788fb)return;_0x3b7177[_0x41f159(0x126)+'h'](caches[_0x41f159(0x14a)](_0x43486d)[_0x41f159(0xfa)](_0xc92043=>{const _0x491c9b=_0x41f159,_0x33ac21=_0x263b53[_0x491c9b(0x12b)](fetch,_0x43486d)[_0x491c9b(0xfa)](_0x277785=>putCopy(_0x43486d,_0x277785))[_0x491c9b(0x110)](()=>_0xc92043);return _0xc92043||_0x33ac21;}));return;}if(_0x1fe651[_0x41f159(0x12a)][_0x41f159(0x130)](_0x263b53[_0x41f159(0x148)]))return;_0x3b7177[_0x41f159(0x126)+'h'](_0x263b53[_0x41f159(0x12b)](fetch,_0x43486d)[_0x41f159(0xfa)](_0x46e386=>putCopy(_0x43486d,_0x46e386))[_0x41f159(0x110)](async()=>{const _0xa0c797=_0x41f159,_0x14eb5d=await caches[_0xa0c797(0x14a)](_0x43486d,{'ignoreSearch':!![]});if(_0x14eb5d)return _0x14eb5d;if(_0x263b53[_0xa0c797(0x102)](_0x43486d[_0xa0c797(0x10f)],_0x263b53[_0xa0c797(0x13e)]))return await caches[_0xa0c797(0x14a)](_0x263b53[_0xa0c797(0x10a)])||await caches[_0xa0c797(0x14a)]('/');return Response[_0xa0c797(0x128)]();}));});
+// v11: Tambah pengecualian robots.txt & sitemap.xml dari cache
+// Fix cache runtime: res.clone() dipanggil sinkron sebelum response dipakai browser
+// -> library CDN (Tailwind/lucide/hls) bisa tersimpan -> offline aman
+const CACHE = "soundpulse-v11";
+const LOCAL = [
+  "/",
+  "/index.html",
+  "/soundpulse-api-client.js",
+  "/audio.js",
+  "/manifest.json",
+  "/android-chrome-192x192.png",
+  "/android-chrome-512x512.png",
+  "/apple-touch-icon.png",
+  "/favicon.ico",
+  "/favicon-16x16.png",
+  "/favicon-32x32.png",
+  "/avatar.jpg",
+];
+const CDN = [
+  "https://cdn.tailwindcss.com",
+  "https://unpkg.com/lucide@latest",
+  "https://cdn.jsdelivr.net/npm/hls.js@1",
+];
+const CDN_HOSTS = [
+  "cdn.tailwindcss.com",
+  "unpkg.com",
+  "cdn.jsdelivr.net",
+  "cdnjs.cloudflare.com",
+  "fonts.googleapis.com",
+  "fonts.gstatic.com",
+];
+
+// File yang TIDAK boleh di-cache (biar Google selalu baca versi fresh)
+const NO_CACHE = ["/robots.txt", "/sitemap.xml"];
+
+self.addEventListener("install", (e) => {
+  e.waitUntil((async () => {
+    const c = await caches.open(CACHE);
+    await Promise.all(LOCAL.map(u => c.add(u).catch(() => {})));
+    // cache.add menolak response opaque, jadi ambil manual lalu put
+    await Promise.all(CDN.map(u => fetch(u, { mode: "no-cors" }).then(r => c.put(u, r)).catch(() => {})));
+  })());
+  self.skipWaiting();
+});
+
+self.addEventListener("activate", (e) => {
+  e.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))));
+  self.clients.claim();
+});
+
+function putCopy(req, res) {
+  if (res && (res.ok || res.type === "opaque")) {
+    const copy = res.clone(); // WAJIB sinkron, sebelum res dikembalikan
+    caches.open(CACHE).then(c => c.put(req, copy)).catch(() => {});
+  }
+  return res;
+}
+
+self.addEventListener("fetch", (e) => {
+  const req = e.request;
+  if (req.method !== "GET" || req.headers.has("range")) return;
+  const url = new URL(req.url);
+
+  // Jangan pernah cache robots.txt & sitemap.xml — biar crawler Google selalu fresh
+  if (NO_CACHE.includes(url.pathname)) {
+    e.respondWith(fetch(req).catch(() => new Response("", { status: 503 })));
+    return;
+  }
+
+  // library CDN + cover art: cache dulu, update di belakang layar
+  if (url.origin !== location.origin) {
+    const isCdn = CDN_HOSTS.includes(url.hostname);
+    const isArt = req.destination === "image" && /sndcdn\.com$/.test(url.hostname);
+    if (!isCdn && !isArt) return;
+    e.respondWith(caches.match(req).then(hit => {
+      const net = fetch(req).then(r => putCopy(req, r)).catch(() => hit);
+      return hit || net;
+    }));
+    return;
+  }
+
+  // API selalu network-only
+  if (url.pathname.startsWith("/api/")) return;
+
+  // file sendiri: network-first, fallback cache
+  // halaman utama jadi fallback untuk navigasi
+  e.respondWith(
+    fetch(req).then(r => putCopy(req, r)).catch(async () => {
+      const hit = await caches.match(req, { ignoreSearch: true });
+      if (hit) return hit;
+      if (req.mode === "navigate") return (await caches.match("/index.html")) || (await caches.match("/"));
+      return Response.error();
+    })
+  );
+});

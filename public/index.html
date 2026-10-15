@@ -7,6 +7,28 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>SoundPulse</title>
+
+<!-- SEO -->
+<meta name="description" content="SoundPulse — Streaming musik gratis dengan lirik sinkron & chat global bareng pendengar lain. Dengarkan lagu favoritmu kapan saja, di mana saja.">
+<meta name="keywords" content="SoundPulse, streaming musik, musik gratis, lirik lagu, chat musik, download lagu">
+<meta name="author" content="xs0ciety HUB">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<link rel="canonical" href="https://soundpulse.duckdns.org/">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="SoundPulse — Streaming Musik dengan Lirik & Chat">
+<meta property="og:description" content="Dengerin lagu favoritmu sambil ngobrol bareng pendengar lain. Gratis, tanpa ribet.">
+<meta property="og:url" content="https://soundpulse.duckdns.org/">
+<meta property="og:image" content="https://soundpulse.duckdns.org/android-chrome-512x512.png">
+<meta property="og:site_name" content="SoundPulse">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="SoundPulse — Streaming Musik dengan Lirik & Chat">
+<meta name="twitter:description" content="Dengerin lagu favoritmu sambil ngobrol bareng pendengar lain.">
+<meta name="twitter:image" content="https://soundpulse.duckdns.org/android-chrome-512x512.png">
+
 <link rel="icon" type="image/x-icon" href="/favicon.ico">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
@@ -350,6 +372,30 @@
     .song-actions button { width:30px; height:30px; }
   }
 </style>
+
+<!-- JSON-LD Structured Data -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "SoundPulse",
+  "url": "https://soundpulse.duckdns.org/",
+  "description": "Streaming musik dengan lirik sinkron & chat global bareng pendengar lain.",
+  "applicationCategory": "MultimediaApplication",
+  "operatingSystem": "Web, Android, iOS",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "IDR"
+  },
+  "author": {
+    "@type": "Person",
+    "name": "xs0ciety HUB"
+  },
+  "image": "https://soundpulse.duckdns.org/android-chrome-512x512.png"
+}
+</script>
+
 <script>
 const THEMES = {
   magenta:["#d946ef","#be185d","#f472b6","Pink"],
@@ -450,6 +496,13 @@ window.addEventListener("load", async () => {
 <body class="grad-bg min-h-screen">
 
 <div id="app">
+
+  <noscript>
+    <div style="padding:40px;text-align:center;font-family:sans-serif;color:#fff">
+      <h1>SoundPulse — Streaming Musik dengan Lirik &amp; Chat</h1>
+      <p>SoundPulse adalah platform streaming musik gratis dengan lirik sinkron dan chat global bareng pendengar lain. Aktifkan JavaScript untuk mulai mendengarkan.</p>
+    </div>
+  </noscript>
 
   <!-- HOME -->
   <section id="view-home" class="view max-w-[640px] mx-auto px-4 pt-6">

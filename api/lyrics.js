@@ -232,7 +232,8 @@ async function viaManual(q, duration) {
 }
 
 export default async function handler(req, res) {
-  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Origin", "https://soundpulse.duckdns.org");
+  res.setHeader("Vary", "Origin");
   res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
   if (req.method === "OPTIONS") return res.status(200).end();
   if (await rateLimit(req, res, { name: "lyrics", max: 90 })) return;

@@ -96,7 +96,8 @@ async function saveMessageAt(idx, msg, useKV) {
 const safeAvatar = (a) => (typeof a === "string" && /^https:\/\//.test(a) ? a : null);
 
 export default async function handler(req, res) {
-  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Origin", "https://soundpulse.duckdns.org");
+  res.setHeader("Vary", "Origin");
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
   res.setHeader("Cache-Control", "no-store");

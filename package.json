@@ -8,9 +8,7 @@
     "dev": "vercel dev --debug",
     "test": "node --check api/auth.js && node --check api/chat.js && node --check api/get-credentials.js && node --check api/lyrics.js && node --check api/search.js && node --check api/stream.js && node --check lib/cookies.js && node --check lib/session.js && node --check public/audio.js && node --check public/soundpulse-api-client.js && node --check sw.js"
   },
-  "dependencies": {
-    "@vercel/kv": "^3.0.0"
-  },
+  "dependencies": {},
   "devDependencies": {},
   "engines": {
     "node": ">=18.0.0"

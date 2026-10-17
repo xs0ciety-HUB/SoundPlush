@@ -1,1 +1,231 @@
-(function(_0x520cfb,_0x53c1c0){const _0x110a0b=_0x48df,_0x1dcd30=_0x520cfb();while(!![]){try{const _0x294123=parseInt(_0x110a0b(0x1af))/(-0x29*0x83+-0x1b*-0x6a+-0x1*-0x9ce)*(-parseInt(_0x110a0b(0x1ee))/(-0x19bb+0x1209+-0x74*-0x11))+parseInt(_0x110a0b(0x20a))/(0x2589*-0x1+0x1820+0x35b*0x4)*(parseInt(_0x110a0b(0x237))/(-0x1a8*0x10+0x23ab+-0x927))+-parseInt(_0x110a0b(0x227))/(0x22d2+0x1*0x721+-0x29ee*0x1)+-parseInt(_0x110a0b(0x217))/(0x315*0x9+-0x26+-0x1b91)+-parseInt(_0x110a0b(0x1ea))/(-0x1*0x24e2+0xb44+0x19a5)+parseInt(_0x110a0b(0x253))/(-0x4f3+-0x117+0x612)+parseInt(_0x110a0b(0x242))/(-0x1b37+-0xc7*-0x31+-0x25*0x4b);if(_0x294123===_0x53c1c0)break;else _0x1dcd30['push'](_0x1dcd30['shift']());}catch(_0x3c4b1c){_0x1dcd30['push'](_0x1dcd30['shift']());}}}(_0x4f29,-0x6b0fb+0x7*-0x9c9b+0x74fa9*0x2));function _0x48df(_0x43e057,_0xb533c8){_0x43e057=_0x43e057-(0x57*0x3f+0x10d4+-0x1*0x2497);const _0x27f5ee=_0x4f29();let _0x271c91=_0x27f5ee[_0x43e057];return _0x271c91;}function _0x4f29(){const _0x38b018=['get-creden','setHeader','-Methods','meout','duration','hls','9643473xZGVGU','XdlxT','json','Missing\x20qu','rror:','username','wyQMK','track_coun','abort','ON\x20from\x20So','transcodin','artwork_ur','filter','full_name','dCloud','AbortError','SoundCloud','186760pHxEBs','EMhxQ','Cache-Cont','AFRyC','format','public,\x20ma','bile\x20Safar','\x20(KHTML,\x20l','message','\x20q=\x22','\x20expired\x20c','GKOFg','5WNWVch','Android\x2013','string','x-age=1800','query','JKNHB','ponse','tracks','trol-Allow','KVGHf','Missing\x20cl','Invalid\x20JS','search/','?q=','mqRxy','[search]\x20E','&represent','QaJjw','track_auth','fozok','ery','count','avatar_url','audio/mpeg','status','&limit=20','EGNds','PJDEf','Mozilla/5.','from\x20/api/','lient_id','UQcmK','-Origin','liLXi','zRtPR','XxlAn','[search]\x20t','OvLFj','Access-Con','\x20playlist\x20','length','rmat',';\x20SM-A135F','users','media','SwWUf','n/json','LLGUY','0\x20(Linux;\x20','playlists','i-v2.sound','PQWTk','ount','ype=','title','retry-afte','Request\x20ti','sYhBO','playlists/','1459654vSrJNK','Dhziw','Invalid\x20cl','rFToC','70748sqLWVr','IjMqy','BrOIw','edentials\x20','followers_','mime_type','ike\x20Gecko)','genre','protocol','\x20API\x20error','includes','rdYVz','ation=full','signal','undCloud','headers','tials','orization','Refresh\x20cr','error:\x20','user','cloud.com/','created_at','applicatio','url','progressiv','RGMds','BLOCK','63003LjKYOC','0.0.0.0\x20Mo','Kit/537.36','collection','i/537.36','albums','nxTpn','streamable','QkLqn','qCSnV','UEcIH','permalink_','isArray','844194Hdqtmw',')\x20AppleWeb','Invalid\x20or','verified','https://ap','LgNOt','Rate\x20limit','aylist\x20res','adsju','\x20Chrome/12','rol','log','cPaiV','get','ient_id\x20fo','gXeZz','2383140PDKgIp','Invalid\x20pl','stream_url','GET,\x20OPTIO','ed\x20by\x20Soun','map','likes_coun','ient_id','LDFkJ','YeAso','policy','descriptio','statusText','?client_id','DDGmg','&client_id','28zRzPnC','error','playback_c','name','find'];_0x4f29=function(){return _0x38b018;};return _0x4f29();}export default async function handler(_0x588f8f,_0x287dcb){const _0x20f3e1=_0x48df,_0x22fa40={'cPaiV':_0x20f3e1(0x1b6),'LDFkJ':_0x20f3e1(0x1d5)+_0x20f3e1(0x1b7)+_0x20f3e1(0x1cf),'YeAso':_0x20f3e1(0x1d5)+_0x20f3e1(0x1b7)+_0x20f3e1(0x23e),'rdYVz':_0x20f3e1(0x22a)+'NS','LgNOt':_0x20f3e1(0x255)+_0x20f3e1(0x221),'QkLqn':_0x20f3e1(0x1a8)+_0x20f3e1(0x1b2),'BrOIw':_0x20f3e1(0x1b9)+_0x20f3e1(0x22e),'gXeZz':function(_0x43a479,_0x22dfda){return _0x43a479!==_0x22dfda;},'JKNHB':_0x20f3e1(0x1b1),'LLGUY':function(_0x1fa8c6,_0x421e41){return _0x1fa8c6<_0x421e41;},'UEcIH':_0x20f3e1(0x1ec)+_0x20f3e1(0x225)+_0x20f3e1(0x1d8),'EGNds':_0x20f3e1(0x1cb)+_0x20f3e1(0x1df)+_0x20f3e1(0x1b0)+_0x20f3e1(0x1d9)+_0x20f3e1(0x218)+_0x20f3e1(0x20c)+_0x20f3e1(0x1aa)+_0x20f3e1(0x1f4)+_0x20f3e1(0x220)+_0x20f3e1(0x20b)+_0x20f3e1(0x1a9)+_0x20f3e1(0x20e),'PJDEf':function(_0x2d2787,_0xd2d1fa){return _0x2d2787(_0xd2d1fa);},'zRtPR':function(_0x498d34,_0x2852d5,_0x29ded6){return _0x498d34(_0x2852d5,_0x29ded6);},'IjMqy':_0x20f3e1(0x205)+_0x20f3e1(0x1dd),'UQcmK':function(_0xbcd292,_0x2ef0f8){return _0xbcd292(_0x2ef0f8);},'AFRyC':_0x20f3e1(0x228)+_0x20f3e1(0x21e)+_0x20f3e1(0x1b5),'KVGHf':_0x20f3e1(0x245)+_0x20f3e1(0x1c3),'EMhxQ':_0x20f3e1(0x1e0),'nxTpn':_0x20f3e1(0x1da),'liLXi':_0x20f3e1(0x20f),'RGMds':function(_0x3ccc77,_0x1f8bda){return _0x3ccc77(_0x1f8bda);},'QaJjw':function(_0x206c77,_0x569666){return _0x206c77===_0x569666;},'mqRxy':_0x20f3e1(0x219)+_0x20f3e1(0x1ad)+_0x20f3e1(0x1cd),'SwWUf':_0x20f3e1(0x200)+_0x20f3e1(0x1f1)+_0x20f3e1(0x1cc)+_0x20f3e1(0x23c)+_0x20f3e1(0x1fe),'fozok':function(_0x4a5df4,_0x2b2545){return _0x4a5df4===_0x2b2545;},'rFToC':_0x20f3e1(0x21d)+_0x20f3e1(0x22b)+_0x20f3e1(0x250),'wyQMK':_0x20f3e1(0x1e6)+'r','OvLFj':_0x20f3e1(0x1ba)+_0x20f3e1(0x24b)+_0x20f3e1(0x1fc),'adsju':_0x20f3e1(0x1be)+_0x20f3e1(0x246),'PQWTk':function(_0x5a601e,_0x1313dd){return _0x5a601e===_0x1313dd;},'DDGmg':_0x20f3e1(0x251),'GKOFg':_0x20f3e1(0x1e7)+_0x20f3e1(0x23f)},{q:_0x5bda5b,client_id:_0x41a71a,type:type=_0x22fa40[_0x20f3e1(0x223)],playlist_id:_0x28bec2}=_0x588f8f[_0x20f3e1(0x1b3)];_0x287dcb[_0x20f3e1(0x23d)](_0x22fa40[_0x20f3e1(0x22f)],'*'),_0x287dcb[_0x20f3e1(0x23d)](_0x22fa40[_0x20f3e1(0x230)],_0x22fa40[_0x20f3e1(0x1f9)]),_0x287dcb[_0x20f3e1(0x23d)](_0x22fa40[_0x20f3e1(0x21c)],_0x22fa40[_0x20f3e1(0x212)]);if(!_0x41a71a)return _0x287dcb[_0x20f3e1(0x1c7)](-0x26ff*0x1+-0x1d05+-0x2*-0x22ca)[_0x20f3e1(0x244)]({'success':![],'error':_0x22fa40[_0x20f3e1(0x1f0)]});if(_0x22fa40[_0x20f3e1(0x226)](typeof _0x41a71a,_0x22fa40[_0x20f3e1(0x1b4)])||_0x22fa40[_0x20f3e1(0x1de)](_0x41a71a[_0x20f3e1(0x1d7)],0xda9+-0x1*-0xbc5+-0x1955))return _0x287dcb[_0x20f3e1(0x1c7)](0x23a3+0x6*-0x489+-0x1*0x6dd)[_0x20f3e1(0x244)]({'success':![],'error':_0x22fa40[_0x20f3e1(0x214)]});const _0x12a928=_0x22fa40[_0x20f3e1(0x1c9)];if(_0x28bec2)try{const _0x450243=_0x20f3e1(0x21b)+_0x20f3e1(0x1e1)+_0x20f3e1(0x203)+_0x20f3e1(0x1e9)+_0x22fa40[_0x20f3e1(0x1ca)](encodeURIComponent,_0x28bec2)+(_0x20f3e1(0x234)+'=')+_0x22fa40[_0x20f3e1(0x1ca)](encodeURIComponent,_0x41a71a)+(_0x20f3e1(0x1bf)+_0x20f3e1(0x1fa)),_0x495af8=new AbortController(),_0xcf4eea=_0x22fa40[_0x20f3e1(0x1d1)](setTimeout,()=>_0x495af8[_0x20f3e1(0x24a)](),-0x1*0x3236+-0x46c4+0xa00a),_0x1ec12a=await _0x22fa40[_0x20f3e1(0x1d1)](fetch,_0x450243,{'signal':_0x495af8[_0x20f3e1(0x1fb)],'headers':{'User-Agent':_0x12a928,'Accept':_0x22fa40[_0x20f3e1(0x1ef)]}});_0x22fa40[_0x20f3e1(0x1ce)](clearTimeout,_0xcf4eea);if(!_0x1ec12a['ok'])return _0x287dcb[_0x20f3e1(0x1c7)](_0x1ec12a[_0x20f3e1(0x1c7)])[_0x20f3e1(0x244)]({'success':![],'error':_0x20f3e1(0x252)+_0x20f3e1(0x1d6)+_0x20f3e1(0x201)+_0x1ec12a[_0x20f3e1(0x1c7)]});const _0x2986c6=await _0x1ec12a[_0x20f3e1(0x244)]();if(!_0x2986c6||!Array[_0x20f3e1(0x216)](_0x2986c6[_0x20f3e1(0x1b6)]))return _0x287dcb[_0x20f3e1(0x1c7)](-0x1*0x2072+-0xc86+-0x2*-0x1777)[_0x20f3e1(0x244)]({'success':![],'error':_0x22fa40[_0x20f3e1(0x1a6)]});return _0x2986c6[_0x20f3e1(0x1b6)]=_0x2986c6[_0x20f3e1(0x1b6)][_0x20f3e1(0x24e)](Boolean)[_0x20f3e1(0x22c)](enhanceTrack),_0x287dcb[_0x20f3e1(0x1c7)](-0x1*0x1421+-0xe31*-0x1+0xa*0xac)[_0x20f3e1(0x244)]({'success':!![],'playlist':{'id':_0x2986c6['id'],'title':_0x2986c6[_0x20f3e1(0x1e5)],'user':_0x2986c6[_0x20f3e1(0x202)],'artwork_url':_0x2986c6[_0x20f3e1(0x24d)+'l'],'track_count':_0x2986c6[_0x20f3e1(0x249)+'t'],'description':_0x2986c6[_0x20f3e1(0x232)+'n']},'collection':_0x2986c6[_0x20f3e1(0x1b6)],'_stats':{'total':_0x2986c6[_0x20f3e1(0x1b6)][_0x20f3e1(0x1d7)],'streamable':_0x2986c6[_0x20f3e1(0x1b6)][_0x20f3e1(0x24e)](_0x1dd7cc=>_0x1dd7cc[_0x20f3e1(0x211)])[_0x20f3e1(0x1d7)]}});}catch(_0x4479b7){return _0x287dcb[_0x20f3e1(0x1c7)](-0x831+0xe38+-0x413)[_0x20f3e1(0x244)]({'success':![],'error':_0x4479b7[_0x20f3e1(0x1ab)],'type':_0x4479b7[_0x20f3e1(0x23a)]});}if(!_0x5bda5b)return _0x287dcb[_0x20f3e1(0x1c7)](0x1*0xa8f+-0x2397+0x2*0xd4c)[_0x20f3e1(0x244)]({'success':![],'error':_0x22fa40[_0x20f3e1(0x1b8)],'required':{'q':_0x22fa40[_0x20f3e1(0x1b4)],'client_id':_0x22fa40[_0x20f3e1(0x1b4)]},'received':{'q':![],'client_id':!!_0x41a71a}});const _0x4188b5=[_0x22fa40[_0x20f3e1(0x223)],_0x22fa40[_0x20f3e1(0x254)],_0x22fa40[_0x20f3e1(0x210)],_0x22fa40[_0x20f3e1(0x1d0)]],_0x1ce985=_0x4188b5[_0x20f3e1(0x1f8)](type)?type:_0x22fa40[_0x20f3e1(0x223)];try{const _0x5f5467=_0x20f3e1(0x21b)+_0x20f3e1(0x1e1)+_0x20f3e1(0x203)+_0x20f3e1(0x1bb)+_0x1ce985+_0x20f3e1(0x1bc)+_0x22fa40[_0x20f3e1(0x1ce)](encodeURIComponent,_0x5bda5b)+(_0x20f3e1(0x236)+'=')+_0x41a71a+_0x20f3e1(0x1c8);console[_0x20f3e1(0x222)](_0x20f3e1(0x1d3)+_0x20f3e1(0x1e4)+_0x1ce985+_0x20f3e1(0x1ac)+_0x5bda5b+'\x22');const _0x7c39d=new AbortController(),_0x27d44d=_0x22fa40[_0x20f3e1(0x1d1)](setTimeout,()=>_0x7c39d[_0x20f3e1(0x24a)](),-0xa66+0x3c51*0x1+-0xadb),_0x2a6c0e=await _0x22fa40[_0x20f3e1(0x1d1)](fetch,_0x5f5467,{'signal':_0x7c39d[_0x20f3e1(0x1fb)],'headers':{'User-Agent':_0x12a928,'Accept':_0x22fa40[_0x20f3e1(0x1ef)]}});_0x22fa40[_0x20f3e1(0x208)](clearTimeout,_0x27d44d);if(!_0x2a6c0e['ok']){if(_0x22fa40[_0x20f3e1(0x1c0)](_0x2a6c0e[_0x20f3e1(0x1c7)],0x8a9+0x2*0x801+0x2*-0xb8d)||_0x22fa40[_0x20f3e1(0x1c0)](_0x2a6c0e[_0x20f3e1(0x1c7)],0x25f8+-0x1b37+-0x92e))return _0x287dcb[_0x20f3e1(0x1c7)](-0x2*0x441+-0x56f*-0x1+-0x6c*-0xb)[_0x20f3e1(0x244)]({'success':![],'error':_0x22fa40[_0x20f3e1(0x1bd)],'status':_0x2a6c0e[_0x20f3e1(0x1c7)],'hint':_0x22fa40[_0x20f3e1(0x1dc)]});if(_0x22fa40[_0x20f3e1(0x1c2)](_0x2a6c0e[_0x20f3e1(0x1c7)],0x131c+-0x2a3+0x766*-0x2))return _0x287dcb[_0x20f3e1(0x1c7)](-0x1a3*-0x5+-0xea1+0x81f*0x1)[_0x20f3e1(0x244)]({'success':![],'error':_0x22fa40[_0x20f3e1(0x1ed)],'status':_0x2a6c0e[_0x20f3e1(0x1c7)],'retry_after':_0x2a6c0e[_0x20f3e1(0x1fd)][_0x20f3e1(0x224)](_0x22fa40[_0x20f3e1(0x248)])||'60'});return _0x287dcb[_0x20f3e1(0x1c7)](_0x2a6c0e[_0x20f3e1(0x1c7)])[_0x20f3e1(0x244)]({'success':![],'error':_0x20f3e1(0x252)+_0x20f3e1(0x1f7)+':\x20'+_0x2a6c0e[_0x20f3e1(0x233)],'status':_0x2a6c0e[_0x20f3e1(0x1c7)]});}let _0x4831bd;try{_0x4831bd=await _0x2a6c0e[_0x20f3e1(0x244)]();}catch{return _0x287dcb[_0x20f3e1(0x1c7)](-0x83*0x36+0x5+0x1d93)[_0x20f3e1(0x244)]({'success':![],'error':_0x22fa40[_0x20f3e1(0x1d4)]});}(!_0x4831bd||!Array[_0x20f3e1(0x216)](_0x4831bd[_0x20f3e1(0x20d)]))&&(_0x4831bd=_0x4831bd||{},_0x4831bd[_0x20f3e1(0x20d)]=[]);_0x4831bd[_0x20f3e1(0x20d)]=_0x4831bd[_0x20f3e1(0x20d)][_0x20f3e1(0x24e)](Boolean);if(_0x22fa40[_0x20f3e1(0x1c0)](_0x1ce985,_0x22fa40[_0x20f3e1(0x223)]))_0x4831bd[_0x20f3e1(0x20d)]=_0x4831bd[_0x20f3e1(0x20d)][_0x20f3e1(0x22c)](enhanceTrack);else{if(_0x22fa40[_0x20f3e1(0x1c0)](_0x1ce985,_0x22fa40[_0x20f3e1(0x254)]))_0x4831bd[_0x20f3e1(0x20d)]=_0x4831bd[_0x20f3e1(0x20d)][_0x20f3e1(0x22c)](_0x149e8f=>({'id':_0x149e8f['id'],'title':_0x149e8f[_0x20f3e1(0x1e5)],'user':_0x149e8f[_0x20f3e1(0x202)],'artwork_url':_0x149e8f[_0x20f3e1(0x24d)+'l'],'track_count':_0x149e8f[_0x20f3e1(0x249)+'t'],'description':_0x149e8f[_0x20f3e1(0x232)+'n'],'created_at':_0x149e8f[_0x20f3e1(0x204)],'genre':_0x149e8f[_0x20f3e1(0x1f5)],'permalink_url':_0x149e8f[_0x20f3e1(0x215)+_0x20f3e1(0x206)]}));else _0x22fa40[_0x20f3e1(0x1c0)](_0x1ce985,_0x22fa40[_0x20f3e1(0x210)])&&(_0x4831bd[_0x20f3e1(0x20d)]=_0x4831bd[_0x20f3e1(0x20d)][_0x20f3e1(0x22c)](_0x4b74b9=>({'id':_0x4b74b9['id'],'username':_0x4b74b9[_0x20f3e1(0x247)],'avatar_url':_0x4b74b9[_0x20f3e1(0x1c5)],'full_name':_0x4b74b9[_0x20f3e1(0x24f)],'followers_count':_0x4b74b9[_0x20f3e1(0x1f2)+_0x20f3e1(0x1c4)],'track_count':_0x4b74b9[_0x20f3e1(0x249)+'t'],'permalink_url':_0x4b74b9[_0x20f3e1(0x215)+_0x20f3e1(0x206)],'verified':_0x4b74b9[_0x20f3e1(0x21a)]})));}return _0x287dcb[_0x20f3e1(0x1c7)](0xb7*0x21+0x4b+-0x171a*0x1)[_0x20f3e1(0x244)]({'success':!![],'type':_0x1ce985,'collection':_0x4831bd[_0x20f3e1(0x20d)],'_stats':{'total':_0x4831bd[_0x20f3e1(0x20d)][_0x20f3e1(0x1d7)]}});}catch(_0x2be796){console[_0x20f3e1(0x238)](_0x22fa40[_0x20f3e1(0x21f)],_0x2be796[_0x20f3e1(0x1ab)]);if(_0x22fa40[_0x20f3e1(0x1e2)](_0x2be796[_0x20f3e1(0x23a)],_0x22fa40[_0x20f3e1(0x235)]))return _0x287dcb[_0x20f3e1(0x1c7)](-0x7*0x2d4+-0xa*0x1a5+-0x92*-0x43)[_0x20f3e1(0x244)]({'success':![],'error':_0x22fa40[_0x20f3e1(0x1ae)]});return _0x287dcb[_0x20f3e1(0x1c7)](0x155d*0x1+0x593+0x2*-0xc7e)[_0x20f3e1(0x244)]({'success':![],'error':_0x2be796[_0x20f3e1(0x1ab)],'type':_0x2be796[_0x20f3e1(0x23a)]});}}function enhanceTrack(_0x95b997){const _0x1a9b5b=_0x48df,_0x3bc455={'XdlxT':_0x1a9b5b(0x207)+'e','XxlAn':_0x1a9b5b(0x241),'Dhziw':function(_0x2ea22f,_0x2bf668){return _0x2ea22f===_0x2bf668;},'sYhBO':_0x1a9b5b(0x209),'qCSnV':function(_0x224bca,_0x6be054){return _0x224bca!==_0x6be054;}};let _0xa82061=null,_0xa839f=null;_0x95b997[_0x1a9b5b(0x229)]&&(_0xa82061=_0x95b997[_0x1a9b5b(0x229)],_0xa839f=_0x3bc455[_0x1a9b5b(0x243)]);if(!_0xa82061&&Array[_0x1a9b5b(0x216)](_0x95b997[_0x1a9b5b(0x1db)]?.[_0x1a9b5b(0x24c)+'gs'])){const _0x4dd81a=_0x95b997[_0x1a9b5b(0x1db)][_0x1a9b5b(0x24c)+'gs'][_0x1a9b5b(0x23b)](_0x18260f=>_0x18260f?.[_0x1a9b5b(0x1a7)]?.[_0x1a9b5b(0x1f6)]===_0x1a9b5b(0x207)+'e'||_0x18260f?.[_0x1a9b5b(0x1a7)]?.[_0x1a9b5b(0x1f3)]===_0x1a9b5b(0x1c6));if(_0x4dd81a?.[_0x1a9b5b(0x206)])_0xa82061=_0x4dd81a[_0x1a9b5b(0x206)],_0xa839f=_0x3bc455[_0x1a9b5b(0x243)];else{const _0x3ba070=_0x95b997[_0x1a9b5b(0x1db)][_0x1a9b5b(0x24c)+'gs'][_0x1a9b5b(0x23b)](_0x18e04c=>_0x18e04c?.[_0x1a9b5b(0x1a7)]?.[_0x1a9b5b(0x1f6)]===_0x1a9b5b(0x241));_0x3ba070?.[_0x1a9b5b(0x206)]&&(_0xa82061=_0x3ba070[_0x1a9b5b(0x206)],_0xa839f=_0x3bc455[_0x1a9b5b(0x1d2)]);}}const _0x45051d=_0x3bc455[_0x1a9b5b(0x1eb)](_0x95b997?.[_0x1a9b5b(0x231)]?.[_0x1a9b5b(0x231)],_0x3bc455[_0x1a9b5b(0x1e8)]),_0x2e885a=_0x3bc455[_0x1a9b5b(0x213)](_0x95b997[_0x1a9b5b(0x211)],![])&&!!_0xa82061&&!_0x45051d;return{'id':_0x95b997['id'],'title':_0x95b997[_0x1a9b5b(0x1e5)],'user':_0x95b997[_0x1a9b5b(0x202)],'artwork_url':_0x95b997[_0x1a9b5b(0x24d)+'l'],'duration':_0x95b997[_0x1a9b5b(0x240)],'playback_count':_0x95b997[_0x1a9b5b(0x239)+_0x1a9b5b(0x1e3)],'likes_count':_0x95b997[_0x1a9b5b(0x22d)+'t'],'genre':_0x95b997[_0x1a9b5b(0x1f5)],'permalink_url':_0x95b997[_0x1a9b5b(0x215)+_0x1a9b5b(0x206)],'track_authorization':_0x95b997[_0x1a9b5b(0x1c1)+_0x1a9b5b(0x1ff)]||null,'stream_url':_0xa82061,'stream_type':_0xa839f,'streamable':_0x2e885a,'policy':_0x95b997[_0x1a9b5b(0x231)]};}
+import { rateLimit } from "../lib/ratelimit.js";
+// api/search.js
+export default async function handler(req, res) {
+  const { q, client_id, type = "tracks", playlist_id } = req.query;
+
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
+  res.setHeader("Cache-Control", "public, max-age=1800");
+  if (await rateLimit(req, res, { name: "search", max: 120 })) return;
+
+  if (!client_id) {
+    return res.status(400).json({ success: false, error: "Missing client_id" });
+  }
+
+  if (typeof client_id !== "string" || client_id.length < 25) {
+    return res.status(400).json({ success: false, error: "Invalid client_id format" });
+  }
+
+  const UA = "Mozilla/5.0 (Linux; Android 13; SM-A135F) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36";
+
+  /* ============================================================
+     MODE 1: Fetch playlist detail by ID
+  ============================================================ */
+  if (playlist_id) {
+    try {
+      const url = `https://api-v2.soundcloud.com/playlists/${encodeURIComponent(playlist_id)}?client_id=${encodeURIComponent(client_id)}&representation=full`;
+      const controller = new AbortController();
+      const t = setTimeout(() => controller.abort(), 10000);
+
+      const r = await fetch(url, {
+        signal: controller.signal,
+        headers: { "User-Agent": UA, Accept: "application/json" }
+      });
+      clearTimeout(t);
+
+      if (!r.ok) {
+        return res.status(r.status).json({
+          success: false,
+          error: `SoundCloud playlist error: ${r.status}`
+        });
+      }
+
+      const data = await r.json();
+      if (!data || !Array.isArray(data.tracks)) {
+        return res.status(502).json({ success: false, error: "Invalid playlist response" });
+      }
+
+      data.tracks = data.tracks.filter(Boolean).map(enhanceTrack);
+
+      return res.status(200).json({
+        success: true,
+        playlist: {
+          id: data.id,
+          title: data.title,
+          user: data.user,
+          artwork_url: data.artwork_url,
+          track_count: data.track_count,
+          description: data.description
+        },
+        collection: data.tracks,
+        _stats: {
+          total: data.tracks.length,
+          streamable: data.tracks.filter(t => t.streamable).length
+        }
+      });
+    } catch (err) {
+      return res.status(500).json({
+        success: false,
+        error: "Terjadi kesalahan di server",
+        type: "ServerError"
+      });
+    }
+  }
+
+  /* ============================================================
+     MODE 2: Search
+  ============================================================ */
+  if (!q) {
+    return res.status(400).json({
+      success: false,
+      error: "Missing query",
+      required: { q: "string", client_id: "string" },
+      received: { q: false, client_id: !!client_id }
+    });
+  }
+
+  const allowedTypes = ["tracks", "playlists", "users", "albums"];
+  const safeType = allowedTypes.includes(type) ? type : "tracks";
+
+  try {
+    const searchUrl = `https://api-v2.soundcloud.com/search/${safeType}?q=${encodeURIComponent(q)}&client_id=${client_id}&limit=20`;
+    console.log(`[search] type=${safeType} q="${q}"`);
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000);
+
+    const scRes = await fetch(searchUrl, {
+      signal: controller.signal,
+      headers: { "User-Agent": UA, Accept: "application/json" }
+    });
+
+    clearTimeout(timeoutId);
+
+    if (!scRes.ok) {
+      if (scRes.status === 401 || scRes.status === 403) {
+        return res.status(401).json({
+          success: false,
+          error: "Invalid or expired client_id",
+          status: scRes.status,
+          hint: "Refresh credentials from /api/get-credentials"
+        });
+      }
+      if (scRes.status === 429) {
+        return res.status(429).json({
+          success: false,
+          error: "Rate limited by SoundCloud",
+          status: scRes.status,
+          retry_after: scRes.headers.get("retry-after") || "60"
+        });
+      }
+      return res.status(scRes.status).json({
+        success: false,
+        error: `SoundCloud API error: ${scRes.statusText}`,
+        status: scRes.status
+      });
+    }
+
+    let data;
+    try { data = await scRes.json(); }
+    catch { return res.status(502).json({ success: false, error: "Invalid JSON from SoundCloud" }); }
+
+    if (!data || !Array.isArray(data.collection)) {
+      data = data || {};
+      data.collection = [];
+    }
+
+    data.collection = data.collection.filter(Boolean);
+
+    if (safeType === "tracks") {
+      data.collection = data.collection.map(enhanceTrack);
+    } else if (safeType === "playlists") {
+      data.collection = data.collection.map(p => ({
+        id: p.id,
+        title: p.title,
+        user: p.user,
+        artwork_url: p.artwork_url,
+        track_count: p.track_count,
+        description: p.description,
+        created_at: p.created_at,
+        genre: p.genre,
+        permalink_url: p.permalink_url
+      }));
+    } else if (safeType === "users") {
+      data.collection = data.collection.map(u => ({
+        id: u.id,
+        username: u.username,
+        avatar_url: u.avatar_url,
+        full_name: u.full_name,
+        followers_count: u.followers_count,
+        track_count: u.track_count,
+        permalink_url: u.permalink_url,
+        verified: u.verified
+      }));
+    }
+
+    return res.status(200).json({
+      success: true,
+      type: safeType,
+      collection: data.collection,
+      _stats: { total: data.collection.length }
+    });
+  } catch (err) {
+    console.error("[search] Error:", err.message);
+    if (err.name === "AbortError") {
+      return res.status(504).json({ success: false, error: "Request timeout" });
+    }
+    return res.status(500).json({ success: false, error: "Terjadi kesalahan di server", type: "ServerError" });
+  }
+}
+
+/* ============================================================
+   Helper: enhance track with stream URL
+   Prioritas: progressive (single file) > hls
+============================================================ */
+function enhanceTrack(track) {
+  let streamUrl = null;
+  let streamType = null;
+
+  if (track.stream_url) {
+    streamUrl = track.stream_url;
+    streamType = "progressive";
+  }
+
+  if (!streamUrl && Array.isArray(track.media?.transcodings)) {
+    // Coba progressive dulu (no segment expiry)
+    const prog = track.media.transcodings.find(t =>
+      t?.format?.protocol === "progressive" || t?.format?.mime_type === "audio/mpeg"
+    );
+
+    if (prog?.url) {
+      streamUrl = prog.url;
+      streamType = "progressive";
+    } else {
+      const hls = track.media.transcodings.find(t => t?.format?.protocol === "hls");
+      if (hls?.url) {
+        streamUrl = hls.url;
+        streamType = "hls";
+      }
+    }
+  }
+
+  const blocked = track?.policy?.policy === "BLOCK";
+  const streamable = track.streamable !== false && !!streamUrl && !blocked;
+
+  return {
+    id: track.id,
+    title: track.title,
+    user: track.user,
+    artwork_url: track.artwork_url,
+    duration: track.duration,
+    playback_count: track.playback_count,
+    likes_count: track.likes_count,
+    genre: track.genre,
+    permalink_url: track.permalink_url,
+    track_authorization: track.track_authorization || null,
+    stream_url: streamUrl,
+    stream_type: streamType,
+    streamable,
+    policy: track.policy
+  };
+}

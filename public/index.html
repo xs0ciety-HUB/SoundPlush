@@ -441,9 +441,31 @@
       "url": "https://soundpulse.duckdns.org/",
       "logo": "https://soundpulse.duckdns.org/android-chrome-512x512.png",
       "sameAs": [
-        "https://github.com/xs0ciety"
+        "https://t.me/xs0cietyHUB",
+        "https://www.tiktok.com/@xprimesociety",
+        "https://www.instagram.com/xs0ciety_hub"
       ]
     }
+  ]
+}
+</script>
+
+<!-- JSON-LD Structured Data Author (Person) -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": "xs0ciety HUB",
+  "url": "https://soundpulse.duckdns.org/",
+  "jobTitle": "Developer",
+  "worksFor": {
+    "@type": "Organization",
+    "name": "SoundPulse"
+  },
+  "sameAs": [
+    "https://t.me/xs0cietyHUB",
+    "https://www.tiktok.com/@xprimesociety",
+    "https://www.instagram.com/xs0ciety_hub"
   ]
 }
 </script>
@@ -1234,7 +1256,6 @@ async function loadAuth() {
       else localStorage.removeItem("sp_user");
     } catch {}
   } catch {
-    // offline: pakai data terakhir supaya tampilan profil tidak kosong
     try { state.user = JSON.parse(localStorage.getItem("sp_user") || "null"); } catch {}
   }
   updateProfileUI();
@@ -1312,7 +1333,6 @@ async function logout() {
   toast("Berhasil keluar");
 }
 
-// Atur bar bawah chat: kolom ketik kalau sudah login, tombol Google kalau belum
 function renderChatAuth() {
   const inChat = state.view === "chat";
   document.getElementById("chatInputBar").classList.toggle("hidden", !(inChat && state.user));
@@ -1818,7 +1838,6 @@ function resetLyrics() {
   if (fc) fc.textContent = "";
 }
 
-// Muat hanya kalau belum ada, belum sedang dimuat, dan belum tampil kotak cari manual
 function ensureLyrics() {
   if (state.lyricLines.length) {
     if (!state._lyricEls) renderLyricLines();
@@ -1865,7 +1884,7 @@ async function fetchLyrics(manual) {
   try {
     const r = await fetch("/api/lyrics?" + qs.toString());
     const d = await r.json();
-    if (myReq !== lyricReq) return; // lagu sudah ganti
+    if (myReq !== lyricReq) return;
     if (!d.success || !Array.isArray(d.lines) || !d.lines.length) throw new Error("kosong");
 
     const plain = d.lines.map(l => l.text);
@@ -1881,7 +1900,6 @@ async function fetchLyrics(manual) {
     }
     state.lyricSynced = !!d.synced;
     state.currentLyricLine = -1;
-    // bobot tiap baris (panjang teks) untuk perkiraan kalau tidak ada timestamp
     let acc = 0;
     state.lyricStarts = []; state.lyricWeights = [];
     for (const line of state.lyricLines) {
@@ -1906,20 +1924,17 @@ async function fetchLyrics(manual) {
   }
 }
 
-// tebakan awal untuk kolom cari manual
 function cleanForSearch(t) {
   return String(t.title || "").replace(/[\(\[][^\)\]]*[\)\]]/g, " ").replace(/\s+/g, " ").trim().slice(0, 80);
 }
 
-// Kira-kira berapa lama baris dinyanyikan bila data akhir baris tidak ada
 function estSingDur(text, gapToNext) {
   return Math.max(0.8, Math.min(gapToNext - 0.05, Math.max(2, text.length * 0.12)));
 }
 
-// Sisipkan penanda jeda "● ● ●" di bagian instrumental (intro, tengah lagu)
 function buildSyncedLyrics(src) {
   const texts = [], times = [], ends = [], gap = [];
-  const MIN_GAP = 5; // detik instrumental minimal agar dianggap jeda
+  const MIN_GAP = 5;
   const push = (text, t, end, isGap) => { texts.push(text); times.push(t); ends.push(end); gap.push(isGap); };
 
   if (src.length && src[0].t >= MIN_GAP + 1) push("● ● ●", 0.5, src[0].t - 0.2, true);
@@ -1944,7 +1959,6 @@ function renderLyricLines() {
   state._lyricEls = [...c.querySelectorAll(".lyric-line")];
 }
 
-// Ketuk baris lirik tersinkron -> lompat ke bagian itu
 document.getElementById("lyricContent").addEventListener("click", (e) => {
   const el = e.target.closest(".lyric-line");
   if (!el || !state.lyricTimes) return;
@@ -1961,13 +1975,9 @@ function lyricOffset(delta) {
   toast(o === 0 ? "Sinkron lirik: normal" : "Lirik " + (o > 0 ? "lebih cepat " : "lebih lambat ") + Math.abs(o).toFixed(2) + " dtk");
 }
 
-/* ============================================================
-   LIRIK: loop per frame (±60x/detik) + scroll halus
-============================================================ */
-const LYRIC_LEAD = 0.2;   // tampil sedikit lebih awal supaya terasa pas dengan suara
+const LYRIC_LEAD = 0.2;
 let _lastCT = -1, _lastPerf = 0, lyricRaf = 0, lyricScrollAnim = 0, lyricUserScrollUntil = 0;
 
-// currentTime di sebagian browser hanya naik ~4x/detik; interpolasi di antaranya
 function lyricNow() {
   const ct = audio.currentTime, now = performance.now();
   if (ct !== _lastCT) { _lastCT = ct; _lastPerf = now; return ct; }
@@ -1986,12 +1996,11 @@ function startLyricLoop() {
     lyricRaf = 0;
     if (audio.paused || document.hidden || !state.lyricLines.length || !lyricPanelVisible()) return;
     updateLyricHighlight();
-    if (!lyricRaf) lyricRaf = requestAnimationFrame(frame); // update bisa sudah mengaktifkan loop; jangan ganda
+    if (!lyricRaf) lyricRaf = requestAnimationFrame(frame);
   };
   lyricRaf = requestAnimationFrame(frame);
 }
 
-// indeks terakhir dengan arr[i] <= x
 function lastLE(arr, x) {
   let lo = 0, hi = arr.length - 1, idx = 0;
   while (lo <= hi) {
@@ -2010,7 +2019,7 @@ function scrollLyricsToActive(instant) {
   cancelAnimationFrame(lyricScrollAnim);
   lyricScrollAnim = 0;
   if (instant) { box.scrollTop = target; return; }
-  if (performance.now() < lyricUserScrollUntil) return; // pengguna sedang scroll sendiri
+  if (performance.now() < lyricUserScrollUntil) return;
 
   let last = performance.now();
   const step = (now) => {
@@ -2045,7 +2054,6 @@ function updateLyricHighlight() {
     idx = lastLE(times, t);
     const start = times[idx];
     const end = state.lyricEnds ? state.lyricEnds[idx] : start + 3;
-    // isi warna hanya selama baris itu dinyanyikan; sesudahnya penuh dan menunggu (jeda instrumental)
     frac = t < start ? 0 : Math.max(0, Math.min(1, (t - start) / Math.max(0.4, end - start)));
   } else {
     if (!audio.duration || !isFinite(audio.duration)) return;
@@ -2072,7 +2080,6 @@ function updateLyricHighlight() {
   const cur = lines[idx];
   if (cur) cur.style.setProperty("--p", (frac * 100).toFixed(1) + "%");
 
-  // pastikan loop per-frame hidup selama lagu berjalan dan panel terlihat
   if (!lyricRaf && !audio.paused && lyricPanelVisible()) startLyricLoop();
 }
 
@@ -2183,9 +2190,6 @@ window.spRecoverStream = function () {
 audio.addEventListener("play", () => setPlayIcon(true));
 audio.addEventListener("pause", () => setPlayIcon(false));
 
-/* ============================================================
-   LIKES + DOWNLOADS
-============================================================ */
 function toggleLikeById(trackId) {
   const t = state.currentTrack && state.currentTrack.id === trackId
     ? state.currentTrack
@@ -2309,9 +2313,6 @@ function renderLiked() {
   renderTrackList(state.likes, "likedList");
 }
 
-/* ============================================================
-   SEARCH
-============================================================ */
 let lastSearchQuery = "";
 function handleSearchKey(e) {
   if (e.key !== 'Enter') return;
@@ -2455,9 +2456,6 @@ function renderSearch() {
   }
 }
 
-/* ============================================================
-   LIBRARY
-============================================================ */
 let libTab = "playlists";
 function switchLibTab(tab, btn) {
   libTab = tab;
@@ -2664,9 +2662,6 @@ function deletePlaylist(i) {
   renderLibrary();
 }
 
-/* ============================================================
-   OFFLINE
-============================================================ */
 function renderOffline() {
   const el = document.getElementById("offlineList");
   document.getElementById("offlineTotal").textContent = state.downloaded.length + " LAGU TERSIMPAN";
@@ -2701,9 +2696,6 @@ function updateNetBadge() {
 window.addEventListener("online", updateNetBadge);
 window.addEventListener("offline", updateNetBadge);
 
-/* ============================================================
-   PWA
-============================================================ */
 async function clearCache() {
   if (!confirm("Bersihkan cache PWA?")) return;
   if ('caches' in window) {
@@ -2748,9 +2740,6 @@ if ('serviceWorker' in navigator) {
   });
 }
 
-/* ============================================================
-   CHAT (ala WhatsApp: balas, edit, hapus pesan sendiri)
-============================================================ */
 let _allMessages = [];
 const CHAT_CACHE_KEY = "sp_chat_cache";
 
@@ -2761,7 +2750,6 @@ function loadChatCache() {
   } catch { return []; }
 }
 
-// Cache tanpa isi foto (base64 besar) supaya localStorage tidak penuh
 function saveChatCache(msgs) {
   const slim = msgs.filter(m => !m._pending).slice(-80)
     .map(m => (m.image || m.file) ? { ...m, image: null, file: null, hadImage: !!m.image, hadFile: !!m.file } : m);
@@ -2893,7 +2881,6 @@ function msgRowHTML(m, first) {
   const nameLine = first
     ? `<div class="text-[11.5px] font-semibold mb-[2px] ml-[2px]" style="color:${color}">${esc(m.name || "")}${badge}</div>`
     : "";
-  // Foto profil + nama hanya di pesan pertama dari satu pengirim berturut-turut
   return `<div class="msg-row other ${mt}"><div class="msg-av">${av}</div><div class="min-w-0 max-w-[78%]">${nameLine}${bubble}</div></div>`;
 }
 
@@ -2920,7 +2907,6 @@ function renderChat(messages, forceScroll) {
   if (forceScroll || nearBottom) window.scrollTo(0, document.body.scrollHeight);
 }
 
-/* ---------- interaksi: tahan lama = menu, tap foto = pratinjau, tap kutipan = lompat ---------- */
 (function initChatInteractions() {
   const el = document.getElementById("chatMessages");
   let timer = null, fired = false;
@@ -2998,7 +2984,6 @@ function closeImageFull() {
   document.getElementById("imgViewerImg").src = "";
 }
 
-/* ---------- menu pesan ---------- */
 function openContextMenu(id) {
   const msg = _allMessages.find(m => m.id === id);
   if (!msg || msg.deleted) return;
@@ -3030,7 +3015,6 @@ async function copyMessage() {
   } catch { toast("Gagal menyalin"); }
 }
 
-/* ---------- balas ---------- */
 function startReplyFromMenu() {
   const id = state.contextMenuId;
   closeChatContextMenu();
@@ -3053,7 +3037,6 @@ function cancelReply() {
   document.getElementById("replyPreview").classList.add("hidden");
 }
 
-/* ---------- lampiran foto ---------- */
 function cancelAttach() {
   state.attach = null;
   document.getElementById("attachPreview").classList.add("hidden");
@@ -3115,7 +3098,6 @@ function handleChatFile(e) {
   reader.onload = (ev) => {
     const dataUrl = ev.target.result;
     if (typeof dataUrl !== "string" || dataUrl.length > 700000) { toast("File terlalu besar"); return; }
-    // Tipe tidak dikenal browser -> data URI bisa tanpa mime; beri default agar lolos validasi server
     const safe = /^data:[a-z0-9.+-]+\/[a-z0-9.+-]+;base64,/i.test(dataUrl)
       ? dataUrl
       : dataUrl.replace(/^data:[^,]*,/, "data:application/octet-stream;base64,");
@@ -3126,7 +3108,6 @@ function handleChatFile(e) {
   reader.readAsDataURL(file);
 }
 
-/* ---------- edit ---------- */
 function startEditMessage() {
   const msg = _allMessages.find(m => m.id === state.contextMenuId);
   if (!msg || !isMine(msg) || !msg.text) return;
@@ -3149,7 +3130,6 @@ function cancelEdit() {
   document.getElementById("editPreview").classList.add("hidden");
 }
 
-/* ---------- hapus ---------- */
 async function deleteMessage() {
   const msgId = state.contextMenuId;
   const msg = _allMessages.find(m => m.id === msgId);
@@ -3182,7 +3162,6 @@ async function deleteMessage() {
   }
 }
 
-/* ---------- kirim / simpan edit ---------- */
 function handleAuthLost() {
   state.user = null;
   try { localStorage.removeItem("sp_user"); } catch {}
@@ -3256,7 +3235,6 @@ async function sendChat() {
   cancelReply();
   cancelAttach();
 
-  // Tampil dulu (optimistic), nanti diganti data server
   _allMessages = [..._allMessages, {
     id: msgId, uid: state.user.uid, name: state.user.name, avatar: state.user.picture,
     admin: state.user.admin, text, image: payload.image || null, file: payload.file || null,
@@ -3284,9 +3262,6 @@ async function sendChat() {
   }
 }
 
-/* ============================================================
-   INIT
-============================================================ */
 async function initApp() {
   renderGenrePills();
   renderRecent();

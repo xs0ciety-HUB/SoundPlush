@@ -3,20 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="google-site-verification" content="d6FDRRgOfiF8TIk4aw28tx8swOc9LRMSFC2MXYGdK5I" />
+<meta name="google-site-verification" content="D1oUHv6dGj1dX7cihsmCFHur-ww9WxDmfzoywawpfPI" />
 <meta name="theme-color" content="#121212">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>SoundPulse</title>
 
-<!-- SEO Tambahan & PWA -->
-<meta name="application-name" content="SoundPulse">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="SoundPulse">
-<meta name="format-detection" content="telephone=no">
-<meta name="googlebot" content="index, follow">
-<meta name="msapplication-TileColor" content="#121212">
-<meta name="msapplication-TileImage" content="/android-chrome-192x192.png">
+<!-- SEO -->
 <meta name="description" content="SoundPulse — Streaming musik gratis dengan lirik sinkron & chat global bareng pendengar lain. Dengarkan lagu favoritmu kapan saja, di mana saja.">
 <meta name="keywords" content="SoundPulse, streaming musik, musik gratis, lirik lagu, chat musik, download lagu">
 <meta name="author" content="xs0ciety HUB">
@@ -29,10 +22,6 @@
 <meta property="og:description" content="Dengerin lagu favoritmu sambil ngobrol bareng pendengar lain. Gratis, tanpa ribet.">
 <meta property="og:url" content="https://soundpulse.duckdns.org/">
 <meta property="og:image" content="https://soundpulse.duckdns.org/android-chrome-512x512.png">
-<meta property="og:image:width" content="512">
-<meta property="og:image:height" content="512">
-<meta property="og:image:alt" content="Logo SoundPulse">
-<meta property="og:locale" content="id_ID">
 <meta property="og:site_name" content="SoundPulse">
 
 <!-- Twitter Card -->
@@ -40,18 +29,6 @@
 <meta name="twitter:title" content="SoundPulse — Streaming Musik dengan Lirik & Chat">
 <meta name="twitter:description" content="Dengerin lagu favoritmu sambil ngobrol bareng pendengar lain.">
 <meta name="twitter:image" content="https://soundpulse.duckdns.org/android-chrome-512x512.png">
-<meta name="twitter:site" content="@xs0cietyHUB">
-<meta name="twitter:creator" content="@xs0cietyHUB">
-
-<!-- Preconnect & DNS Prefetch (Biar Loading Makin Ngebut) -->
-<link rel="preconnect" href="https://cdn.tailwindcss.com" crossorigin>
-<link rel="preconnect" href="https://unpkg.com" crossorigin>
-<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-<link rel="preconnect" href="https://accounts.google.com" crossorigin>
-<link rel="dns-prefetch" href="https://cdn.tailwindcss.com">
-<link rel="dns-prefetch" href="https://unpkg.com">
-<link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
-<link rel="dns-prefetch" href="https://accounts.google.com">
 
 <link rel="icon" type="image/x-icon" href="/favicon.ico">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
@@ -283,6 +260,25 @@
     border-bottom:1px solid rgba(255,255,255,.08); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
   }
   .page-head h1 { font-size:34px; line-height:1.1; font-weight:800; letter-spacing:-.02em; margin-top:34px; }
+
+  /* ===== Sosial & Support ===== */
+  .soc-list { display:flex; flex-direction:column; gap:8px; }
+  .soc-btn { display:flex; align-items:center; gap:12px; padding:11px 12px; border-radius:16px; text-decoration:none; color:#fff;
+    background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.07); transition:background .2s ease, border-color .2s ease; }
+  .soc-btn:hover { background:rgba(255,255,255,.07); border-color:rgba(255,255,255,.14); }
+  .soc-badge { width:38px; height:38px; border-radius:12px; display:flex; align-items:center; justify-content:center; flex-shrink:0; color:#fff; }
+  .soc-badge.tt { background:#000; border:1px solid rgba(255,255,255,.18); box-shadow:-1.5px -1.5px 0 #25f4ee, 1.5px 1.5px 0 #fe2c55; }
+  .soc-badge.ig { background:linear-gradient(45deg,#f9a03f 0%,#e1306c 50%,#833ab4 100%); }
+  .soc-badge.tg { background:#229ed9; }
+  .soc-badge.sp { background:linear-gradient(135deg,#328f83 0%,#376d91 100%); }
+  .soc-ic { width:20px; height:20px; }
+  .soc-go { width:16px; height:16px; margin-left:auto; color:rgba(255,255,255,.4); flex-shrink:0; }
+  .soc-meta { min-width:0; display:flex; flex-direction:column; line-height:1.25; }
+  .soc-meta b { font-size:14.5px; font-weight:700; }
+  .soc-meta small { font-size:12.5px; color:rgba(255,255,255,.5); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .support-strip { display:flex; align-items:center; gap:12px; padding:12px 14px; margin-bottom:20px; border-radius:18px; text-decoration:none; color:#fff;
+    background:rgba(65,157,140,.12); border:1px solid rgba(65,157,140,.26); }
+  .support-strip .soc-meta small { color:rgba(255,255,255,.6); }
   .row-k { color:rgba(255,255,255,.55); } .row-v { font-weight:600; }
   .fav-box { background:rgba(255,255,255,.045); border:1px solid rgba(255,255,255,.07); border-radius:16px; padding:14px 16px; font-size:15.5px; font-weight:600; }
   .wide-btn { width:100%; padding:19px 0; border-radius:20px; background:#101012; border:1px solid rgba(255,255,255,.07);
@@ -397,7 +393,7 @@
   }
 </style>
 
-<!-- JSON-LD Structured Data Utama -->
+<!-- JSON-LD Structured Data -->
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -417,56 +413,6 @@
     "name": "xs0ciety HUB"
   },
   "image": "https://soundpulse.duckdns.org/android-chrome-512x512.png"
-}
-</script>
-
-<!-- JSON-LD Structured Data Tambahan (WebSite & Organization) -->
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@graph": [
-    {
-      "@type": "WebSite",
-      "name": "SoundPulse",
-      "url": "https://soundpulse.duckdns.org/",
-      "potentialAction": {
-        "@type": "SearchAction",
-        "target": "https://soundpulse.duckdns.org/?q={search_term_string}",
-        "query-input": "required name=search_term_string"
-      }
-    },
-    {
-      "@type": "Organization",
-      "name": "xs0ciety HUB",
-      "url": "https://soundpulse.duckdns.org/",
-      "logo": "https://soundpulse.duckdns.org/android-chrome-512x512.png",
-      "sameAs": [
-        "https://t.me/xs0cietyHUB",
-        "https://www.tiktok.com/@xprimesociety",
-        "https://www.instagram.com/xs0ciety_hub"
-      ]
-    }
-  ]
-}
-</script>
-
-<!-- JSON-LD Structured Data Author (Person) -->
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "Person",
-  "name": "xs0ciety HUB",
-  "url": "https://soundpulse.duckdns.org/",
-  "jobTitle": "Developer",
-  "worksFor": {
-    "@type": "Organization",
-    "name": "SoundPulse"
-  },
-  "sameAs": [
-    "https://t.me/xs0cietyHUB",
-    "https://www.tiktok.com/@xprimesociety",
-    "https://www.instagram.com/xs0ciety_hub"
-  ]
 }
 </script>
 
@@ -589,6 +535,12 @@ window.addEventListener("load", async () => {
         <i data-lucide="message-circle" class="w-[24px] h-[24px]"></i><span>Chat</span>
       </button>
     </div>
+
+    <a href="https://t.me/xs0cietyHUB" target="_blank" rel="noopener noreferrer" class="support-strip tap" aria-label="Hubungi support lewat Telegram">
+      <span class="soc-badge sp"><svg class="soc-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 14v-2a9 9 0 0 1 18 0v2"/><path d="M21 15.5a2.5 2.5 0 0 1-2.5 2.5H18a1 1 0 0 1-1-1v-3.5a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1z"/><path d="M3 15.5A2.5 2.5 0 0 0 5.5 18H6a1 1 0 0 0 1-1v-3.5a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1z"/><path d="M19 18v1a3 3 0 0 1-3 3h-3"/></svg></span>
+      <span class="soc-meta"><b>Butuh bantuan? Hubungi Support</b><small>Telegram &middot; @xs0cietyHUB</small></span>
+      <svg class="soc-go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7"/><path d="M8 7h9v9"/></svg>
+    </a>
 
     <div class="-mx-4 px-4 mb-6 flex gap-[6px] overflow-x-auto no-scrollbar pill-bar" id="genrePills"></div>
 
@@ -737,6 +689,25 @@ window.addEventListener("load", async () => {
         <div class="flex justify-between items-center text-[16px] pb-4 border-b border-white/[0.07] mb-4">
           <span class="row-k">Developed by</span>
           <span class="row-v flex items-center gap-2"><img src="/avatar.jpg" class="w-[30px] h-[30px] rounded-full object-cover" onerror="this.style.display='none'">xs0ciety HUB</span>
+        </div>
+        <div class="mb-2 text-[13px] font-bold tracking-wider uppercase text-white/60">Media Sosial</div>
+        <div class="soc-list pb-4 border-b border-white/[0.07] mb-4">
+          <a href="https://www.tiktok.com/@xprimesociety" target="_blank" rel="noopener noreferrer" class="soc-btn tap">
+            <span class="soc-badge tt"><svg class="soc-ic" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg></span>
+            <span class="soc-meta"><b>TikTok</b><small>@xprimesociety</small></span><svg class="soc-go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7"/><path d="M8 7h9v9"/></svg>
+          </a>
+          <a href="https://www.instagram.com/xs0ciety_hub" target="_blank" rel="noopener noreferrer" class="soc-btn tap">
+            <span class="soc-badge ig"><svg class="soc-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="2.5" width="19" height="19" rx="5.5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.6" cy="6.4" r="1" fill="currentColor" stroke="none"/></svg></span>
+            <span class="soc-meta"><b>Instagram</b><small>@xs0ciety_hub</small></span><svg class="soc-go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7"/><path d="M8 7h9v9"/></svg>
+          </a>
+          <a href="https://t.me/xprimecty" target="_blank" rel="noopener noreferrer" class="soc-btn tap">
+            <span class="soc-badge tg"><svg class="soc-ic" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg></span>
+            <span class="soc-meta"><b>Grup Telegram</b><small>t.me/xprimecty</small></span><svg class="soc-go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7"/><path d="M8 7h9v9"/></svg>
+          </a>
+          <a href="https://t.me/xs0cietyHUB" target="_blank" rel="noopener noreferrer" class="soc-btn tap">
+            <span class="soc-badge sp"><svg class="soc-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 14v-2a9 9 0 0 1 18 0v2"/><path d="M21 15.5a2.5 2.5 0 0 1-2.5 2.5H18a1 1 0 0 1-1-1v-3.5a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1z"/><path d="M3 15.5A2.5 2.5 0 0 0 5.5 18H6a1 1 0 0 0 1-1v-3.5a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1z"/><path d="M19 18v1a3 3 0 0 1-3 3h-3"/></svg></span>
+            <span class="soc-meta"><b>Kontak Developer</b><small>Telegram &middot; @xs0cietyHUB</small></span><svg class="soc-go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7"/><path d="M8 7h9v9"/></svg>
+          </a>
         </div>
         <div class="flex items-center gap-2 mb-2 text-[13px] font-bold tracking-wider uppercase text-white/60">
           <i data-lucide="heart" class="w-[15px] h-[15px] text-rose-400 fill-current"></i> Lagu yang disukai
@@ -1256,6 +1227,7 @@ async function loadAuth() {
       else localStorage.removeItem("sp_user");
     } catch {}
   } catch {
+    // offline: pakai data terakhir supaya tampilan profil tidak kosong
     try { state.user = JSON.parse(localStorage.getItem("sp_user") || "null"); } catch {}
   }
   updateProfileUI();
@@ -1333,6 +1305,7 @@ async function logout() {
   toast("Berhasil keluar");
 }
 
+// Atur bar bawah chat: kolom ketik kalau sudah login, tombol Google kalau belum
 function renderChatAuth() {
   const inChat = state.view === "chat";
   document.getElementById("chatInputBar").classList.toggle("hidden", !(inChat && state.user));
@@ -1838,6 +1811,7 @@ function resetLyrics() {
   if (fc) fc.textContent = "";
 }
 
+// Muat hanya kalau belum ada, belum sedang dimuat, dan belum tampil kotak cari manual
 function ensureLyrics() {
   if (state.lyricLines.length) {
     if (!state._lyricEls) renderLyricLines();
@@ -1884,7 +1858,7 @@ async function fetchLyrics(manual) {
   try {
     const r = await fetch("/api/lyrics?" + qs.toString());
     const d = await r.json();
-    if (myReq !== lyricReq) return;
+    if (myReq !== lyricReq) return; // lagu sudah ganti
     if (!d.success || !Array.isArray(d.lines) || !d.lines.length) throw new Error("kosong");
 
     const plain = d.lines.map(l => l.text);
@@ -1900,6 +1874,7 @@ async function fetchLyrics(manual) {
     }
     state.lyricSynced = !!d.synced;
     state.currentLyricLine = -1;
+    // bobot tiap baris (panjang teks) untuk perkiraan kalau tidak ada timestamp
     let acc = 0;
     state.lyricStarts = []; state.lyricWeights = [];
     for (const line of state.lyricLines) {
@@ -1924,17 +1899,20 @@ async function fetchLyrics(manual) {
   }
 }
 
+// tebakan awal untuk kolom cari manual
 function cleanForSearch(t) {
   return String(t.title || "").replace(/[\(\[][^\)\]]*[\)\]]/g, " ").replace(/\s+/g, " ").trim().slice(0, 80);
 }
 
+// Kira-kira berapa lama baris dinyanyikan bila data akhir baris tidak ada
 function estSingDur(text, gapToNext) {
   return Math.max(0.8, Math.min(gapToNext - 0.05, Math.max(2, text.length * 0.12)));
 }
 
+// Sisipkan penanda jeda "● ● ●" di bagian instrumental (intro, tengah lagu)
 function buildSyncedLyrics(src) {
   const texts = [], times = [], ends = [], gap = [];
-  const MIN_GAP = 5;
+  const MIN_GAP = 5; // detik instrumental minimal agar dianggap jeda
   const push = (text, t, end, isGap) => { texts.push(text); times.push(t); ends.push(end); gap.push(isGap); };
 
   if (src.length && src[0].t >= MIN_GAP + 1) push("● ● ●", 0.5, src[0].t - 0.2, true);
@@ -1959,6 +1937,7 @@ function renderLyricLines() {
   state._lyricEls = [...c.querySelectorAll(".lyric-line")];
 }
 
+// Ketuk baris lirik tersinkron -> lompat ke bagian itu
 document.getElementById("lyricContent").addEventListener("click", (e) => {
   const el = e.target.closest(".lyric-line");
   if (!el || !state.lyricTimes) return;
@@ -1975,9 +1954,13 @@ function lyricOffset(delta) {
   toast(o === 0 ? "Sinkron lirik: normal" : "Lirik " + (o > 0 ? "lebih cepat " : "lebih lambat ") + Math.abs(o).toFixed(2) + " dtk");
 }
 
-const LYRIC_LEAD = 0.2;
+/* ============================================================
+   LIRIK: loop per frame (±60x/detik) + scroll halus
+============================================================ */
+const LYRIC_LEAD = 0.2;   // tampil sedikit lebih awal supaya terasa pas dengan suara
 let _lastCT = -1, _lastPerf = 0, lyricRaf = 0, lyricScrollAnim = 0, lyricUserScrollUntil = 0;
 
+// currentTime di sebagian browser hanya naik ~4x/detik; interpolasi di antaranya
 function lyricNow() {
   const ct = audio.currentTime, now = performance.now();
   if (ct !== _lastCT) { _lastCT = ct; _lastPerf = now; return ct; }
@@ -1996,11 +1979,12 @@ function startLyricLoop() {
     lyricRaf = 0;
     if (audio.paused || document.hidden || !state.lyricLines.length || !lyricPanelVisible()) return;
     updateLyricHighlight();
-    if (!lyricRaf) lyricRaf = requestAnimationFrame(frame);
+    if (!lyricRaf) lyricRaf = requestAnimationFrame(frame); // update bisa sudah mengaktifkan loop; jangan ganda
   };
   lyricRaf = requestAnimationFrame(frame);
 }
 
+// indeks terakhir dengan arr[i] <= x
 function lastLE(arr, x) {
   let lo = 0, hi = arr.length - 1, idx = 0;
   while (lo <= hi) {
@@ -2019,7 +2003,7 @@ function scrollLyricsToActive(instant) {
   cancelAnimationFrame(lyricScrollAnim);
   lyricScrollAnim = 0;
   if (instant) { box.scrollTop = target; return; }
-  if (performance.now() < lyricUserScrollUntil) return;
+  if (performance.now() < lyricUserScrollUntil) return; // pengguna sedang scroll sendiri
 
   let last = performance.now();
   const step = (now) => {
@@ -2054,6 +2038,7 @@ function updateLyricHighlight() {
     idx = lastLE(times, t);
     const start = times[idx];
     const end = state.lyricEnds ? state.lyricEnds[idx] : start + 3;
+    // isi warna hanya selama baris itu dinyanyikan; sesudahnya penuh dan menunggu (jeda instrumental)
     frac = t < start ? 0 : Math.max(0, Math.min(1, (t - start) / Math.max(0.4, end - start)));
   } else {
     if (!audio.duration || !isFinite(audio.duration)) return;
@@ -2080,6 +2065,7 @@ function updateLyricHighlight() {
   const cur = lines[idx];
   if (cur) cur.style.setProperty("--p", (frac * 100).toFixed(1) + "%");
 
+  // pastikan loop per-frame hidup selama lagu berjalan dan panel terlihat
   if (!lyricRaf && !audio.paused && lyricPanelVisible()) startLyricLoop();
 }
 
@@ -2190,6 +2176,9 @@ window.spRecoverStream = function () {
 audio.addEventListener("play", () => setPlayIcon(true));
 audio.addEventListener("pause", () => setPlayIcon(false));
 
+/* ============================================================
+   LIKES + DOWNLOADS
+============================================================ */
 function toggleLikeById(trackId) {
   const t = state.currentTrack && state.currentTrack.id === trackId
     ? state.currentTrack
@@ -2313,6 +2302,9 @@ function renderLiked() {
   renderTrackList(state.likes, "likedList");
 }
 
+/* ============================================================
+   SEARCH
+============================================================ */
 let lastSearchQuery = "";
 function handleSearchKey(e) {
   if (e.key !== 'Enter') return;
@@ -2456,6 +2448,9 @@ function renderSearch() {
   }
 }
 
+/* ============================================================
+   LIBRARY
+============================================================ */
 let libTab = "playlists";
 function switchLibTab(tab, btn) {
   libTab = tab;
@@ -2662,6 +2657,9 @@ function deletePlaylist(i) {
   renderLibrary();
 }
 
+/* ============================================================
+   OFFLINE
+============================================================ */
 function renderOffline() {
   const el = document.getElementById("offlineList");
   document.getElementById("offlineTotal").textContent = state.downloaded.length + " LAGU TERSIMPAN";
@@ -2696,6 +2694,9 @@ function updateNetBadge() {
 window.addEventListener("online", updateNetBadge);
 window.addEventListener("offline", updateNetBadge);
 
+/* ============================================================
+   PWA
+============================================================ */
 async function clearCache() {
   if (!confirm("Bersihkan cache PWA?")) return;
   if ('caches' in window) {
@@ -2740,6 +2741,9 @@ if ('serviceWorker' in navigator) {
   });
 }
 
+/* ============================================================
+   CHAT (ala WhatsApp: balas, edit, hapus pesan sendiri)
+============================================================ */
 let _allMessages = [];
 const CHAT_CACHE_KEY = "sp_chat_cache";
 
@@ -2750,6 +2754,7 @@ function loadChatCache() {
   } catch { return []; }
 }
 
+// Cache tanpa isi foto (base64 besar) supaya localStorage tidak penuh
 function saveChatCache(msgs) {
   const slim = msgs.filter(m => !m._pending).slice(-80)
     .map(m => (m.image || m.file) ? { ...m, image: null, file: null, hadImage: !!m.image, hadFile: !!m.file } : m);
@@ -2881,6 +2886,7 @@ function msgRowHTML(m, first) {
   const nameLine = first
     ? `<div class="text-[11.5px] font-semibold mb-[2px] ml-[2px]" style="color:${color}">${esc(m.name || "")}${badge}</div>`
     : "";
+  // Foto profil + nama hanya di pesan pertama dari satu pengirim berturut-turut
   return `<div class="msg-row other ${mt}"><div class="msg-av">${av}</div><div class="min-w-0 max-w-[78%]">${nameLine}${bubble}</div></div>`;
 }
 
@@ -2907,6 +2913,7 @@ function renderChat(messages, forceScroll) {
   if (forceScroll || nearBottom) window.scrollTo(0, document.body.scrollHeight);
 }
 
+/* ---------- interaksi: tahan lama = menu, tap foto = pratinjau, tap kutipan = lompat ---------- */
 (function initChatInteractions() {
   const el = document.getElementById("chatMessages");
   let timer = null, fired = false;
@@ -2984,6 +2991,7 @@ function closeImageFull() {
   document.getElementById("imgViewerImg").src = "";
 }
 
+/* ---------- menu pesan ---------- */
 function openContextMenu(id) {
   const msg = _allMessages.find(m => m.id === id);
   if (!msg || msg.deleted) return;
@@ -3015,6 +3023,7 @@ async function copyMessage() {
   } catch { toast("Gagal menyalin"); }
 }
 
+/* ---------- balas ---------- */
 function startReplyFromMenu() {
   const id = state.contextMenuId;
   closeChatContextMenu();
@@ -3037,6 +3046,7 @@ function cancelReply() {
   document.getElementById("replyPreview").classList.add("hidden");
 }
 
+/* ---------- lampiran foto ---------- */
 function cancelAttach() {
   state.attach = null;
   document.getElementById("attachPreview").classList.add("hidden");
@@ -3098,6 +3108,7 @@ function handleChatFile(e) {
   reader.onload = (ev) => {
     const dataUrl = ev.target.result;
     if (typeof dataUrl !== "string" || dataUrl.length > 700000) { toast("File terlalu besar"); return; }
+    // Tipe tidak dikenal browser -> data URI bisa tanpa mime; beri default agar lolos validasi server
     const safe = /^data:[a-z0-9.+-]+\/[a-z0-9.+-]+;base64,/i.test(dataUrl)
       ? dataUrl
       : dataUrl.replace(/^data:[^,]*,/, "data:application/octet-stream;base64,");
@@ -3108,6 +3119,7 @@ function handleChatFile(e) {
   reader.readAsDataURL(file);
 }
 
+/* ---------- edit ---------- */
 function startEditMessage() {
   const msg = _allMessages.find(m => m.id === state.contextMenuId);
   if (!msg || !isMine(msg) || !msg.text) return;
@@ -3130,6 +3142,7 @@ function cancelEdit() {
   document.getElementById("editPreview").classList.add("hidden");
 }
 
+/* ---------- hapus ---------- */
 async function deleteMessage() {
   const msgId = state.contextMenuId;
   const msg = _allMessages.find(m => m.id === msgId);
@@ -3162,6 +3175,7 @@ async function deleteMessage() {
   }
 }
 
+/* ---------- kirim / simpan edit ---------- */
 function handleAuthLost() {
   state.user = null;
   try { localStorage.removeItem("sp_user"); } catch {}
@@ -3235,6 +3249,7 @@ async function sendChat() {
   cancelReply();
   cancelAttach();
 
+  // Tampil dulu (optimistic), nanti diganti data server
   _allMessages = [..._allMessages, {
     id: msgId, uid: state.user.uid, name: state.user.name, avatar: state.user.picture,
     admin: state.user.admin, text, image: payload.image || null, file: payload.file || null,
@@ -3262,6 +3277,9 @@ async function sendChat() {
   }
 }
 
+/* ============================================================
+   INIT
+============================================================ */
 async function initApp() {
   renderGenrePills();
   renderRecent();

@@ -261,24 +261,30 @@
   }
   .page-head h1 { font-size:34px; line-height:1.1; font-weight:800; letter-spacing:-.02em; margin-top:34px; }
 
-  /* ===== Sosial & Support ===== */
-  .soc-list { display:flex; flex-direction:column; gap:8px; }
-  .soc-btn { display:flex; align-items:center; gap:12px; padding:11px 12px; border-radius:16px; text-decoration:none; color:#fff;
-    background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.07); transition:background .2s ease, border-color .2s ease; }
-  .soc-btn:hover { background:rgba(255,255,255,.07); border-color:rgba(255,255,255,.14); }
-  .soc-badge { width:38px; height:38px; border-radius:12px; display:flex; align-items:center; justify-content:center; flex-shrink:0; color:#fff; }
-  .soc-badge.tt { background:#000; border:1px solid rgba(255,255,255,.18); box-shadow:-1.5px -1.5px 0 #25f4ee, 1.5px 1.5px 0 #fe2c55; }
-  .soc-badge.ig { background:linear-gradient(45deg,#f9a03f 0%,#e1306c 50%,#833ab4 100%); }
-  .soc-badge.tg { background:#229ed9; }
-  .soc-badge.sp { background:linear-gradient(135deg,#328f83 0%,#376d91 100%); }
-  .soc-ic { width:20px; height:20px; }
-  .soc-go { width:16px; height:16px; margin-left:auto; color:rgba(255,255,255,.4); flex-shrink:0; }
-  .soc-meta { min-width:0; display:flex; flex-direction:column; line-height:1.25; }
-  .soc-meta b { font-size:14.5px; font-weight:700; }
-  .soc-meta small { font-size:12.5px; color:rgba(255,255,255,.5); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-  .support-strip { display:flex; align-items:center; gap:12px; padding:12px 14px; margin-bottom:20px; border-radius:18px; text-decoration:none; color:#fff;
-    background:rgba(65,157,140,.12); border:1px solid rgba(65,157,140,.26); }
-  .support-strip .soc-meta small { color:rgba(255,255,255,.6); }
+  .sm-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .sm-item { position:relative; display:flex; flex-direction:column; gap:12px; padding:14px; border-radius:18px;
+    color:#fff; text-decoration:none; background:#101012; border:1px solid rgba(255,255,255,.09); }
+  .sm-item.tt { border-color:rgba(37,244,238,.25); }
+  .sm-item.ig { border-color:rgba(225,48,108,.28); }
+  .sm-item.tg { border-color:rgba(34,158,217,.30); }
+  .sm-item.kt { border-color:rgba(65,157,140,.30); }
+  .sm-icon { width:42px; height:42px; border-radius:13px; display:flex; align-items:center; justify-content:center; color:#fff; }
+  .sm-icon.tt { background:#0a0a0a; border:1px solid rgba(255,255,255,.14); }
+  .sm-icon.tt .sm-ic { filter:drop-shadow(-1.2px -1px 0 #25f4ee) drop-shadow(1.2px 1px 0 #fe2c55); }
+  .sm-icon.ig { background:radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%); }
+  .sm-icon.tg { background:linear-gradient(180deg,#37aee2,#1e96c8); }
+  .sm-icon.kt { background:linear-gradient(135deg,#3aa595,#376d91); }
+  .sm-ic { width:22px; height:22px; }
+  .sm-go { position:absolute; top:14px; right:12px; width:16px; height:16px; color:rgba(255,255,255,.35); }
+  .sm-txt { display:flex; flex-direction:column; min-width:0; line-height:1.3; }
+  .sm-txt b { font-size:14.5px; font-weight:700; }
+  .sm-txt small { font-size:12px; color:rgba(255,255,255,.55); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .sm-bar { display:flex; align-items:center; gap:13px; padding:11px 14px 11px 12px; margin-bottom:20px; border-radius:18px;
+    color:#fff; text-decoration:none; background:transparent; border:1px solid rgba(255,255,255,.14); }
+  .sm-bar .sm-icon { width:36px; height:36px; background:none; border:0; border-radius:0; }
+  .sm-bar .sm-ic { width:28px; height:28px; }
+  .sm-bar .sm-go { position:static; margin-left:auto; width:18px; height:18px; }
+  @media (max-width:340px) { .sm-grid { grid-template-columns:1fr; } }
   .row-k { color:rgba(255,255,255,.55); } .row-v { font-weight:600; }
   .fav-box { background:rgba(255,255,255,.045); border:1px solid rgba(255,255,255,.07); border-radius:16px; padding:14px 16px; font-size:15.5px; font-weight:600; }
   .wide-btn { width:100%; padding:19px 0; border-radius:20px; background:#101012; border:1px solid rgba(255,255,255,.07);
@@ -536,10 +542,10 @@ window.addEventListener("load", async () => {
       </button>
     </div>
 
-    <a href="https://t.me/xs0cietyHUB" target="_blank" rel="noopener noreferrer" class="support-strip tap" aria-label="Hubungi support lewat Telegram">
-      <span class="soc-badge sp"><svg class="soc-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 14v-2a9 9 0 0 1 18 0v2"/><path d="M21 15.5a2.5 2.5 0 0 1-2.5 2.5H18a1 1 0 0 1-1-1v-3.5a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1z"/><path d="M3 15.5A2.5 2.5 0 0 0 5.5 18H6a1 1 0 0 0 1-1v-3.5a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1z"/><path d="M19 18v1a3 3 0 0 1-3 3h-3"/></svg></span>
-      <span class="soc-meta"><b>Butuh bantuan? Hubungi Support</b><small>Telegram &middot; @xs0cietyHUB</small></span>
-      <svg class="soc-go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7"/><path d="M8 7h9v9"/></svg>
+    <a href="https://t.me/xs0cietyHUB" target="_blank" rel="noopener noreferrer" class="sm-bar tap">
+      <span class="sm-icon"><svg class="sm-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-5Zm0 0a9 9 0 1 1 18 0m0 0v5a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3Z"/><path d="M21 16v2a4 4 0 0 1-4 4h-5"/></svg></span>
+      <span class="sm-txt"><b>Butuh bantuan? Hubungi Support</b><small>Telegram &middot; @xs0cietyHUB</small></span>
+      <svg class="sm-go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg>
     </a>
 
     <div class="-mx-4 px-4 mb-6 flex gap-[6px] overflow-x-auto no-scrollbar pill-bar" id="genrePills"></div>
@@ -690,23 +696,23 @@ window.addEventListener("load", async () => {
           <span class="row-k">Developed by</span>
           <span class="row-v flex items-center gap-2"><img src="/avatar.jpg" class="w-[30px] h-[30px] rounded-full object-cover" onerror="this.style.display='none'">xs0ciety HUB</span>
         </div>
-        <div class="mb-2 text-[13px] font-bold tracking-wider uppercase text-white/60">Media Sosial</div>
-        <div class="soc-list pb-4 border-b border-white/[0.07] mb-4">
-          <a href="https://www.tiktok.com/@xprimesociety" target="_blank" rel="noopener noreferrer" class="soc-btn tap">
-            <span class="soc-badge tt"><svg class="soc-ic" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg></span>
-            <span class="soc-meta"><b>TikTok</b><small>@xprimesociety</small></span><svg class="soc-go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7"/><path d="M8 7h9v9"/></svg>
+        <div class="mb-3 text-[13px] font-bold tracking-wider uppercase text-white/60">Media Sosial</div>
+        <div class="sm-grid pb-5 border-b border-white/[0.07] mb-4">
+          <a href="https://www.tiktok.com/@xprimesociety" target="_blank" rel="noopener noreferrer" class="sm-item tt tap">
+            <span class="sm-icon tt"><svg class="sm-ic" viewBox="0 0 24 24" fill="currentColor"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg></span><svg class="sm-go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg>
+            <span class="sm-txt"><b>TikTok</b><small>@xprimesociety</small></span>
           </a>
-          <a href="https://www.instagram.com/xs0ciety_hub" target="_blank" rel="noopener noreferrer" class="soc-btn tap">
-            <span class="soc-badge ig"><svg class="soc-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="2.5" width="19" height="19" rx="5.5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.6" cy="6.4" r="1" fill="currentColor" stroke="none"/></svg></span>
-            <span class="soc-meta"><b>Instagram</b><small>@xs0ciety_hub</small></span><svg class="soc-go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7"/><path d="M8 7h9v9"/></svg>
+          <a href="https://www.instagram.com/xs0ciety_hub" target="_blank" rel="noopener noreferrer" class="sm-item ig tap">
+            <span class="sm-icon ig"><svg class="sm-ic" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C8.74 0 8.333.015 7.053.072 5.775.132 4.905.333 4.14.63c-.789.306-1.459.717-2.126 1.384S.935 3.35.63 4.14C.333 4.905.131 5.775.072 7.053.012 8.333 0 8.74 0 12s.015 3.667.072 4.947c.06 1.277.261 2.148.558 2.913.306.788.717 1.459 1.384 2.126.667.666 1.336 1.079 2.126 1.384.766.296 1.636.499 2.913.558C8.333 23.988 8.74 24 12 24s3.667-.015 4.947-.072c1.277-.06 2.148-.262 2.913-.558.788-.306 1.459-.718 2.126-1.384.666-.667 1.079-1.335 1.384-2.126.296-.765.499-1.636.558-2.913.06-1.28.072-1.687.072-4.947s-.015-3.667-.072-4.947c-.06-1.277-.262-2.149-.558-2.913-.306-.789-.718-1.459-1.384-2.126C21.319 1.347 20.651.935 19.86.63c-.765-.297-1.636-.499-2.913-.558C15.667.012 15.26 0 12 0zm0 2.16c3.203 0 3.585.016 4.85.071 1.17.055 1.805.249 2.227.415.562.217.96.477 1.382.896.419.42.679.819.896 1.381.164.422.36 1.057.413 2.227.057 1.266.07 1.646.07 4.85s-.015 3.585-.074 4.85c-.061 1.17-.256 1.805-.421 2.227-.224.562-.479.96-.899 1.382-.419.419-.824.679-1.38.896-.42.164-1.065.36-2.235.413-1.274.057-1.649.07-4.859.07-3.211 0-3.586-.015-4.859-.074-1.171-.061-1.816-.256-2.236-.421-.569-.224-.96-.479-1.379-.899-.421-.419-.69-.824-.9-1.38-.165-.42-.359-1.065-.42-2.235-.045-1.26-.061-1.649-.061-4.844 0-3.196.016-3.586.061-4.861.061-1.17.255-1.814.42-2.234.21-.57.479-.96.9-1.381.419-.419.81-.689 1.379-.898.42-.166 1.051-.361 2.221-.421 1.275-.045 1.65-.06 4.859-.06l.045.03zm0 3.678c-3.405 0-6.162 2.76-6.162 6.162 0 3.405 2.76 6.162 6.162 6.162 3.405 0 6.162-2.76 6.162-6.162 0-3.405-2.76-6.162-6.162-6.162zM12 16c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4zm7.846-10.405c0 .795-.646 1.44-1.44 1.44-.795 0-1.44-.646-1.44-1.44 0-.794.646-1.439 1.44-1.439.793-.001 1.44.645 1.44 1.439z"/></svg></span><svg class="sm-go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg>
+            <span class="sm-txt"><b>Instagram</b><small>@xs0ciety_hub</small></span>
           </a>
-          <a href="https://t.me/xprimecty" target="_blank" rel="noopener noreferrer" class="soc-btn tap">
-            <span class="soc-badge tg"><svg class="soc-ic" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg></span>
-            <span class="soc-meta"><b>Grup Telegram</b><small>t.me/xprimecty</small></span><svg class="soc-go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7"/><path d="M8 7h9v9"/></svg>
+          <a href="https://t.me/xprimecty" target="_blank" rel="noopener noreferrer" class="sm-item tg tap">
+            <span class="sm-icon tg"><svg class="sm-ic" viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg></span><svg class="sm-go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg>
+            <span class="sm-txt"><b>Grup Telegram</b><small>t.me/xprimecty</small></span>
           </a>
-          <a href="https://t.me/xs0cietyHUB" target="_blank" rel="noopener noreferrer" class="soc-btn tap">
-            <span class="soc-badge sp"><svg class="soc-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 14v-2a9 9 0 0 1 18 0v2"/><path d="M21 15.5a2.5 2.5 0 0 1-2.5 2.5H18a1 1 0 0 1-1-1v-3.5a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1z"/><path d="M3 15.5A2.5 2.5 0 0 0 5.5 18H6a1 1 0 0 0 1-1v-3.5a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1z"/><path d="M19 18v1a3 3 0 0 1-3 3h-3"/></svg></span>
-            <span class="soc-meta"><b>Kontak Developer</b><small>Telegram &middot; @xs0cietyHUB</small></span><svg class="soc-go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7"/><path d="M8 7h9v9"/></svg>
+          <a href="https://t.me/xs0cietyHUB" target="_blank" rel="noopener noreferrer" class="sm-item kt tap">
+            <span class="sm-icon kt"><svg class="sm-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span><svg class="sm-go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg>
+            <span class="sm-txt"><b>Kontak</b><small>@xs0cietyHUB</small></span>
           </a>
         </div>
         <div class="flex items-center gap-2 mb-2 text-[13px] font-bold tracking-wider uppercase text-white/60">

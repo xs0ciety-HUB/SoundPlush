@@ -572,7 +572,7 @@ window.addEventListener("load", async () => {
           Refresh <i data-lucide="refresh-cw" class="w-[11px] h-[11px]"></i>
         </button>
       </div>
-      <div id="quickPicksGrid" class="space-y-2">
+      <div id="quickPicksGrid" class="space-y-2 max-h-[340px] overflow-y-auto overscroll-contain no-scrollbar">
         <div class="text-white/35 text-[12px] py-8 text-center">Memuat lagu...</div>
       </div>
     </section>
@@ -1382,13 +1382,43 @@ async function loadQuickPicks(query) {
     return;
   }
   try {
-    const data = await apiClient.search(query);
-    const tracks = (data.collection || []).filter(t => t && t.title).slice(0, 20);
+    let tracks = [];
+    if (query === "Indonesian Pop Hits") tracks = await loadMixedPicks();
+    if (!tracks.length) {
+      const data = await apiClient.search(query);
+      tracks = (data.collection || []).filter(t => t && t.title).slice(0, 20);
+    }
     state.tracks = tracks;
     renderTrackList(tracks, "quickPicksGrid");
   } catch (e) {
     grid.innerHTML = `<div class="text-red-400/80 text-[12px] py-6 text-center">Gagal memuat: ${esc(e.message)}</div>`;
   }
+}
+
+// Campuran lagu "Buat kamu": ada Hindia + indie + pop, tanpa dangdut/DJ/remix
+const PICKS_BLOCK = /\b(dj|remix|dangdut|koplo|jedag|jedug|breakbeat|fullbass|slowed)\b/i;
+async function loadMixedPicks() {
+  const queries = ["Hindia", "indie indonesia", "pop indonesia", "lagu galau indonesia"];
+  const results = await Promise.allSettled(queries.map(q => apiClient.search(q)));
+  const lists = results.map(r => r.status === "fulfilled"
+    ? (r.value.collection || []).filter(t => t && t.title && !PICKS_BLOCK.test(t.title))
+    : []);
+  // Prioritaskan lagu yang memang dari Hindia
+  const hindia = lists[0].filter(t => /hindia/i.test((t.user && t.user.username) || ""));
+  if (hindia.length) lists[0] = hindia;
+  const seen = new Set(), out = [];
+  for (let i = 0; out.length < 12; i++) {
+    let any = false;
+    for (const l of lists) {
+      if (i < l.length) {
+        any = true;
+        const t = l[i];
+        if (!seen.has(t.id) && out.length < 12) { seen.add(t.id); out.push(t); }
+      }
+    }
+    if (!any) break;
+  }
+  return out;
 }
 
 function renderTrackList(list, containerId) {
@@ -1476,6 +1506,7 @@ async function loadPopularPlaylists() {
 
 async function openPlaylist(id, title) {
   toast("Membuka: " + title);
+  if (state.view === "search") return openPlaylistInSearch(id, title);
   switchView("home");
   const grid = document.getElementById("quickPicksGrid");
   grid.innerHTML = `<div class="flex justify-center py-10"><div class="spinner"></div></div>`;
@@ -1489,12 +1520,56 @@ async function openPlaylist(id, title) {
   } catch (e) { grid.innerHTML = `<div class="text-red-400/80 text-[12px] py-6 text-center">Gagal: ${esc(e.message)}</div>`; }
 }
 
+// Buka playlist langsung di halaman pencarian (tidak pindah ke beranda)
+async function openPlaylistInSearch(id, title) {
+  searchRunId++; // batalkan pencarian yang masih berjalan
+  const el = document.getElementById("searchResults");
+  el.innerHTML = `
+    <button onclick="closeSearchPlaylist()" class="text-[12px] text-white/50 flex items-center gap-1 mb-4 tap">
+      <i data-lucide="chevron-left" class="w-[16px] h-[16px]"></i> Kembali ke pencarian
+    </button>
+    <h2 class="text-[18px] font-extrabold mb-3 truncate">${esc(title)}</h2>
+    <div id="searchPlaylistTracks" class="space-y-2"><div class="flex justify-center py-10"><div class="spinner"></div></div></div>`;
+  lucide.createIcons();
+  window.scrollTo({ top: 0 });
+  try {
+    const data = await apiClient.getPlaylistTracks(id);
+    const tracks = (data.collection || []).filter(t => t && t.title);
+    state.tracks = tracks;
+    renderTrackList(tracks, "searchPlaylistTracks");
+  } catch (e) {
+    const box = document.getElementById("searchPlaylistTracks");
+    if (box) box.innerHTML = `<div class="text-red-400/80 text-[12px] py-6 text-center">Gagal: ${esc(e.message)}</div>`;
+  }
+}
+
+function closeSearchPlaylist() {
+  const el = document.getElementById("searchResults");
+  if (state.searchType === "playlists" && lastSearchPlaylists.length) {
+    el.innerHTML = `<div class="grid grid-cols-2 gap-3">${lastSearchPlaylists.map((p, i) => searchPlaylistCard(p, i, true)).join("")}</div>`;
+    lucide.createIcons();
+  } else if (state.searchType === "tracks" && (lastSearchData.length || lastSearchPlaylists.length)) {
+    renderSearch();
+    lucide.createIcons();
+  } else if (lastSearchQuery) {
+    doSearch(lastSearchQuery);
+  }
+}
+
 async function loadTopArtists() {
   const row = document.getElementById("artistsRow");
   if (!apiClient) { row.innerHTML = `<div class="shrink-0 text-red-400/70 text-[12px] py-4">API client tidak siap</div>`; return; }
   try {
-    const data = await apiClient.searchArtists("indonesia");
-    const artists = (data.collection || []).filter(a => a && a.username).slice(0, 12);
+    const [data, hRes] = await Promise.all([
+      apiClient.searchArtists("indonesia"),
+      apiClient.searchArtists("Hindia").catch(() => null),
+    ]);
+    let artists = (data.collection || []).filter(a => a && a.username).slice(0, 12);
+    // Artis favorit: Hindia selalu di urutan pertama
+    const hList = ((hRes && hRes.collection) || []).filter(a => a && a.username);
+    let hindia = hList.find(a => /^hindia$/i.test(a.username)) || hList.find(a => /hindia/i.test(a.username));
+    if (!hindia) hindia = { username: "Hindia", avatar_url: null, followers_count: 0 };
+    artists = [hindia, ...artists.filter(a => !/hindia/i.test(a.username))].slice(0, 12);
     if (!artists.length) { row.innerHTML = `<div class="shrink-0 text-white/35 text-[12px] py-4">Artis tidak tersedia</div>`; return; }
     row.innerHTML = artists.map((a, idx) => {
       const art = a.avatar_url;
